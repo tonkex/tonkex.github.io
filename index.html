@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>tonkex projects</title>
+    <meta
+      name="description"
+      content="A small index of public projects, notes, guides, and demos by tonkex."
+    />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap header-grid">
+        <div>
+          <p class="eyebrow">tonkex.github.io</p>
+          <h1>Projects, guides, and demos</h1>
+          <p class="lead">
+            공개해 둔 학습 자료, 실험, 문서 사이트를 한 곳에서 찾아갈 수 있도록 만든
+            개인 프로젝트 인덱스입니다.
+          </p>
+        </div>
+        <nav class="quick-links" aria-label="Quick links">
+          <a href="#guides">Guides</a>
+          <a href="#learning">Learning</a>
+          <a href="#research">Research</a>
+          <a href="#robotics">Robotics</a>
+          <a href="https://github.com/tonkex">GitHub</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <section id="guides" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Guides</p>
+          <h2>읽기 좋은 문서</h2>
+        </div>
+        <div class="cards">
+          <article class="card featured">
+            <div>
+              <p class="tag">LLM Systems</p>
+              <h3>LLM 추론 및 추론 병렬화 가이드북</h3>
+              <p>
+                KV cache, prefill/decode, batching, tensor parallelism, context
+                parallelism, serving 지표를 개발자 관점에서 정리한 가이드입니다.
+              </p>
+            </div>
+            <div class="actions">
+              <a class="primary" href="https://tonkex.github.io/llm-inference-parallelism-guide/">Read</a>
+              <a href="https://github.com/tonkex/llm-inference-parallelism-guide">Repo</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="learning" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Learning</p>
+          <h2>학습 사이트</h2>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <div>
+              <p class="tag">Deep Learning</p>
+              <h3>밑바닥부터 시작하는 딥러닝 1</h3>
+              <p>딥러닝 기초를 인터랙티브하게 학습하기 위한 사이트입니다.</p>
+            </div>
+            <div class="actions">
+              <a class="primary" href="https://tonkex.github.io/dlfs1-learning/">Open</a>
+              <a href="https://github.com/tonkex/dlfs1-learning">Repo</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div>
+              <p class="tag">Generative AI</p>
+              <h3>Diffusion Learning</h3>
+              <p>Diffusion model 관련 학습 자료와 실험을 모아 둔 프로젝트입니다.</p>
+            </div>
+            <div class="actions">
+              <a class="primary" href="https://tonkex.github.io/diffusion-learning/">Open</a>
+              <a href="https://github.com/tonkex/diffusion-learning">Repo</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="research" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Research</p>
+          <h2>연구와 참고 프로젝트</h2>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <div>
+              <p class="tag">Reinforcement Learning</p>
+              <h3>FlashSAC</h3>
+              <p>High-dimensional robot control을 위한 fast and stable off-policy RL 프로젝트입니다.</p>
+            </div>
+            <div class="actions">
+              <a class="primary" href="https://holiday-robot.github.io/FlashSAC/">Open</a>
+              <a href="https://github.com/tonkex/FlashSAC">Repo</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div>
+              <p class="tag">MPC</p>
+              <h3>NARRATE</h3>
+              <p>NARRATE 논문 구현과 관련 자료를 확인할 수 있는 프로젝트입니다.</p>
+            </div>
+            <div class="actions">
+              <a class="primary" href="https://narrate-mpc.github.io/">Open</a>
+              <a href="https://github.com/tonkex/narrate">Repo</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div>
+              <p class="tag">Local AI</p>
+              <h3>exo</h3>
+              <p>Frontier AI를 로컬에서 실행하기 위한 공개 프로젝트입니다.</p>
+            </div>
+            <div class="actions">
+              <a href="https://github.com/tonkex/exo">Repo</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="robotics" class="section">
+        <div class="section-heading">
+          <p class="eyebrow">Robotics</p>
+          <h2>로보틱스와 시뮬레이션</h2>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <div>
+              <p class="tag">Jetson</p>
+              <h3>Jetson Copilot</h3>
+              <p>LLM과 RAG를 활용한 로컬 AI assistant reference application입니다.</p>
+            </div>
+            <div class="actions">
+              <a href="https://github.com/tonkex/jetson-copilot">Repo</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div>
+              <p class="tag">ROS</p>
+              <h3>ROS-LLM</h3>
+              <p>ROS 환경에서 LLM 기반 의사결정과 자연어 상호작용을 연결하는 프로젝트입니다.</p>
+            </div>
+            <div class="actions">
+              <a href="https://github.com/tonkex/ROS-LLM">Repo</a>
+            </div>
+          </article>
+
+          <article class="card">
+            <div>
+              <p class="tag">Simulation</p>
+              <h3>PyBullet Projects</h3>
+              <p>Bin picking, URDF models, robot simulation 관련 공개 저장소들입니다.</p>
+            </div>
+            <div class="actions">
+              <a href="https://github.com/tonkex/Bin-Picking-Simulation-using-Pybullet">Bin Picking</a>
+              <a href="https://github.com/tonkex/pybullet-URDF-models">URDF Models</a>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap footer-grid">
+        <p>Maintained by <a href="https://github.com/tonkex">tonkex</a>.</p>
+        <p>새 프로젝트를 추가할 때는 이 페이지에 카드 하나를 더하면 됩니다.</p>
+      </div>
+    </footer>
+  </body>
+</html>
