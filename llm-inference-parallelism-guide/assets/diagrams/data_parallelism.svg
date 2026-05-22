@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="460" viewBox="0 0 960 460" role="img" aria-labelledby="title desc">
+  <title id="title">Data Parallelism</title>
+  <desc id="desc">Multiple identical model replicas on separate GPUs process different user requests.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .h{font:700 22px sans-serif;fill:#0f172a}
+      .t{font:500 16px sans-serif;fill:#475569}
+      .req{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:10}
+      .gpu{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:12}
+      .lb{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:12}
+      .arrow{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="960" height="460" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">Data Parallelism: 같은 모델 replica가 서로 다른 요청을 처리</text>
+
+  <rect x="70" y="105" width="155" height="58" class="req"/>
+  <text x="147" y="141" text-anchor="middle" class="h">Request A</text>
+  <rect x="70" y="190" width="155" height="58" class="req"/>
+  <text x="147" y="226" text-anchor="middle" class="h">Request B</text>
+  <rect x="70" y="275" width="155" height="58" class="req"/>
+  <text x="147" y="311" text-anchor="middle" class="h">Request C</text>
+
+  <path d="M225 134 H352" class="arrow"/>
+  <path d="M225 219 H352" class="arrow"/>
+  <path d="M225 304 H352" class="arrow"/>
+
+  <rect x="355" y="180" width="180" height="92" class="lb"/>
+  <text x="445" y="218" text-anchor="middle" class="h">Load balancer</text>
+  <text x="445" y="246" text-anchor="middle" class="t">요청 분산</text>
+
+  <path d="M535 226 C590 140,615 118,662 118" class="arrow"/>
+  <path d="M535 226 H662" class="arrow"/>
+  <path d="M535 226 C590 312,615 334,662 334" class="arrow"/>
+
+  <rect x="665" y="80" width="210" height="76" class="gpu"/>
+  <text x="770" y="111" text-anchor="middle" class="h">GPU 0</text>
+  <text x="770" y="137" text-anchor="middle" class="t">Model replica</text>
+  <rect x="665" y="188" width="210" height="76" class="gpu"/>
+  <text x="770" y="219" text-anchor="middle" class="h">GPU 1</text>
+  <text x="770" y="245" text-anchor="middle" class="t">Model replica</text>
+  <rect x="665" y="296" width="210" height="76" class="gpu"/>
+  <text x="770" y="327" text-anchor="middle" class="h">GPU 2</text>
+  <text x="770" y="353" text-anchor="middle" class="t">Model replica</text>
+</svg>

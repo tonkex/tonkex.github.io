@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" role="img" aria-labelledby="title desc">
+  <title id="title">KV cache growth</title>
+  <desc id="desc">KV cache memory grows linearly as context length and batch size increase.</desc>
+  <style>
+    .h{font:700 22px sans-serif;fill:#0f172a}
+    .t{font:500 16px sans-serif;fill:#475569}
+    .axis{stroke:#334155;stroke-width:3}
+    .grid{stroke:#e2e8f0;stroke-width:1}
+    .line1{stroke:#0369a1;stroke-width:4;fill:none}
+    .line2{stroke:#15803d;stroke-width:4;fill:none}
+    .dot1{fill:#0369a1}
+    .dot2{fill:#15803d}
+  </style>
+  <rect width="960" height="500" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">KV cache 메모리는 context length와 batch size에 선형 증가</text>
+  <line x1="120" y1="400" x2="840" y2="400" class="axis"/>
+  <line x1="120" y1="400" x2="120" y2="100" class="axis"/>
+  <text x="480" y="450" text-anchor="middle" class="h">Context length</text>
+  <text x="58" y="250" text-anchor="middle" class="h" transform="rotate(-90 58 250)">KV cache memory</text>
+
+  <line x1="120" y1="325" x2="840" y2="325" class="grid"/>
+  <line x1="120" y1="250" x2="840" y2="250" class="grid"/>
+  <line x1="120" y1="175" x2="840" y2="175" class="grid"/>
+  <line x1="300" y1="100" x2="300" y2="400" class="grid"/>
+  <line x1="480" y1="100" x2="480" y2="400" class="grid"/>
+  <line x1="660" y1="100" x2="660" y2="400" class="grid"/>
+
+  <polyline points="140,370 300,330 480,285 660,240 820,200" class="line1"/>
+  <polyline points="140,340 300,270 480,200 660,130 820,105" class="line2"/>
+
+  <circle cx="820" cy="200" r="7" class="dot1"/>
+  <circle cx="820" cy="105" r="7" class="dot2"/>
+  <text x="650" y="218" class="t">Batch size = 1</text>
+  <text x="650" y="122" class="t">Batch size가 더 큰 경우</text>
+  <text x="132" y="425" text-anchor="middle" class="t">짧음</text>
+  <text x="820" y="425" text-anchor="middle" class="t">김</text>
+</svg>

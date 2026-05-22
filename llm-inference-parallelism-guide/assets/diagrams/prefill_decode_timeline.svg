@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="430" viewBox="0 0 960 430" role="img" aria-labelledby="title desc">
+  <title id="title">Prefill and decode timeline</title>
+  <desc id="desc">Prefill processes the whole prompt and determines time to first token. Decode repeatedly generates one output token at a time.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .h{font:700 22px sans-serif;fill:#0f172a}
+      .t{font:500 16px sans-serif;fill:#475569}
+      .axis{stroke:#334155;stroke-width:3;marker-end:url(#arrow)}
+      .prefill{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:10}
+      .decode{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:10}
+      .mark{stroke:#64748b;stroke-width:2;stroke-dasharray:6 6}
+    </style>
+  </defs>
+  <rect width="960" height="430" fill="#fff"/>
+  <text x="480" y="55" text-anchor="middle" class="h">LLM 요청 처리 시간선</text>
+  <line x1="90" y1="235" x2="880" y2="235" class="axis"/>
+  <text x="880" y="265" text-anchor="middle" class="t">time</text>
+
+  <rect x="110" y="145" width="260" height="78" class="prefill"/>
+  <text x="240" y="178" text-anchor="middle" class="h">Prefill</text>
+  <text x="240" y="204" text-anchor="middle" class="t">prompt 전체 처리 + KV cache 생성</text>
+
+  <line x1="370" y1="115" x2="370" y2="278" class="mark"/>
+  <text x="370" y="100" text-anchor="middle" class="h">TTFT</text>
+  <text x="370" y="303" text-anchor="middle" class="t">첫 token 도착</text>
+
+  <rect x="410" y="145" width="82" height="78" class="decode"/>
+  <rect x="506" y="145" width="82" height="78" class="decode"/>
+  <rect x="602" y="145" width="82" height="78" class="decode"/>
+  <rect x="698" y="145" width="82" height="78" class="decode"/>
+  <text x="451" y="178" text-anchor="middle" class="h">D1</text>
+  <text x="547" y="178" text-anchor="middle" class="h">D2</text>
+  <text x="643" y="178" text-anchor="middle" class="h">D3</text>
+  <text x="739" y="178" text-anchor="middle" class="h">D4</text>
+  <text x="595" y="322" text-anchor="middle" class="h">Decode 반복</text>
+  <text x="595" y="350" text-anchor="middle" class="t">각 단계에서 output token 하나 생성</text>
+  <text x="499" y="112" text-anchor="middle" class="t">TPOT</text>
+  <line x1="492" y1="126" x2="506" y2="126" stroke="#334155" stroke-width="2"/>
+</svg>

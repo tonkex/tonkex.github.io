@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-labelledby="title desc">
+  <title id="title">Transformer block overview</title>
+  <desc id="desc">Token embeddings pass through repeated transformer blocks made of self-attention and MLP layers, then an output head produces logits.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .h{font:700 22px sans-serif;fill:#0f172a}
+      .t{font:500 16px sans-serif;fill:#475569}
+      .box{fill:#f8fafc;stroke:#334155;stroke-width:2;rx:12}
+      .attn{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:12}
+      .mlp{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:12}
+      .out{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:12}
+      .arrow{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+      .dash{stroke:#64748b;stroke-width:2;stroke-dasharray:8 8;fill:none}
+    </style>
+  </defs>
+  <rect width="960" height="520" fill="#fff"/>
+  <rect x="55" y="208" width="150" height="88" class="box"/>
+  <text x="130" y="244" text-anchor="middle" class="h">Tokens</text>
+  <text x="130" y="272" text-anchor="middle" class="t">token id sequence</text>
+  <path d="M205 252 H270" class="arrow"/>
+
+  <rect x="272" y="208" width="170" height="88" class="box"/>
+  <text x="357" y="244" text-anchor="middle" class="h">Embedding</text>
+  <text x="357" y="272" text-anchor="middle" class="t">vector로 변환</text>
+  <path d="M442 252 H505" class="arrow"/>
+
+  <rect x="506" y="70" width="250" height="364" class="dash"/>
+  <text x="631" y="104" text-anchor="middle" class="h">Transformer block x N</text>
+
+  <rect x="540" y="138" width="182" height="86" class="attn"/>
+  <text x="631" y="174" text-anchor="middle" class="h">Self-attention</text>
+  <text x="631" y="202" text-anchor="middle" class="t">context를 참조</text>
+  <path d="M631 224 V272" class="arrow"/>
+
+  <rect x="540" y="274" width="182" height="86" class="mlp"/>
+  <text x="631" y="310" text-anchor="middle" class="h">MLP</text>
+  <text x="631" y="338" text-anchor="middle" class="t">token별 변환</text>
+  <path d="M756 252 H820" class="arrow"/>
+
+  <rect x="820" y="208" width="100" height="88" class="out"/>
+  <text x="870" y="244" text-anchor="middle" class="h">Logits</text>
+  <text x="870" y="272" text-anchor="middle" class="t">다음 token</text>
+</svg>

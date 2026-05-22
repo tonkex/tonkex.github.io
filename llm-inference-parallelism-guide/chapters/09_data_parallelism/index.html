@@ -1,0 +1,2842 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="개발자를 위한 LLM 추론 시스템과 병렬화 입문서">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/llm-inference-parallelism-guide/chapters/09_data_parallelism/">
+
+
+        <link rel="prev" href="../08_why_parallelism/">
+
+
+        <link rel="next" href="../10_tensor_parallelism/">
+
+
+
+
+
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>9장. Data Parallelism - LLM 추론 및 추론 병렬화 가이드북</title>
+
+
+
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+      <link rel="stylesheet" href="../../stylesheets/site-navigation.css">
+
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#9-data-parallelism" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="LLM 추론 및 추론 병렬화 가이드북" class="md-header__button md-logo" aria-label="LLM 추론 및 추론 병렬화 가이드북" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LLM 추론 및 추론 병렬화 가이드북
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              9장. Data Parallelism
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LLM 추론 및 추론 병렬화 가이드북" class="md-nav__button md-logo" aria-label="LLM 추론 및 추론 병렬화 가이드북" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LLM 추론 및 추론 병렬화 가이드북
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    시작하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    1부. LLM 추론을 이해하기 위한 최소 배경
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    1부. LLM 추론을 이해하기 위한 최소 배경
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../parts/part_01/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    개요
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../01_what_is_llm_inference/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    1장. LLM 추론이란 무엇인가
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../02_transformer_inference_overview/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    2장. Transformer 추론의 큰 그림
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../03_token_context_sequence_length/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    3장. Token, Context, Sequence Length
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    2부. 단일 GPU 추론의 핵심 원리
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    2부. 단일 GPU 추론의 핵심 원리
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../parts/part_02/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    개요
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../04_prefill_and_decode/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    4장. Prefill과 Decode
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05_kv_cache/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. KV Cache
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06_attention_optimization_intro/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. Attention 최적화 입문
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07_sampling_and_output_control/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Sampling과 출력 제어
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    3부. LLM 추론 병렬화의 기본 개념
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    3부. LLM 추론 병렬화의 기본 개념
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../parts/part_03/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    개요
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08_why_parallelism/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. 왜 병렬화가 필요한가
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. Data Parallelism
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. Data Parallelism
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        학습 목표
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#91-data-parallel" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.1 Data Parallel의 정의
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="9.1 Data Parallel의 정의">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#911-replica-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.1.1 모델 replica를 여러 GPU에 올린다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#912-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.1.2 서로 다른 요청을 서로 다른 GPU가 처리한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#913-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.1.3 가장 직관적인 throughput 확장 방식이다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#92-data-parallel" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.2 언제 Data Parallel이 적합한가
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="9.2 언제 Data Parallel이 적합한가">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#921-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.2.1 모델이 GPU 하나에 들어가는 경우
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#922" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.2.2 요청 수가 많은 경우
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#923-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.2.3 GPU 간 통신을 줄이고 싶은 경우
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#93-data-parallel" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.3 Data Parallel의 한계
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="9.3 Data Parallel의 한계">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#931-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.3.1 각 GPU가 모델 전체를 가져야 한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#932" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.3.2 큰 모델에는 단독으로 쓰기 어렵다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#933-load-balancing" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.3.3 Load balancing이 필요하다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        점검 질문
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        다음 장으로
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../10_tensor_parallelism/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. Tensor Parallelism
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../11_pipeline_parallelism/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. Pipeline Parallelism
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../12_expert_parallelism/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    12장. Expert Parallelism
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+
+
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    4부. Long-context 추론과 Context Parallelism
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    4부. Long-context 추론과 Context Parallelism
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../parts/part_04/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    개요
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../13_long_context_inference/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    13장. Long-context 추론
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../14_context_parallelism/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    14장. Context Parallelism
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../15_decode_context_parallel/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    15장. Decode Context Parallelism
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+
+
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5부. LLM Serving 시스템
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    5부. LLM Serving 시스템
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../parts/part_05/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    개요
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../16_llm_server_architecture/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    16장. LLM 서버 아키텍처
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../17_batching_and_scheduling/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    17장. Batching과 Scheduling
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../18_prefix_caching_and_kv_reuse/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    18장. Prefix Caching과 KV 재사용
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../19_disaggregated_prefill_decode/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    19장. Disaggregated Prefill/Decode
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+
+
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6부. 추론 엔진과 도구
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    6부. 추론 엔진과 도구
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../parts/part_06/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    개요
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../20_vllm_intro/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    20장. vLLM 입문
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../21_sglang_intro/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    21장. SGLang 입문
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../22_tensorrt_llm_intro/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    22장. TensorRT-LLM 입문
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+
+
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7부. 성능 측정과 튜닝
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    7부. 성능 측정과 튜닝
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../parts/part_07/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    개요
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../23_performance_metrics/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    23장. 성능 지표
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../24_common_performance_problems/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    24장. 흔한 성능 문제
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../25_parallelism_strategy_guide/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    25장. 병렬화 전략 선택 가이드
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
+
+
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8부. 실무 운영
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    8부. 실무 운영
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../parts/part_08/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    개요
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../26_local_inference/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    26장. 로컬 추론
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../27_small_team_llm_server/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    27장. 작은 팀의 LLM 서버
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../28_large_scale_inference_architecture/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    28장. 대규모 추론 아키텍처
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_10" >
+
+
+          <label class="md-nav__link" for="__nav_10" id="__nav_10_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9부. 다음 단계
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_10">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    9부. 다음 단계
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../parts/part_09/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    개요
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../29_speculative_decoding/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    29장. Speculative Decoding
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../30_quantization_low_precision/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    30장. Quantization과 Low Precision
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../31_on_device_and_distributed_inference/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    31장. On-device와 분산 추론
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_11" >
+
+
+          <label class="md-nav__link" for="__nav_11" id="__nav_11_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_11">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    부록
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../parts/appendix/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    개요
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../appendices/appendix_a_glossary/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 A. 용어 사전
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../appendices/appendix_b_kv_cache_formula/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 B. KV cache 계산식
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../appendices/appendix_c_labs/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 C. 실습 아이디어
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../appendices/appendix_d_references/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 D. 참고 자료
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        학습 목표
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#91-data-parallel" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.1 Data Parallel의 정의
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="9.1 Data Parallel의 정의">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#911-replica-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.1.1 모델 replica를 여러 GPU에 올린다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#912-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.1.2 서로 다른 요청을 서로 다른 GPU가 처리한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#913-throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.1.3 가장 직관적인 throughput 확장 방식이다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#92-data-parallel" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.2 언제 Data Parallel이 적합한가
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="9.2 언제 Data Parallel이 적합한가">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#921-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.2.1 모델이 GPU 하나에 들어가는 경우
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#922" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.2.2 요청 수가 많은 경우
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#923-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.2.3 GPU 간 통신을 줄이고 싶은 경우
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#93-data-parallel" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.3 Data Parallel의 한계
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="9.3 Data Parallel의 한계">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#931-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.3.1 각 GPU가 모델 전체를 가져야 한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#932" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.3.2 큰 모델에는 단독으로 쓰기 어렵다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#933-load-balancing" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        9.3.3 Load balancing이 필요하다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        점검 질문
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        다음 장으로
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="9-data-parallelism">9장. Data Parallelism<a class="headerlink" href="#9-data-parallelism" title="Permanent link">&para;</a></h1>
+<p>Data Parallelism은 가장 직관적인 추론 확장 방식이다. 같은 모델을 여러 GPU에 각각 올리고, 서로 다른 요청을 서로 다른 GPU가 처리하게 한다. 모델 replica가 여러 개 생기는 구조라고 생각하면 된다.</p>
+<p><img alt="Data Parallelism 구조" src="../../assets/diagrams/data_parallelism.svg" /></p>
+<h3 id="_1">학습 목표<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Data Parallel의 구조를 이해한다.</li>
+<li>어떤 serving 상황에서 적합한지 판단한다.</li>
+<li>Data Parallel의 한계를 설명한다.</li>
+</ul>
+<h3 id="91-data-parallel">9.1 Data Parallel의 정의<a class="headerlink" href="#91-data-parallel" title="Permanent link">&para;</a></h3>
+<p>Data Parallel은 요청 단위로 일을 나눈다. GPU 0은 사용자 A의 요청을 처리하고, GPU 1은 사용자 B의 요청을 처리하고, GPU 2는 사용자 C의 요청을 처리하는 식이다. 각 GPU는 모델 전체를 가지고 있으므로, 요청 하나를 처리하는 과정에서 GPU 간 통신이 거의 필요 없다.</p>
+<h4 id="911-replica-gpu">9.1.1 모델 replica를 여러 GPU에 올린다<a class="headerlink" href="#911-replica-gpu" title="Permanent link">&para;</a></h4>
+<p>Data Parallel에서는 각 GPU에 같은 model weights가 올라간다. 예를 들어 4장의 GPU가 있다면 같은 모델 server worker를 4개 띄우고, 앞단 load balancer가 요청을 분산할 수 있다. 이때 각 worker는 독립적으로 prefill, decode, KV cache 관리를 수행한다.</p>
+<p>이 구조는 단순하고 안정적이다. 한 GPU에서 문제가 생겨도 다른 replica가 계속 요청을 처리할 수 있고, traffic이 늘어나면 replica 수를 늘리는 방식으로 확장할 수 있다.</p>
+<h4 id="912-gpu">9.1.2 서로 다른 요청을 서로 다른 GPU가 처리한다<a class="headerlink" href="#912-gpu" title="Permanent link">&para;</a></h4>
+<p>Data Parallel은 단일 요청을 여러 GPU로 쪼개 빠르게 만드는 방식이 아니다. 요청 A는 GPU 0에서 끝까지 처리되고, 요청 B는 GPU 1에서 끝까지 처리된다. 따라서 단일 요청 latency가 아니라 전체 요청 처리량을 늘리는 데 초점이 있다.</p>
+<p>예를 들어 팀 내부 챗봇에서 여러 사용자가 동시에 짧은 질문을 보내는 상황이라면 Data Parallel이 잘 맞는다. 각 요청은 독립적이고, 모델이 GPU 한 장에 들어가며, 요청 수가 많기 때문이다.</p>
+<h4 id="913-throughput">9.1.3 가장 직관적인 throughput 확장 방식이다<a class="headerlink" href="#913-throughput" title="Permanent link">&para;</a></h4>
+<p>Throughput은 단위 시간에 처리할 수 있는 일의 양이다. Data Parallel은 replica 수를 늘려 throughput을 확장한다. 한 GPU가 초당 10개의 짧은 요청을 처리할 수 있다면, 이상적으로 4개 replica는 더 많은 요청을 처리할 수 있다.</p>
+<p>물론 완전히 선형으로 증가하지는 않는다. Load balancing, queueing, tokenizer CPU 병목, 네트워크, 요청 길이 편차가 영향을 준다. 그래도 구조가 단순해 첫 번째 확장 전략으로 자주 선택된다.</p>
+<h3 id="92-data-parallel">9.2 언제 Data Parallel이 적합한가<a class="headerlink" href="#92-data-parallel" title="Permanent link">&para;</a></h3>
+<p>Data Parallel은 모델이 GPU 하나에 들어가고 요청량이 많은 경우에 특히 적합하다. GPU 간 통신을 최소화하고 싶을 때도 좋은 선택이다.</p>
+<h4 id="921-gpu">9.2.1 모델이 GPU 하나에 들어가는 경우<a class="headerlink" href="#921-gpu" title="Permanent link">&para;</a></h4>
+<p>각 GPU가 모델 전체를 가져야 하므로, 모델이 GPU 한 장에 들어가야 한다. 7B 또는 quantized 13B 모델처럼 단일 GPU에서 serving 가능한 모델은 Data Parallel로 replica를 늘리기 쉽다.</p>
+<p>반대로 70B dense model이 GPU 한 장에 들어가지 않는다면 Data Parallel만으로는 해결되지 않는다. 이 경우 먼저 Tensor Parallel이나 Pipeline Parallel로 모델 하나를 여러 GPU에 나누어 올린 뒤, 그 묶음을 다시 Data Parallel replica로 여러 개 둘 수 있다.</p>
+<h4 id="922">9.2.2 요청 수가 많은 경우<a class="headerlink" href="#922" title="Permanent link">&para;</a></h4>
+<p>Data Parallel은 많은 사용자가 독립적인 요청을 보내는 workload에 잘 맞는다. 예를 들어 짧은 Q&amp;A, 분류, 간단한 요약, 내부 도우미 챗봇처럼 요청이 많고 각 요청이 독립적이라면 replica를 늘리는 방식이 효과적이다.</p>
+<p>요청 수가 적고 단일 요청이 매우 긴 경우에는 Data Parallel만으로 latency를 줄이기 어렵다. 이때는 long-context 최적화나 context parallelism을 검토해야 한다.</p>
+<h4 id="923-gpu">9.2.3 GPU 간 통신을 줄이고 싶은 경우<a class="headerlink" href="#923-gpu" title="Permanent link">&para;</a></h4>
+<p>Tensor Parallel이나 Context Parallel은 GPU 간 통신이 필요하다. Data Parallel은 각 요청이 한 replica 안에서 처리되므로 GPU 간 통신이 상대적으로 적다. 이 점은 interconnect가 빠르지 않은 환경에서 장점이 된다.</p>
+<p>클라우드에서 여러 GPU가 같은 고속 interconnect로 묶여 있지 않거나, 여러 노드에 replica를 흩어 배치해야 하는 경우 Data Parallel은 운영이 쉽다.</p>
+<h3 id="93-data-parallel">9.3 Data Parallel의 한계<a class="headerlink" href="#93-data-parallel" title="Permanent link">&para;</a></h3>
+<p>Data Parallel은 단순하지만 모든 문제를 해결하지는 못한다. 특히 model weight 메모리 문제와 단일 요청 latency 문제에는 한계가 있다.</p>
+<h4 id="931-gpu">9.3.1 각 GPU가 모델 전체를 가져야 한다<a class="headerlink" href="#931-gpu" title="Permanent link">&para;</a></h4>
+<p>각 replica가 모델 전체를 저장하므로 weight 메모리는 줄어들지 않는다. GPU 4장을 사용하더라도 각 GPU에는 같은 weight가 들어간다. 총 시스템 메모리는 늘어나지만, 단일 GPU의 모델 적재 한계는 그대로다.</p>
+<p>따라서 모델이 GPU 한 장에 들어가지 않는 문제는 Data Parallel이 아니라 Tensor Parallel, Pipeline Parallel, quantization으로 먼저 해결해야 한다.</p>
+<h4 id="932">9.3.2 큰 모델에는 단독으로 쓰기 어렵다<a class="headerlink" href="#932" title="Permanent link">&para;</a></h4>
+<p>큰 모델을 serving할 때는 보통 TP 또는 PP로 모델 하나를 여러 GPU에 나눈 뒤, 그 GPU group을 하나의 replica처럼 본다. 예를 들어 8 GPU로 70B 모델 하나를 TP로 띄우고, 이런 8 GPU group을 여러 개 만들어 Data Parallel처럼 운영할 수 있다.</p>
+<p>즉 대규모 시스템에서 Data Parallel은 단독 전략이라기보다 다른 병렬화와 조합되는 경우가 많다.</p>
+<h4 id="933-load-balancing">9.3.3 Load balancing이 필요하다<a class="headerlink" href="#933-load-balancing" title="Permanent link">&para;</a></h4>
+<p>Data Parallel에서는 요청을 어느 replica에 보낼지 결정해야 한다. 단순 round-robin은 구현이 쉽지만, LLM 요청은 길이가 제각각이라 부하가 고르게 나뉘지 않을 수 있다. 긴 RAG 요청 하나가 특정 replica를 오래 점유할 수 있다.</p>
+<p>좋은 load balancer는 replica별 queue length, 현재 처리 중인 token 수, GPU memory pressure, 요청 유형을 고려할 수 있다. 최소한 운영자는 긴 요청과 짧은 요청이 섞일 때 tail latency가 악화될 수 있음을 알아야 한다.</p>
+<h3 id="_2">정리<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<p>Data Parallel은 같은 모델 replica를 여러 GPU에 올리고 요청을 나누는 방식이다. 구조가 단순하고 GPU 간 통신이 적어 throughput 확장에 유리하다. 하지만 각 GPU가 모델 전체를 가져야 하므로 큰 모델의 weight 메모리 문제를 해결하지 못하고, 단일 요청 latency를 직접 줄이는 방식도 아니다.</p>
+<h3 id="_3">점검 질문<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Data Parallel은 model weight 메모리 문제를 해결하는가?</li>
+<li>Data Parallel에서 load balancing이 필요한 이유는 무엇인가?</li>
+</ul>
+<h3 id="_4">다음 장으로<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<p>다음 장에서는 모델 내부의 큰 행렬 계산을 여러 GPU가 나누어 수행하는 Tensor Parallelism을 다룬다.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../08_why_parallelism/" class="md-footer__link md-footer__link--prev" aria-label="이전: 8장. 왜 병렬화가 필요한가">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                8장. 왜 병렬화가 필요한가
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../10_tensor_parallelism/" class="md-footer__link md-footer__link--next" aria-label="다음: 10장. Tensor Parallelism">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                10장. Tensor Parallelism
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="../../javascripts/header-home-link.js"></script>
+
+
+  </body>
+</html>

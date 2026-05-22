@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-labelledby="title desc">
+  <title id="title">LLM inference metrics dashboard</title>
+  <desc id="desc">A conceptual dashboard groups latency, throughput, and GPU metrics for LLM serving.</desc>
+  <style>
+    .h{font:700 22px sans-serif;fill:#0f172a}
+    .t{font:500 16px sans-serif;fill:#475569}
+    .card{fill:#f8fafc;stroke:#334155;stroke-width:2;rx:12}
+    .lat{fill:#fee2e2;stroke:#b91c1c;stroke-width:2;rx:12}
+    .thr{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:12}
+    .gpu{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:12}
+  </style>
+  <rect width="960" height="520" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">LLM Serving 지표는 세 묶음으로 본다</text>
+  <rect x="70" y="105" width="250" height="290" class="lat"/>
+  <text x="195" y="150" text-anchor="middle" class="h">Latency</text>
+  <text x="195" y="195" text-anchor="middle" class="t">TTFT</text>
+  <text x="195" y="230" text-anchor="middle" class="t">TPOT</text>
+  <text x="195" y="265" text-anchor="middle" class="t">End-to-end latency</text>
+  <text x="195" y="315" text-anchor="middle" class="t">사용자 체감 속도</text>
+
+  <rect x="355" y="105" width="250" height="290" class="thr"/>
+  <text x="480" y="150" text-anchor="middle" class="h">Throughput</text>
+  <text x="480" y="195" text-anchor="middle" class="t">Tokens/sec</text>
+  <text x="480" y="230" text-anchor="middle" class="t">Requests/sec</text>
+  <text x="480" y="265" text-anchor="middle" class="t">Goodput</text>
+  <text x="480" y="315" text-anchor="middle" class="t">처리 용량</text>
+
+  <rect x="640" y="105" width="250" height="290" class="gpu"/>
+  <text x="765" y="150" text-anchor="middle" class="h">GPU / Network</text>
+  <text x="765" y="195" text-anchor="middle" class="t">GPU utilization</text>
+  <text x="765" y="230" text-anchor="middle" class="t">Memory usage</text>
+  <text x="765" y="265" text-anchor="middle" class="t">Memory bandwidth</text>
+  <text x="765" y="300" text-anchor="middle" class="t">Network communication</text>
+  <text x="480" y="455" text-anchor="middle" class="t">한 지표만 보면 오해하기 쉽다. 병목 진단은 세 묶음을 함께 본다.</text>
+</svg>

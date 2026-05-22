@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
+  <title id="title">Performance triage flow</title>
+  <desc id="desc">A decision flow maps common symptoms to likely LLM inference bottlenecks.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .h{font:700 21px sans-serif;fill:#0f172a}
+      .t{font:500 15px sans-serif;fill:#475569}
+      .sym{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:12}
+      .cause{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:12}
+      .fix{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:12}
+      .arrow{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="960" height="560" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">성능 문제 triage: 증상에서 병목으로</text>
+
+  <rect x="60" y="105" width="210" height="72" class="sym"/>
+  <text x="165" y="135" text-anchor="middle" class="h">첫 응답이 느림</text>
+  <text x="165" y="160" text-anchor="middle" class="t">TTFT 증가</text>
+  <path d="M270 141 H365" class="arrow"/>
+  <rect x="368" y="105" width="210" height="72" class="cause"/>
+  <text x="473" y="135" text-anchor="middle" class="h">Prefill 병목</text>
+  <text x="473" y="160" text-anchor="middle" class="t">긴 prompt / queue</text>
+  <path d="M578 141 H673" class="arrow"/>
+  <rect x="676" y="105" width="220" height="72" class="fix"/>
+  <text x="786" y="135" text-anchor="middle" class="h">Prompt 축소</text>
+  <text x="786" y="160" text-anchor="middle" class="t">prefix cache / chunked prefill</text>
+
+  <rect x="60" y="240" width="210" height="72" class="sym"/>
+  <text x="165" y="270" text-anchor="middle" class="h">Token이 천천히 나옴</text>
+  <text x="165" y="295" text-anchor="middle" class="t">TPOT 증가</text>
+  <path d="M270 276 H365" class="arrow"/>
+  <rect x="368" y="240" width="210" height="72" class="cause"/>
+  <text x="473" y="270" text-anchor="middle" class="h">Decode 병목</text>
+  <text x="473" y="295" text-anchor="middle" class="t">KV cache / batch</text>
+  <path d="M578 276 H673" class="arrow"/>
+  <rect x="676" y="240" width="220" height="72" class="fix"/>
+  <text x="786" y="270" text-anchor="middle" class="h">Batch 조정</text>
+  <text x="786" y="295" text-anchor="middle" class="t">KV 관리 / decode 지표</text>
+
+  <rect x="60" y="375" width="210" height="72" class="sym"/>
+  <text x="165" y="405" text-anchor="middle" class="h">OOM 발생</text>
+  <text x="165" y="430" text-anchor="middle" class="t">memory 초과</text>
+  <path d="M270 411 H365" class="arrow"/>
+  <rect x="368" y="375" width="210" height="72" class="cause"/>
+  <text x="473" y="405" text-anchor="middle" class="h">Weight 또는 KV</text>
+  <text x="473" y="430" text-anchor="middle" class="t">모델 크기 / context</text>
+  <path d="M578 411 H673" class="arrow"/>
+  <rect x="676" y="375" width="220" height="72" class="fix"/>
+  <text x="786" y="405" text-anchor="middle" class="h">Quantization</text>
+  <text x="786" y="430" text-anchor="middle" class="t">max length / batch 제한</text>
+</svg>

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-labelledby="title desc">
+  <title id="title">Inference architecture patterns</title>
+  <desc id="desc">Three common inference architecture patterns: local inference, small team server, and large scale service.</desc>
+  <style>
+    .h{font:700 22px sans-serif;fill:#0f172a}
+    .t{font:500 16px sans-serif;fill:#475569}
+    .local{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:14}
+    .team{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:14}
+    .prod{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:14}
+  </style>
+  <rect width="960" height="520" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">실전 아키텍처 패턴은 규모에 따라 달라진다</text>
+  <rect x="70" y="115" width="250" height="285" class="local"/>
+  <text x="195" y="160" text-anchor="middle" class="h">개인 로컬 추론</text>
+  <text x="195" y="205" text-anchor="middle" class="t">작은 모델</text>
+  <text x="195" y="240" text-anchor="middle" class="t">quantized model</text>
+  <text x="195" y="275" text-anchor="middle" class="t">편의성 우선</text>
+  <text x="195" y="330" text-anchor="middle" class="t">목표: 실험과 개발</text>
+
+  <rect x="355" y="115" width="250" height="285" class="team"/>
+  <text x="480" y="160" text-anchor="middle" class="h">소규모 팀 서버</text>
+  <text x="480" y="205" text-anchor="middle" class="t">공유 API server</text>
+  <text x="480" y="240" text-anchor="middle" class="t">rate limit</text>
+  <text x="480" y="275" text-anchor="middle" class="t">GPU monitoring</text>
+  <text x="480" y="330" text-anchor="middle" class="t">목표: 비용과 안정성</text>
+
+  <rect x="640" y="115" width="250" height="285" class="prod"/>
+  <text x="765" y="160" text-anchor="middle" class="h">대규모 서비스</text>
+  <text x="765" y="205" text-anchor="middle" class="t">worker pool</text>
+  <text x="765" y="240" text-anchor="middle" class="t">TP/DP/PP 조합</text>
+  <text x="765" y="275" text-anchor="middle" class="t">SLO와 canary</text>
+  <text x="765" y="330" text-anchor="middle" class="t">목표: 확장성과 운영</text>
+</svg>

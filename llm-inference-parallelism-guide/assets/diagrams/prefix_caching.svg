@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" role="img" aria-labelledby="title desc">
+  <title id="title">Prefix caching</title>
+  <desc id="desc">Requests sharing the same token prefix can reuse cached KV states for that prefix.</desc>
+  <style>
+    .h{font:700 22px sans-serif;fill:#0f172a}
+    .t{font:500 16px sans-serif;fill:#475569}
+    .prefix{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:8}
+    .tail1{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:8}
+    .tail2{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:8}
+    .cache{fill:#f3e8ff;stroke:#7e22ce;stroke-width:2;rx:12}
+    .line{stroke:#64748b;stroke-width:2;stroke-dasharray:6 6}
+  </style>
+  <rect width="960" height="500" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">Prefix caching: 반복 prefix의 KV cache를 재사용</text>
+
+  <text x="115" y="125" class="h">Request A</text>
+  <rect x="110" y="145" width="360" height="58" class="prefix"/>
+  <text x="290" y="181" text-anchor="middle" class="t">system prompt + tool schema</text>
+  <rect x="475" y="145" width="210" height="58" class="tail1"/>
+  <text x="580" y="181" text-anchor="middle" class="t">user question A</text>
+
+  <text x="115" y="255" class="h">Request B</text>
+  <rect x="110" y="275" width="360" height="58" class="prefix"/>
+  <text x="290" y="311" text-anchor="middle" class="t">same token prefix</text>
+  <rect x="475" y="275" width="210" height="58" class="tail2"/>
+  <text x="580" y="311" text-anchor="middle" class="t">user question B</text>
+
+  <line x1="110" y1="225" x2="470" y2="225" class="line"/>
+  <text x="290" y="245" text-anchor="middle" class="t">동일한 token sequence</text>
+
+  <rect x="720" y="195" width="170" height="88" class="cache"/>
+  <text x="805" y="230" text-anchor="middle" class="h">KV cache</text>
+  <text x="805" y="258" text-anchor="middle" class="t">prefix 재사용</text>
+  <text x="480" y="410" text-anchor="middle" class="t">텍스트가 비슷한 것이 아니라 token prefix가 동일해야 cache hit가 가능하다</text>
+</svg>

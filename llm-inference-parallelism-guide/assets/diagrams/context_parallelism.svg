@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" role="img" aria-labelledby="title desc">
+  <title id="title">Context Parallelism</title>
+  <desc id="desc">A long sequence is split across GPUs along the context length dimension.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .h{font:700 22px sans-serif;fill:#0f172a}
+      .t{font:500 16px sans-serif;fill:#475569}
+      .seg1{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:8}
+      .seg2{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:8}
+      .seg3{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:8}
+      .gpu{fill:#f8fafc;stroke:#334155;stroke-width:2;rx:12}
+      .arrow{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="960" height="500" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">Context Parallelism: 긴 sequence를 context 길이 방향으로 나눈다</text>
+
+  <text x="480" y="105" text-anchor="middle" class="h">Long context</text>
+  <rect x="100" y="130" width="250" height="68" class="seg1"/>
+  <text x="225" y="171" text-anchor="middle" class="h">token 0-32K</text>
+  <rect x="355" y="130" width="250" height="68" class="seg2"/>
+  <text x="480" y="171" text-anchor="middle" class="h">token 32K-64K</text>
+  <rect x="610" y="130" width="250" height="68" class="seg3"/>
+  <text x="735" y="171" text-anchor="middle" class="h">token 64K-96K</text>
+
+  <path d="M225 198 V255" class="arrow"/>
+  <path d="M480 198 V255" class="arrow"/>
+  <path d="M735 198 V255" class="arrow"/>
+
+  <rect x="105" y="258" width="240" height="95" class="gpu"/>
+  <text x="225" y="294" text-anchor="middle" class="h">GPU 0</text>
+  <text x="225" y="322" text-anchor="middle" class="t">context shard 0</text>
+  <rect x="360" y="258" width="240" height="95" class="gpu"/>
+  <text x="480" y="294" text-anchor="middle" class="h">GPU 1</text>
+  <text x="480" y="322" text-anchor="middle" class="t">context shard 1</text>
+  <rect x="615" y="258" width="240" height="95" class="gpu"/>
+  <text x="735" y="294" text-anchor="middle" class="h">GPU 2</text>
+  <text x="735" y="322" text-anchor="middle" class="t">context shard 2</text>
+
+  <text x="480" y="420" text-anchor="middle" class="t">Prefill에서는 긴 입력 처리 분산, decode에서는 KV cache shard 참조가 핵심이 된다</text>
+</svg>

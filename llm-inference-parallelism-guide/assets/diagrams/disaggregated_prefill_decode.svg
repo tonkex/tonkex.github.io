@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" role="img" aria-labelledby="title desc">
+  <title id="title">Disaggregated Prefill Decode</title>
+  <desc id="desc">Prefill workers and decode workers are separated, with KV cache transferred between them.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .h{font:700 22px sans-serif;fill:#0f172a}
+      .t{font:500 16px sans-serif;fill:#475569}
+      .req{fill:#f8fafc;stroke:#334155;stroke-width:2;rx:12}
+      .pre{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:12}
+      .dec{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:12}
+      .kv{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:12}
+      .arrow{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="960" height="500" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">Disaggregated Prefill/Decode: 서로 다른 worker pool로 분리</text>
+
+  <rect x="65" y="205" width="150" height="80" class="req"/>
+  <text x="140" y="238" text-anchor="middle" class="h">Request</text>
+  <text x="140" y="264" text-anchor="middle" class="t">long prompt</text>
+  <path d="M215 245 H305" class="arrow"/>
+
+  <rect x="308" y="180" width="190" height="130" class="pre"/>
+  <text x="403" y="224" text-anchor="middle" class="h">Prefill worker</text>
+  <text x="403" y="252" text-anchor="middle" class="t">prompt 처리</text>
+  <text x="403" y="278" text-anchor="middle" class="t">KV cache 생성</text>
+  <path d="M498 245 H588" class="arrow"/>
+
+  <rect x="590" y="185" width="140" height="120" class="kv"/>
+  <text x="660" y="230" text-anchor="middle" class="h">KV cache</text>
+  <text x="660" y="258" text-anchor="middle" class="t">transfer</text>
+  <path d="M730 245 H800" class="arrow"/>
+
+  <rect x="802" y="180" width="110" height="130" class="dec"/>
+  <text x="857" y="224" text-anchor="middle" class="h">Decode</text>
+  <text x="857" y="252" text-anchor="middle" class="t">token</text>
+  <text x="857" y="278" text-anchor="middle" class="t">stream</text>
+
+  <text x="480" y="400" text-anchor="middle" class="t">Prefill은 compute-heavy, decode는 memory-bandwidth-heavy라 서로 다른 자원 정책을 가질 수 있다</text>
+</svg>

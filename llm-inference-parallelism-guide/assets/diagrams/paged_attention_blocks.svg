@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="470" viewBox="0 0 960 470" role="img" aria-labelledby="title desc">
+  <title id="title">PagedAttention blocks</title>
+  <desc id="desc">KV cache is divided into fixed-size blocks so multiple requests can use GPU memory more flexibly.</desc>
+  <style>
+    .h{font:700 22px sans-serif;fill:#0f172a}
+    .t{font:500 16px sans-serif;fill:#475569}
+    .block{stroke:#334155;stroke-width:2;rx:8}
+    .a{fill:#e0f2fe}
+    .b{fill:#dcfce7}
+    .c{fill:#fef3c7}
+    .free{fill:#f8fafc;stroke:#cbd5e1}
+    .line{stroke:#64748b;stroke-width:2;stroke-dasharray:6 6}
+  </style>
+  <rect width="960" height="470" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">PagedAttention: KV cache를 block/page처럼 관리</text>
+
+  <text x="170" y="105" text-anchor="middle" class="h">Request A</text>
+  <rect x="75" y="130" width="70" height="54" class="block a"/>
+  <rect x="150" y="130" width="70" height="54" class="block a"/>
+  <rect x="225" y="130" width="70" height="54" class="block a"/>
+  <text x="185" y="215" text-anchor="middle" class="t">긴 sequence</text>
+
+  <text x="480" y="105" text-anchor="middle" class="h">Request B</text>
+  <rect x="385" y="130" width="70" height="54" class="block b"/>
+  <rect x="460" y="130" width="70" height="54" class="block b"/>
+  <text x="460" y="215" text-anchor="middle" class="t">중간 sequence</text>
+
+  <text x="760" y="105" text-anchor="middle" class="h">Request C</text>
+  <rect x="700" y="130" width="70" height="54" class="block c"/>
+  <text x="735" y="215" text-anchor="middle" class="t">짧은 sequence</text>
+
+  <line x1="80" y1="250" x2="880" y2="250" class="line"/>
+  <text x="480" y="286" text-anchor="middle" class="h">GPU KV block pool</text>
+
+  <rect x="95" y="320" width="58" height="50" class="block a"/>
+  <rect x="160" y="320" width="58" height="50" class="block b"/>
+  <rect x="225" y="320" width="58" height="50" class="block a"/>
+  <rect x="290" y="320" width="58" height="50" class="block free"/>
+  <rect x="355" y="320" width="58" height="50" class="block c"/>
+  <rect x="420" y="320" width="58" height="50" class="block a"/>
+  <rect x="485" y="320" width="58" height="50" class="block b"/>
+  <rect x="550" y="320" width="58" height="50" class="block free"/>
+  <rect x="615" y="320" width="58" height="50" class="block free"/>
+  <rect x="680" y="320" width="58" height="50" class="block free"/>
+  <text x="480" y="410" text-anchor="middle" class="t">연속된 큰 공간이 아니어도 block mapping으로 KV cache를 배치할 수 있다</text>
+</svg>

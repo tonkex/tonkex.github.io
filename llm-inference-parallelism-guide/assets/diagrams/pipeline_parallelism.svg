@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" role="img" aria-labelledby="title desc">
+  <title id="title">Pipeline Parallelism</title>
+  <desc id="desc">Model layers are split across GPUs and micro-batches flow through them like a pipeline.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .h{font:700 22px sans-serif;fill:#0f172a}
+      .t{font:500 16px sans-serif;fill:#475569}
+      .gpu{fill:#f8fafc;stroke:#334155;stroke-width:2;rx:12}
+      .mb1{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:8}
+      .mb2{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:8}
+      .mb3{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:8}
+      .arrow{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="960" height="500" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">Pipeline Parallelism: layer 묶음을 여러 GPU에 나누어 배치</text>
+
+  <rect x="80" y="110" width="210" height="250" class="gpu"/>
+  <text x="185" y="150" text-anchor="middle" class="h">GPU 0</text>
+  <text x="185" y="178" text-anchor="middle" class="t">Layer 1-10</text>
+  <rect x="130" y="225" width="110" height="48" class="mb1"/>
+  <text x="185" y="256" text-anchor="middle" class="t">micro-batch A</text>
+
+  <path d="M290 235 H370" class="arrow"/>
+
+  <rect x="375" y="110" width="210" height="250" class="gpu"/>
+  <text x="480" y="150" text-anchor="middle" class="h">GPU 1</text>
+  <text x="480" y="178" text-anchor="middle" class="t">Layer 11-20</text>
+  <rect x="425" y="195" width="110" height="48" class="mb1"/>
+  <text x="480" y="226" text-anchor="middle" class="t">A</text>
+  <rect x="425" y="260" width="110" height="48" class="mb2"/>
+  <text x="480" y="291" text-anchor="middle" class="t">B</text>
+
+  <path d="M585 235 H665" class="arrow"/>
+
+  <rect x="670" y="110" width="210" height="250" class="gpu"/>
+  <text x="775" y="150" text-anchor="middle" class="h">GPU 2</text>
+  <text x="775" y="178" text-anchor="middle" class="t">Layer 21-30</text>
+  <rect x="720" y="165" width="110" height="48" class="mb1"/>
+  <text x="775" y="196" text-anchor="middle" class="t">A</text>
+  <rect x="720" y="230" width="110" height="48" class="mb2"/>
+  <text x="775" y="261" text-anchor="middle" class="t">B</text>
+  <rect x="720" y="295" width="110" height="48" class="mb3"/>
+  <text x="775" y="326" text-anchor="middle" class="t">C</text>
+
+  <text x="480" y="420" text-anchor="middle" class="t">초기와 끝에는 일부 GPU가 비는 pipeline bubble이 생길 수 있다</text>
+</svg>

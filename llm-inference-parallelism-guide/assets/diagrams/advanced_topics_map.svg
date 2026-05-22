@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="520" viewBox="0 0 960 520" role="img" aria-labelledby="title desc">
+  <title id="title">Advanced inference topics map</title>
+  <desc id="desc">Speculative decoding, quantization, and on-device or distributed inference each target different constraints.</desc>
+  <style>
+    .h{font:700 22px sans-serif;fill:#0f172a}
+    .t{font:500 16px sans-serif;fill:#475569}
+    .spec{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:14}
+    .quant{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:14}
+    .edge{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:14}
+  </style>
+  <rect width="960" height="520" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">고급 주제는 서로 다른 제약을 겨냥한다</text>
+  <rect x="90" y="130" width="230" height="245" class="spec"/>
+  <text x="205" y="175" text-anchor="middle" class="h">Speculative decoding</text>
+  <text x="205" y="220" text-anchor="middle" class="t">Decode 병목 완화</text>
+  <text x="205" y="255" text-anchor="middle" class="t">draft + target model</text>
+  <text x="205" y="290" text-anchor="middle" class="t">workload 의존</text>
+
+  <rect x="365" y="130" width="230" height="245" class="quant"/>
+  <text x="480" y="175" text-anchor="middle" class="h">Quantization</text>
+  <text x="480" y="220" text-anchor="middle" class="t">Weight memory 감소</text>
+  <text x="480" y="255" text-anchor="middle" class="t">INT8 / INT4 / FP8</text>
+  <text x="480" y="290" text-anchor="middle" class="t">품질 평가 필요</text>
+
+  <rect x="640" y="130" width="230" height="245" class="edge"/>
+  <text x="755" y="175" text-anchor="middle" class="h">On-device / hybrid</text>
+  <text x="755" y="220" text-anchor="middle" class="t">Privacy / latency</text>
+  <text x="755" y="255" text-anchor="middle" class="t">작은 모델</text>
+  <text x="755" y="290" text-anchor="middle" class="t">cloud와 역할 분담</text>
+</svg>

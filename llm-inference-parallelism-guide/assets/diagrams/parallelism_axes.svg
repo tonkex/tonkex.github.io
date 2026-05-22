@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="540" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Parallelism axes</title>
+  <desc id="desc">LLM inference parallelism can split requests, tensors, layers, experts, or context and KV cache.</desc>
+  <style>
+    .h{font:700 22px sans-serif;fill:#0f172a}
+    .t{font:500 16px sans-serif;fill:#475569}
+    .box{fill:#f8fafc;stroke:#334155;stroke-width:2;rx:12}
+    .dp{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:12}
+    .tp{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:12}
+    .pp{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:12}
+    .cp{fill:#f3e8ff;stroke:#7e22ce;stroke-width:2;rx:12}
+  </style>
+  <rect width="960" height="540" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">병렬화는 무엇을 나누는가?</text>
+
+  <rect x="80" y="100" width="210" height="130" class="dp"/>
+  <text x="185" y="142" text-anchor="middle" class="h">Data Parallel</text>
+  <text x="185" y="172" text-anchor="middle" class="t">요청을 나눈다</text>
+  <text x="185" y="200" text-anchor="middle" class="t">모델 replica 여러 개</text>
+
+  <rect x="375" y="100" width="210" height="130" class="tp"/>
+  <text x="480" y="142" text-anchor="middle" class="h">Tensor Parallel</text>
+  <text x="480" y="172" text-anchor="middle" class="t">큰 행렬 계산을 나눈다</text>
+  <text x="480" y="200" text-anchor="middle" class="t">GPU 간 결과 통합</text>
+
+  <rect x="670" y="100" width="210" height="130" class="pp"/>
+  <text x="775" y="142" text-anchor="middle" class="h">Pipeline Parallel</text>
+  <text x="775" y="172" text-anchor="middle" class="t">layer를 나눈다</text>
+  <text x="775" y="200" text-anchor="middle" class="t">앞 layer -> 뒤 layer</text>
+
+  <rect x="220" y="295" width="230" height="130" class="cp"/>
+  <text x="335" y="337" text-anchor="middle" class="h">Context Parallel</text>
+  <text x="335" y="367" text-anchor="middle" class="t">sequence/context를 나눈다</text>
+  <text x="335" y="395" text-anchor="middle" class="t">long-context에 중요</text>
+
+  <rect x="520" y="295" width="230" height="130" class="box"/>
+  <text x="635" y="337" text-anchor="middle" class="h">Expert Parallel</text>
+  <text x="635" y="367" text-anchor="middle" class="t">MoE expert를 나눈다</text>
+  <text x="635" y="395" text-anchor="middle" class="t">token routing 필요</text>
+</svg>

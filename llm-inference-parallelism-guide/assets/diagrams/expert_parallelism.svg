@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" role="img" aria-labelledby="title desc">
+  <title id="title">Expert Parallelism</title>
+  <desc id="desc">A router sends tokens to selected experts distributed across GPUs in a mixture-of-experts model.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .h{font:700 22px sans-serif;fill:#0f172a}
+      .t{font:500 16px sans-serif;fill:#475569}
+      .tok{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:10}
+      .router{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:12}
+      .expert{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:12}
+      .hot{fill:#fee2e2;stroke:#b91c1c;stroke-width:2;rx:12}
+      .arrow{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="960" height="500" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">Expert Parallelism: token을 선택된 expert로 보낸다</text>
+
+  <rect x="70" y="145" width="160" height="64" class="tok"/>
+  <text x="150" y="185" text-anchor="middle" class="h">Tokens</text>
+  <rect x="70" y="240" width="160" height="64" class="tok"/>
+  <text x="150" y="280" text-anchor="middle" class="h">Tokens</text>
+  <path d="M230 177 H330" class="arrow"/>
+  <path d="M230 272 H330" class="arrow"/>
+
+  <rect x="332" y="180" width="170" height="88" class="router"/>
+  <text x="417" y="216" text-anchor="middle" class="h">Router</text>
+  <text x="417" y="244" text-anchor="middle" class="t">top-k expert 선택</text>
+
+  <path d="M502 224 C560 120,590 105,642 105" class="arrow"/>
+  <path d="M502 224 H642" class="arrow"/>
+  <path d="M502 224 C560 328,590 343,642 343" class="arrow"/>
+
+  <rect x="645" y="75" width="220" height="70" class="expert"/>
+  <text x="755" y="106" text-anchor="middle" class="h">GPU 0: Expert 0</text>
+  <text x="755" y="129" text-anchor="middle" class="t">일부 token 처리</text>
+  <rect x="645" y="190" width="220" height="70" class="hot"/>
+  <text x="755" y="221" text-anchor="middle" class="h">GPU 1: Expert 1</text>
+  <text x="755" y="244" text-anchor="middle" class="t">hot expert 가능</text>
+  <rect x="645" y="305" width="220" height="70" class="expert"/>
+  <text x="755" y="336" text-anchor="middle" class="h">GPU 2: Expert 2</text>
+  <text x="755" y="359" text-anchor="middle" class="t">일부 token 처리</text>
+</svg>

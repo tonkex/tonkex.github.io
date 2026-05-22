@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="500" viewBox="0 0 960 500" role="img" aria-labelledby="title desc">
+  <title id="title">Continuous batching</title>
+  <desc id="desc">New requests can enter a running batch as completed requests leave, keeping the GPU busy.</desc>
+  <style>
+    .h{font:700 22px sans-serif;fill:#0f172a}
+    .t{font:500 16px sans-serif;fill:#475569}
+    .axis{stroke:#334155;stroke-width:3}
+    .a{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:8}
+    .b{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:8}
+    .c{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:8}
+    .d{fill:#f3e8ff;stroke:#7e22ce;stroke-width:2;rx:8}
+    .grid{stroke:#e2e8f0;stroke-width:1}
+  </style>
+  <rect width="960" height="500" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">Continuous batching: 실행 중인 batch에 요청이 들어오고 나간다</text>
+  <line x1="100" y1="405" x2="860" y2="405" class="axis"/>
+  <text x="480" y="450" text-anchor="middle" class="h">Decode step / time</text>
+
+  <line x1="180" y1="90" x2="180" y2="405" class="grid"/>
+  <line x1="320" y1="90" x2="320" y2="405" class="grid"/>
+  <line x1="460" y1="90" x2="460" y2="405" class="grid"/>
+  <line x1="600" y1="90" x2="600" y2="405" class="grid"/>
+  <line x1="740" y1="90" x2="740" y2="405" class="grid"/>
+
+  <text x="75" y="140" text-anchor="middle" class="t">slot 1</text>
+  <text x="75" y="210" text-anchor="middle" class="t">slot 2</text>
+  <text x="75" y="280" text-anchor="middle" class="t">slot 3</text>
+  <text x="75" y="350" text-anchor="middle" class="t">slot 4</text>
+
+  <rect x="120" y="112" width="420" height="45" class="a"/>
+  <text x="330" y="141" text-anchor="middle" class="t">Request A</text>
+  <rect x="120" y="182" width="240" height="45" class="b"/>
+  <text x="240" y="211" text-anchor="middle" class="t">Request B</text>
+  <rect x="260" y="252" width="420" height="45" class="c"/>
+  <text x="470" y="281" text-anchor="middle" class="t">Request C joins later</text>
+  <rect x="460" y="322" width="300" height="45" class="d"/>
+  <text x="610" y="351" text-anchor="middle" class="t">Request D joins later</text>
+
+  <text x="675" y="140" class="t">완료된 요청은 빠지고 새 요청이 들어온다</text>
+</svg>

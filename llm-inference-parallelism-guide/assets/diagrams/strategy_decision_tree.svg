@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="560" viewBox="0 0 960 560" role="img" aria-labelledby="title desc">
+  <title id="title">Parallelism strategy decision tree</title>
+  <desc id="desc">A beginner decision tree for choosing quantization, tensor parallelism, data parallelism, and context parallelism.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .h{font:700 20px sans-serif;fill:#0f172a}
+      .t{font:500 15px sans-serif;fill:#475569}
+      .q{fill:#fef3c7;stroke:#b45309;stroke-width:2;rx:12}
+      .a{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:12}
+      .b{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:12}
+      .arrow{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="960" height="560" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">병렬화 전략 선택의 첫 질문</text>
+  <rect x="360" y="90" width="240" height="70" class="q"/>
+  <text x="480" y="120" text-anchor="middle" class="h">무엇이 병목인가?</text>
+  <text x="480" y="144" text-anchor="middle" class="t">memory, throughput, context</text>
+
+  <path d="M480 160 C310 205,240 230,190 260" class="arrow"/>
+  <path d="M480 160 V250" class="arrow"/>
+  <path d="M480 160 C650 205,720 230,770 260" class="arrow"/>
+
+  <rect x="70" y="260" width="240" height="82" class="b"/>
+  <text x="190" y="293" text-anchor="middle" class="h">모델이 GPU에 안 들어감</text>
+  <text x="190" y="320" text-anchor="middle" class="t">weight memory 문제</text>
+  <rect x="360" y="250" width="240" height="82" class="b"/>
+  <text x="480" y="283" text-anchor="middle" class="h">요청량이 많음</text>
+  <text x="480" y="310" text-anchor="middle" class="t">throughput 문제</text>
+  <rect x="650" y="260" width="240" height="82" class="b"/>
+  <text x="770" y="293" text-anchor="middle" class="h">context가 너무 김</text>
+  <text x="770" y="320" text-anchor="middle" class="t">KV cache 문제</text>
+
+  <path d="M190 342 V405" class="arrow"/>
+  <path d="M480 332 V405" class="arrow"/>
+  <path d="M770 342 V405" class="arrow"/>
+
+  <rect x="70" y="408" width="240" height="82" class="a"/>
+  <text x="190" y="438" text-anchor="middle" class="h">Quantization -> TP</text>
+  <text x="190" y="464" text-anchor="middle" class="t">필요하면 PP 조합</text>
+  <rect x="360" y="408" width="240" height="82" class="a"/>
+  <text x="480" y="438" text-anchor="middle" class="h">DP + batching</text>
+  <text x="480" y="464" text-anchor="middle" class="t">load balancing</text>
+  <rect x="650" y="408" width="240" height="82" class="a"/>
+  <text x="770" y="438" text-anchor="middle" class="h">Context 제한</text>
+  <text x="770" y="464" text-anchor="middle" class="t">prefix cache -> CP/DCP</text>
+</svg>

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="420" viewBox="0 0 960 420" role="img" aria-labelledby="title desc">
+  <title id="title">Query Key Value attention intuition</title>
+  <desc id="desc">Query asks what to find, keys indicate where relevant information is, and values contain the information to retrieve.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .h{font:700 22px sans-serif;fill:#0f172a}
+      .t{font:500 16px sans-serif;fill:#475569}
+      .box{stroke-width:2;rx:14}
+      .q{fill:#fee2e2;stroke:#b91c1c}
+      .k{fill:#fef3c7;stroke:#b45309}
+      .v{fill:#dcfce7;stroke:#15803d}
+      .out{fill:#e0f2fe;stroke:#0369a1}
+      .arrow{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="960" height="420" fill="#fff"/>
+  <rect x="70" y="88" width="190" height="92" class="box q"/>
+  <text x="165" y="126" text-anchor="middle" class="h">Query</text>
+  <text x="165" y="154" text-anchor="middle" class="t">무엇을 찾는가</text>
+
+  <rect x="380" y="60" width="190" height="92" class="box k"/>
+  <text x="475" y="98" text-anchor="middle" class="h">Keys</text>
+  <text x="475" y="126" text-anchor="middle" class="t">어디에 있는가</text>
+
+  <rect x="380" y="218" width="190" height="92" class="box v"/>
+  <text x="475" y="256" text-anchor="middle" class="h">Values</text>
+  <text x="475" y="284" text-anchor="middle" class="t">무엇을 가져올까</text>
+
+  <path d="M260 134 C315 92,335 82,380 104" class="arrow"/>
+  <text x="325" y="76" text-anchor="middle" class="t">유사도 계산</text>
+
+  <path d="M475 152 V218" class="arrow"/>
+  <text x="590" y="190" class="t">가중치로 Value를 섞음</text>
+
+  <path d="M570 264 H700" class="arrow"/>
+  <rect x="702" y="218" width="190" height="92" class="box out"/>
+  <text x="797" y="256" text-anchor="middle" class="h">Attention output</text>
+  <text x="797" y="284" text-anchor="middle" class="t">context 반영 결과</text>
+</svg>

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="440" viewBox="0 0 960 440" role="img" aria-labelledby="title desc">
+  <title id="title">FlashAttention IO intuition</title>
+  <desc id="desc">Standard attention materializes large intermediate matrices, while FlashAttention computes attention in tiles to reduce high bandwidth memory traffic.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+    <style>
+      .h{font:700 22px sans-serif;fill:#0f172a}
+      .t{font:500 16px sans-serif;fill:#475569}
+      .box{fill:#f8fafc;stroke:#334155;stroke-width:2;rx:12}
+      .bad{fill:#fee2e2;stroke:#b91c1c;stroke-width:2;rx:12}
+      .good{fill:#dcfce7;stroke:#15803d;stroke-width:2;rx:12}
+      .mem{fill:#e0f2fe;stroke:#0369a1;stroke-width:2;rx:12}
+      .arrow{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect width="960" height="440" fill="#fff"/>
+  <text x="480" y="52" text-anchor="middle" class="h">FlashAttention의 직관: 결과는 같게, 메모리 이동은 적게</text>
+
+  <text x="240" y="96" text-anchor="middle" class="h">표준 attention</text>
+  <rect x="70" y="125" width="150" height="70" class="box"/>
+  <text x="145" y="167" text-anchor="middle" class="h">Q, K, V</text>
+  <path d="M220 160 H286" class="arrow"/>
+  <rect x="288" y="115" width="170" height="90" class="bad"/>
+  <text x="373" y="151" text-anchor="middle" class="h">큰 중간 행렬</text>
+  <text x="373" y="178" text-anchor="middle" class="t">attention scores</text>
+  <path d="M373 205 V260" class="arrow"/>
+  <rect x="288" y="262" width="170" height="70" class="mem"/>
+  <text x="373" y="304" text-anchor="middle" class="h">HBM 왕복 증가</text>
+
+  <text x="720" y="96" text-anchor="middle" class="h">FlashAttention</text>
+  <rect x="555" y="125" width="150" height="70" class="box"/>
+  <text x="630" y="167" text-anchor="middle" class="h">Q, K, V</text>
+  <path d="M705 160 H760" class="arrow"/>
+  <rect x="762" y="115" width="140" height="90" class="good"/>
+  <text x="832" y="151" text-anchor="middle" class="h">Tile 단위</text>
+  <text x="832" y="178" text-anchor="middle" class="t">on-chip 계산</text>
+  <path d="M832 205 V260" class="arrow"/>
+  <rect x="762" y="262" width="140" height="70" class="good"/>
+  <text x="832" y="304" text-anchor="middle" class="h">HBM 접근 감소</text>
+</svg>
