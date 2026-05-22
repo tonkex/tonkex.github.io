@@ -147,13 +147,6 @@ h3 {
   border-color: rgba(15, 118, 110, 0.24);
 }
 
-.note-cards {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.note-cards .card {
-  min-height: 220px;
-}
 
 .card {
   display: flex;
@@ -172,6 +165,58 @@ h3 {
   grid-column: span 2;
   border-color: rgba(15, 118, 110, 0.35);
   box-shadow: var(--shadow);
+}
+
+.note-list {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--line);
+}
+
+.note-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.note-item h3 {
+  margin-bottom: 6px;
+  font-size: 1.08rem;
+}
+
+.note-item p:not(.note-meta) {
+  margin-bottom: 0;
+  color: var(--muted);
+}
+
+.note-meta {
+  margin-bottom: 6px;
+  color: var(--accent-strong);
+  font-size: 0.74rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.note-item > a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.note-item > a:hover {
+  border-color: var(--accent);
+  background: var(--tag-bg);
 }
 
 .card p:not(.tag) {
@@ -254,5 +299,14 @@ h3 {
   .actions a,
   .quick-links a {
     width: 100%;
+  }
+
+  .note-item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .note-item > a {
+    width: fit-content;
   }
 }
