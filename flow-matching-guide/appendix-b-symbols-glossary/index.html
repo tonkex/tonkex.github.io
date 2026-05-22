@@ -1,0 +1,2208 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="생성 모델, diffusion, Flow Matching, 로보틱스 응용을 연결하는 개발자용 입문서">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/flow-matching-guide/appendix-b-symbols-glossary/">
+
+
+        <link rel="prev" href="../appendix-a-references/">
+
+
+        <link rel="next" href="../appendix-c-math-supplement/">
+
+
+
+
+
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>부록 B. 주요 기호와 용어 정리 - Flow Matching 가이드북</title>
+
+
+
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#b" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href=".." title="Flow Matching 가이드북" class="md-header__button md-logo" aria-label="Flow Matching 가이드북" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flow Matching 가이드북
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              부록 B. 주요 기호와 용어 정리
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Flow Matching 가이드북" class="md-nav__button md-logo" aria-label="Flow Matching 가이드북" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flow Matching 가이드북
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    머릿말
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    프롤로그
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    프롤로그
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../00-why-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    0장. 생성 모델은 어떻게 여기까지 왔을까?
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    1부. 생성 모델을 위한 수학 언어
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    1부. 생성 모델을 위한 수학 언어
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../01-probability-language/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    1장. 생성 모델을 위한 확률 언어
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../02-conditional-probability-marginalization/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    2장. 조건부 확률과 주변화
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../03-moving-distributions/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    3장. 분포를 움직인다는 생각
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../04-noisy-dynamics/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    4장. 노이즈가 들어간 동역학
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-continuity-score/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. 확률 질량 보존과 score
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    2부. Flow Matching의 핵심 아이디어
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    2부. Flow Matching의 핵심 아이디어
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-flow-matching-definition/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. Flow Matching의 한 문장 정의
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07-conditional-to-marginal/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Conditional Flow에서 Marginal Flow로
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08-cfm-loss/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Conditional Flow Matching Loss 뜯어보기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../09-diffusion-vs-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. Diffusion과 Flow Matching 비교
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+
+
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    3부. 구현과 실험
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    3부. 구현과 실험
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../10-toy-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. 2차원 Toy Example로 Flow Matching 실습하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../11-pytorch-training-loop/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. PyTorch Training Loop 설계
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../12-image-example/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    12장. 작은 이미지 예제로 확장하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../13-path-parameterization/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    13장. Path Parameterization 선택
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../14-sampling-ode-solver/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    14장. Sampling과 ODE Solver
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+
+
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    4부. 논문 로드맵과 확장
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    4부. 논문 로드맵과 확장
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../15-paper-roadmap/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    15장. 논문 로드맵
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../16-guidance-conditional-generation/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    16장. Guidance와 Conditional Generation
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../17-broader-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    17장. Flow Matching의 확장 지형
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../18-flow-matching-robotics/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    18장. 로보틱스에서의 Flow Matching
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+
+
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    부록
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-a-references/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 A. 참고문헌과 읽기 지도
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 B. 주요 기호와 용어 정리
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 B. 주요 기호와 용어 정리
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        부록의 목적
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        주요 기호
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#flow-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Flow Matching 용어
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="Flow Matching 용어">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#probability-path" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Probability Path
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#velocity-field" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Velocity Field
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#conditional-flow-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Conditional Flow Matching
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#simulation-free-training" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Simulation-Free Training
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#path-sampler" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Path Sampler
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#diffusion" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Diffusion 관련 용어
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="Diffusion 관련 용어">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#forward-noising-process" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Forward Noising Process
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#reverse-process" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Reverse Process
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#score" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Score
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#probability-flow-ode" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Probability Flow ODE
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        로보틱스 관련 용어
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="로보틱스 관련 용어">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#action-chunk" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Action Chunk
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#vla" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        VLA
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#action-expert" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Action Expert
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#dynamic-feasibility" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Dynamic Feasibility
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#equivariance" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Equivariance
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        헷갈리기 쉬운 구분
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-c-math-supplement/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 C. 수학 보충 설명
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-d-implementation-checklist/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 D. 구현 체크리스트
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-e-visual-checklist/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 E. 시각 자료 제작 체크리스트
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        부록의 목적
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        주요 기호
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#flow-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Flow Matching 용어
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="Flow Matching 용어">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#probability-path" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Probability Path
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#velocity-field" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Velocity Field
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#conditional-flow-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Conditional Flow Matching
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#simulation-free-training" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Simulation-Free Training
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#path-sampler" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Path Sampler
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#diffusion" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Diffusion 관련 용어
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="Diffusion 관련 용어">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#forward-noising-process" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Forward Noising Process
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#reverse-process" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Reverse Process
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#score" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Score
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#probability-flow-ode" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Probability Flow ODE
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        로보틱스 관련 용어
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="로보틱스 관련 용어">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#action-chunk" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Action Chunk
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#vla" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        VLA
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#action-expert" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Action Expert
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#dynamic-feasibility" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Dynamic Feasibility
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#equivariance" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Equivariance
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        헷갈리기 쉬운 구분
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="b">부록 B. 주요 기호와 용어<a class="headerlink" href="#b" title="Permanent link">&para;</a></h1>
+<h2 id="_1">부록의 목적<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>이 부록은 본문에서 반복해서 등장하는 수식 기호와 핵심 용어를 한곳에 모은 것이다. Flow Matching과 diffusion 논문은 같은 대상을 서로 다른 표기로 설명하는 경우가 많다. 처음 읽을 때는 표기만 달라져도 완전히 다른 개념처럼 느껴질 수 있으므로, 이 부록을 참고해 기호의 역할을 먼저 확인하면 좋다.</p>
+<h2 id="_2">주요 기호<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>기호</th>
+<th>의미</th>
+<th>주로 등장하는 장</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(x\)</span></td>
+<td>데이터 공간의 샘플 또는 현재 위치</td>
+<td>1장 이후 전체</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(x_0\)</span></td>
+<td>시작 분포에서 뽑은 샘플, 보통 noise sample</td>
+<td>6장 이후</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(x_1\)</span></td>
+<td>목표 데이터 분포에서 뽑은 샘플</td>
+<td>6장 이후</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(x_t\)</span></td>
+<td>시간 <span class="arithmatex">\(t\)</span>에서의 중간 샘플</td>
+<td>3장 이후</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(t\)</span></td>
+<td>생성 과정의 인공 시간, 보통 <span class="arithmatex">\([0,1]\)</span> 범위</td>
+<td>3장 이후</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(p_0\)</span></td>
+<td>시작 분포, 보통 표준 정규분포</td>
+<td>1장, 6장</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(p_1\)</span></td>
+<td>목표 데이터 분포</td>
+<td>1장, 6장</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(p_t\)</span></td>
+<td>시간 <span class="arithmatex">\(t\)</span>에서의 중간 분포</td>
+<td>3장 이후</td>
+</tr>
+<tr>
+<td>$p_t(x</td>
+<td>z)$</td>
+<td>조건 <span class="arithmatex">\(z\)</span>가 주어진 조건부 경로의 분포</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(z\)</span></td>
+<td>조건부 경로를 정하는 조건 변수</td>
+<td>2장, 7장</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(u_t(x)\)</span></td>
+<td>실제 또는 목표 marginal velocity field</td>
+<td>5장 이후</td>
+</tr>
+<tr>
+<td>$u_t(x</td>
+<td>z)$</td>
+<td>조건부 경로에서 계산되는 목표 velocity</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(v_\theta(x,t)\)</span></td>
+<td>신경망이 예측하는 velocity field</td>
+<td>6장 이후</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\theta\)</span></td>
+<td>모델 파라미터</td>
+<td>6장 이후</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\epsilon\)</span></td>
+<td>diffusion에서 자주 쓰는 Gaussian noise</td>
+<td>4장, 9장</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\nabla_x \log p_t(x)\)</span></td>
+<td>score, 현재 위치에서 density가 증가하는 방향</td>
+<td>5장, 9장</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\alpha_t, \sigma_t\)</span></td>
+<td>Gaussian path 또는 diffusion path의 시간 스케줄</td>
+<td>9장, 13장</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(A\)</span></td>
+<td>로봇 action chunk 또는 action sequence</td>
+<td>18장</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(\tau\)</span></td>
+<td>로봇 trajectory</td>
+<td>18장</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(o\)</span></td>
+<td>로봇 관측, 이미지/상태/언어 지시 등을 포함</td>
+<td>18장</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(c\)</span></td>
+<td>조건 정보, class/text/goal/environment 등</td>
+<td>16장, 18장</td>
+</tr>
+</tbody>
+</table>
+<h2 id="flow-matching">Flow Matching 용어<a class="headerlink" href="#flow-matching" title="Permanent link">&para;</a></h2>
+<h3 id="probability-path">Probability Path<a class="headerlink" href="#probability-path" title="Permanent link">&para;</a></h3>
+<p>Probability path는 시간에 따라 변하는 분포들의 가족이다.</p>
+<div class="arithmatex">\[
+\{p_t\}_{t\in[0,1]}.
+\]</div>
+<p>Flow Matching에서는 시작 분포 <span class="arithmatex">\(p_0\)</span>와 목표 분포 <span class="arithmatex">\(p_1\)</span> 사이를 어떤 중간 분포들이 잇는지 먼저 생각한다. 이 경로를 어떻게 정하느냐가 target velocity와 sampling 효율에 영향을 준다.</p>
+<h3 id="velocity-field">Velocity Field<a class="headerlink" href="#velocity-field" title="Permanent link">&para;</a></h3>
+<p>Velocity field는 위치 <span class="arithmatex">\(x\)</span>와 시간 <span class="arithmatex">\(t\)</span>에서 샘플이 어느 방향으로 움직여야 하는지 알려 주는 벡터장이다.</p>
+<div class="arithmatex">\[
+\frac{dx_t}{dt}=u_t(x_t).
+\]</div>
+<p>Flow Matching은 이 velocity field를 모델 <span class="arithmatex">\(v_\theta(x,t)\)</span>가 맞추도록 학습한다.</p>
+<h3 id="conditional-flow-matching">Conditional Flow Matching<a class="headerlink" href="#conditional-flow-matching" title="Permanent link">&para;</a></h3>
+<p>Conditional Flow Matching은 조건부 경로에서 계산하기 쉬운 target velocity를 샘플링해 학습하는 방식이다.</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\mathrm{CFM}}(\theta)=\mathbb{E}\left[\left\|v_\theta(x_t,t)-u_t(x_t|z)\right\|^2\right].
+\]</div>
+<p>조건부 target을 학습해도 MSE의 조건부 평균 성질 때문에 marginal velocity를 배울 수 있다는 점이 핵심이다.</p>
+<h3 id="simulation-free-training">Simulation-Free Training<a class="headerlink" href="#simulation-free-training" title="Permanent link">&para;</a></h3>
+<p>학습 중에 ODE trajectory 전체를 매번 적분하지 않고, 임의의 시간 <span class="arithmatex">\(t\)</span>에서 <span class="arithmatex">\(x_t\)</span>와 target velocity를 직접 만들어 회귀 학습하는 방식을 말한다. 생성할 때는 여전히 ODE solver를 사용한다.</p>
+<h3 id="path-sampler">Path Sampler<a class="headerlink" href="#path-sampler" title="Permanent link">&para;</a></h3>
+<p>Path sampler는 <span class="arithmatex">\(x_0\)</span>, <span class="arithmatex">\(x_1\)</span>, <span class="arithmatex">\(t\)</span>를 받아 중간 샘플 <span class="arithmatex">\(x_t\)</span>와 목표 속도 <span class="arithmatex">\(u_t\)</span>를 반환하는 코드 단위다.</p>
+<div class="highlight"><pre><span></span><code><span class="n">xt</span><span class="p">,</span> <span class="n">ut</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+</code></pre></div>
+<p>경로 실험을 쉽게 하려면 이 부분을 trainer와 분리하는 것이 좋다.</p>
+<h2 id="diffusion">Diffusion 관련 용어<a class="headerlink" href="#diffusion" title="Permanent link">&para;</a></h2>
+<h3 id="forward-noising-process">Forward Noising Process<a class="headerlink" href="#forward-noising-process" title="Permanent link">&para;</a></h3>
+<p>데이터에 점진적으로 noise를 섞어 단순한 noise 분포로 보내는 과정이다. 보통 diffusion에서는 이 과정이 직접 설계된다.</p>
+<h3 id="reverse-process">Reverse Process<a class="headerlink" href="#reverse-process" title="Permanent link">&para;</a></h3>
+<p>noise에서 시작해 data로 돌아오는 생성 과정이다. diffusion model은 이 역방향 denoising을 학습한다.</p>
+<h3 id="score">Score<a class="headerlink" href="#score" title="Permanent link">&para;</a></h3>
+<p>Score는 log density의 입력에 대한 gradient다.</p>
+<div class="arithmatex">\[
+\nabla_x \log p_t(x).
+\]</div>
+<p>현재 위치에서 density가 증가하는 방향을 나타낸다. diffusion의 reverse dynamics에서 핵심 역할을 한다.</p>
+<h3 id="probability-flow-ode">Probability Flow ODE<a class="headerlink" href="#probability-flow-ode" title="Permanent link">&para;</a></h3>
+<p>Score 기반 SDE와 같은 marginal distribution을 갖는 ODE 관점이다. diffusion과 Flow Matching이 ODE 언어로 만나는 지점 중 하나다.</p>
+<h2 id="_3">로보틱스 관련 용어<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h3 id="action-chunk">Action Chunk<a class="headerlink" href="#action-chunk" title="Permanent link">&para;</a></h3>
+<p>한 번에 생성하는 여러 step의 action sequence다.</p>
+<div class="arithmatex">\[
+A=(a_1,a_2,\ldots,a_H).
+\]</div>
+<p>로봇 정책에서는 매 순간 단일 action만 예측하기보다 action chunk를 생성하고 일부를 실행한 뒤 다시 계획하는 방식이 많이 쓰인다.</p>
+<h3 id="vla">VLA<a class="headerlink" href="#vla" title="Permanent link">&para;</a></h3>
+<p>Vision-Language-Action 모델의 약자다. 이미지와 언어 지시를 입력으로 받아 로봇 행동을 출력하는 모델 계열을 말한다.</p>
+<h3 id="action-expert">Action Expert<a class="headerlink" href="#action-expert" title="Permanent link">&para;</a></h3>
+<p>VLA 구조에서 시각/언어 backbone이 만든 표현을 받아 실제 연속 action을 생성하는 모듈이다. 최근 Flow Matching은 이 action expert로 자주 쓰인다.</p>
+<h3 id="dynamic-feasibility">Dynamic Feasibility<a class="headerlink" href="#dynamic-feasibility" title="Permanent link">&para;</a></h3>
+<p>생성된 trajectory가 실제 로봇의 속도, 가속도, joint limit, 물리 제약 안에서 실행 가능한지를 뜻한다.</p>
+<h3 id="equivariance">Equivariance<a class="headerlink" href="#equivariance" title="Permanent link">&para;</a></h3>
+<p>입력 장면이 회전하거나 이동할 때 출력 행동도 그 변화에 맞게 변하는 성질이다. 로봇 조작에서는 공간 일반화를 위해 중요하다.</p>
+<h2 id="_4">헷갈리기 쉬운 구분<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>구분</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>score vs velocity</td>
+<td>score는 density가 증가하는 방향이고, velocity는 path를 따라 샘플이 움직이는 방향이다.</td>
+</tr>
+<tr>
+<td>path vs trajectory</td>
+<td>path는 분포 또는 조건부 생성 과정의 설계이고, trajectory는 특정 샘플이 시간에 따라 지나간 실제 경로다.</td>
+</tr>
+<tr>
+<td>training time vs sampling time</td>
+<td>학습에서는 임의의 <span class="arithmatex">\(t\)</span>에서 target velocity를 회귀하고, sampling에서는 ODE를 적분한다.</td>
+</tr>
+<tr>
+<td>noise prediction vs velocity prediction</td>
+<td>diffusion은 noise 또는 score를 예측할 수 있고, Flow Matching은 path의 velocity를 예측한다.</td>
+</tr>
+<tr>
+<td>action regression vs action generation</td>
+<td>단일 평균 action을 예측하는 것과 가능한 action distribution에서 샘플링하는 것은 다르다.</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../appendix-a-references/" class="md-footer__link md-footer__link--prev" aria-label="이전: 부록 A. 참고문헌과 읽기 지도">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                부록 A. 참고문헌과 읽기 지도
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../appendix-c-math-supplement/" class="md-footer__link md-footer__link--next" aria-label="다음: 부록 C. 수학 보충 설명">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                부록 C. 수학 보충 설명
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+  </body>
+</html>

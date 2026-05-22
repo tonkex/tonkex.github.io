@@ -1,0 +1,1906 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="생성 모델, diffusion, Flow Matching, 로보틱스 응용을 연결하는 개발자용 입문서">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/flow-matching-guide/11-pytorch-training-loop/">
+
+
+        <link rel="prev" href="../10-toy-flow-matching/">
+
+
+        <link rel="next" href="../12-image-example/">
+
+
+
+
+
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>11장. PyTorch Training Loop 설계 - Flow Matching 가이드북</title>
+
+
+
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#11-pytorch-training-loop" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href=".." title="Flow Matching 가이드북" class="md-header__button md-logo" aria-label="Flow Matching 가이드북" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flow Matching 가이드북
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              11장. PyTorch Training Loop 설계
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Flow Matching 가이드북" class="md-nav__button md-logo" aria-label="Flow Matching 가이드북" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flow Matching 가이드북
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    머릿말
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    프롤로그
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    프롤로그
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../00-why-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    0장. 생성 모델은 어떻게 여기까지 왔을까?
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    1부. 생성 모델을 위한 수학 언어
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    1부. 생성 모델을 위한 수학 언어
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../01-probability-language/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    1장. 생성 모델을 위한 확률 언어
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../02-conditional-probability-marginalization/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    2장. 조건부 확률과 주변화
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../03-moving-distributions/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    3장. 분포를 움직인다는 생각
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../04-noisy-dynamics/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    4장. 노이즈가 들어간 동역학
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-continuity-score/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. 확률 질량 보존과 score
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    2부. Flow Matching의 핵심 아이디어
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    2부. Flow Matching의 핵심 아이디어
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-flow-matching-definition/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. Flow Matching의 한 문장 정의
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07-conditional-to-marginal/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Conditional Flow에서 Marginal Flow로
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08-cfm-loss/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Conditional Flow Matching Loss 뜯어보기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../09-diffusion-vs-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. Diffusion과 Flow Matching 비교
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
+
+
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    3부. 구현과 실험
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    3부. 구현과 실험
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../10-toy-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. 2차원 Toy Example로 Flow Matching 실습하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. PyTorch Training Loop 설계
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. PyTorch Training Loop 설계
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        이 장의 질문
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        최소 구성 요소
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#pathsampler" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        PathSampler 분리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        시간 임베딩
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#trainer-step" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Trainer의 한 step
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#config" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Config로 관리할 항목
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Logging과 시각화
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#checkpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Checkpoint 설계
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        테스트 가능한 작은 단위
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        그림 후보
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        요약
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../12-image-example/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    12장. 작은 이미지 예제로 확장하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../13-path-parameterization/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    13장. Path Parameterization 선택
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../14-sampling-ode-solver/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    14장. Sampling과 ODE Solver
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+
+
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    4부. 논문 로드맵과 확장
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    4부. 논문 로드맵과 확장
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../15-paper-roadmap/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    15장. 논문 로드맵
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../16-guidance-conditional-generation/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    16장. Guidance와 Conditional Generation
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../17-broader-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    17장. Flow Matching의 확장 지형
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../18-flow-matching-robotics/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    18장. 로보틱스에서의 Flow Matching
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+
+
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    부록
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-a-references/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 A. 참고문헌과 읽기 지도
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-b-symbols-glossary/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 B. 주요 기호와 용어 정리
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-c-math-supplement/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 C. 수학 보충 설명
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-d-implementation-checklist/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 D. 구현 체크리스트
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-e-visual-checklist/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 E. 시각 자료 제작 체크리스트
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        이 장의 질문
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        최소 구성 요소
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#pathsampler" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        PathSampler 분리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        시간 임베딩
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#trainer-step" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Trainer의 한 step
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#config" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Config로 관리할 항목
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#logging" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Logging과 시각화
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#checkpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Checkpoint 설계
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        테스트 가능한 작은 단위
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        그림 후보
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        요약
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="11-pytorch-training-loop">11장. PyTorch Training Loop 설계<a class="headerlink" href="#11-pytorch-training-loop" title="Permanent link">&para;</a></h1>
+<h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Toy example을 넘어 실제 실험 코드를 만들려면 무엇을 분리해야 할까? Flow Matching 학습 루프는 짧게 쓸 수 있지만, 책이나 논문을 따라 여러 경로와 모델을 실험하려면 구조가 금방 복잡해진다. 이 장은 재사용 가능한 PyTorch 코드 구조를 설계하는 데 초점을 둔다.</p>
+<p>목표는 거대한 프레임워크를 만드는 것이 아니다. 경로, 모델, 데이터, solver, logging을 적절히 분리해서 실험이 망가졌을 때 원인을 찾기 쉽게 만드는 것이다.</p>
+<h2 id="_2">최소 구성 요소<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Flow Matching 실험 코드는 다음 구성 요소로 나누면 좋다.</p>
+<ul>
+<li>dataset 또는 dataloader</li>
+<li>noise sampler</li>
+<li>path sampler</li>
+<li>velocity model</li>
+<li>loss function</li>
+<li>optimizer와 scheduler</li>
+<li>sampler 또는 ODE solver</li>
+<li>evaluation과 visualization</li>
+<li>checkpoint와 config</li>
+</ul>
+<p>이 중 학습 루프의 핵심은 path sampler와 velocity model의 연결이다.</p>
+<div class="arithmatex">\[
+(x_0,x_1,t)\mapsto(x_t,u_t),
+\]</div>
+<div class="arithmatex">\[
+(x_t,t)\mapsto v_\theta(x_t,t).
+\]</div>
+<p>그리고 loss는</p>
+<div class="arithmatex">\[
+\left\|v_\theta(x_t,t)-u_t\right\|^2
+\]</div>
+<p>이다.</p>
+<h2 id="pathsampler">PathSampler 분리<a class="headerlink" href="#pathsampler" title="Permanent link">&para;</a></h2>
+<p>경로 수식은 실험의 핵심 변수다. 따라서 학습 루프 안에 직접 쓰기보다 클래스로 분리하는 편이 좋다.</p>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">LinearPath</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">sample</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">view_shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">x0</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">x0</span><span class="o">.</span><span class="n">ndim</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">t_view</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">*</span><span class="n">view_shape</span><span class="p">)</span>
+        <span class="n">xt</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t_view</span><span class="p">)</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">t_view</span> <span class="o">*</span> <span class="n">x1</span>
+        <span class="n">ut</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span>
+        <span class="k">return</span> <span class="n">xt</span><span class="p">,</span> <span class="n">ut</span>
+</code></pre></div>
+<p>이 구조의 장점은 나중에 다른 경로를 추가해도 trainer 코드를 거의 바꾸지 않아도 된다는 점이다.</p>
+<div class="highlight"><pre><span></span><code><span class="n">xt</span><span class="p">,</span> <span class="n">ut</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+<span class="n">pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xt</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+<span class="n">loss</span> <span class="o">=</span> <span class="n">mse</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span> <span class="n">ut</span><span class="p">)</span>
+</code></pre></div>
+<p>13장에서 여러 path parameterization을 비교할 때 이 분리가 중요해진다.</p>
+<h2 id="_3">시간 임베딩<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>모델이 시간 <span class="arithmatex">\(t\)</span>를 이해하려면 시간 정보를 적절히 넣어야 한다. toy example에서는 단순 concatenate로 충분할 수 있지만, 이미지 모델에서는 sinusoidal embedding이나 learned embedding을 쓴다.</p>
+<p>시간 임베딩의 목적은 모델이 다음과 같은 차이를 구분하게 하는 것이다.</p>
+<ul>
+<li><span class="arithmatex">\(t\)</span>가 작을 때: 노이즈에 가까운 상태</li>
+<li><span class="arithmatex">\(t\)</span>가 중간일 때: 구조가 섞인 상태</li>
+<li><span class="arithmatex">\(t\)</span>가 클 때: 데이터에 가까운 상태</li>
+</ul>
+<p>수식으로는 모델을 다음처럼 볼 수 있다.</p>
+<div class="arithmatex">\[
+v_\theta(x_t,t)=f_\theta(x_t,\phi(t)),
+\]</div>
+<p>여기서 <span class="arithmatex">\(\phi(t)\)</span>는 시간 임베딩 함수다.</p>
+<p>시간 임베딩이 약하면 모델은 같은 <span class="arithmatex">\(x_t\)</span>라도 시간에 따라 다른 속도가 필요하다는 사실을 표현하기 어렵다.</p>
+<h2 id="trainer-step">Trainer의 한 step<a class="headerlink" href="#trainer-step" title="Permanent link">&para;</a></h2>
+<p>학습 step은 다음 순서를 유지한다.</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">train_step</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">x1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">xt</span><span class="p">,</span> <span class="n">target_v</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">pred_v</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xt</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="p">((</span><span class="n">pred_v</span> <span class="o">-</span> <span class="n">target_v</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">(</span><span class="n">set_to_none</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+</code></pre></div>
+<p>여기서 <code>batch</code>는 데이터 샘플 <span class="arithmatex">\(x_1\)</span>이다. 시작 샘플 <span class="arithmatex">\(x_0\)</span>는 매 step마다 새로 뽑는다. 이 방식은 같은 데이터라도 다양한 노이즈 출발점과 연결되게 한다.</p>
+<h2 id="config">Config로 관리할 항목<a class="headerlink" href="#config" title="Permanent link">&para;</a></h2>
+<p>실험을 반복하려면 config가 필요하다. 최소한 다음 항목을 기록해야 한다.</p>
+<ul>
+<li>dataset 이름과 preprocessing</li>
+<li>batch size</li>
+<li>learning rate</li>
+<li>optimizer 종류</li>
+<li>training steps 또는 epochs</li>
+<li>path type</li>
+<li>time sampling 방식</li>
+<li>model size</li>
+<li>random seed</li>
+<li>ODE solver 종류와 step 수</li>
+<li>checkpoint 저장 주기</li>
+</ul>
+<p>Flow Matching은 경로와 solver가 결과에 큰 영향을 주므로, 이 둘을 config에 반드시 남겨야 한다. loss만 저장하고 경로 설정을 잃어버리면 나중에 결과를 재현하기 어렵다.</p>
+<h2 id="logging">Logging과 시각화<a class="headerlink" href="#logging" title="Permanent link">&para;</a></h2>
+<p>로그에는 loss만 남기면 부족하다. 다음 항목을 함께 확인하는 것이 좋다.</p>
+<ul>
+<li>training loss moving average</li>
+<li>validation 또는 held-out loss</li>
+<li>sample image 또는 toy scatter plot</li>
+<li>velocity norm의 평균과 분산</li>
+<li>ODE step 수별 sample 품질</li>
+<li>시간 구간별 loss</li>
+</ul>
+<p>시간 구간별 loss는 특히 유용하다. 예를 들어 <span class="arithmatex">\(t\in[0,0.25]\)</span>, <span class="arithmatex">\([0.25,0.5]\)</span>, <span class="arithmatex">\([0.5,0.75]\)</span>, <span class="arithmatex">\([0.75,1]\)</span>로 나누어 loss를 보면 모델이 어느 시간대에서 어려움을 겪는지 알 수 있다.</p>
+<h2 id="checkpoint">Checkpoint 설계<a class="headerlink" href="#checkpoint" title="Permanent link">&para;</a></h2>
+<p>checkpoint에는 모델 가중치만 저장하지 말고 실험 상태를 함께 저장해야 한다.</p>
+<ul>
+<li>model state</li>
+<li>optimizer state</li>
+<li>training step</li>
+<li>config</li>
+<li>random seed 또는 RNG state</li>
+<li>exponential moving average를 쓴다면 EMA state</li>
+</ul>
+<p>샘플 품질을 볼 때는 보통 EMA 모델이 더 안정적일 수 있다. 입문 구현에서는 필수는 아니지만, 이미지 실험으로 넘어가면 고려할 만하다.</p>
+<h2 id="_4">테스트 가능한 작은 단위<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>Flow Matching 코드는 다음 단위를 테스트할 수 있다.</p>
+<ol>
+<li>path sampler가 올바른 shape를 반환하는가?</li>
+<li><span class="arithmatex">\(t=0\)</span>일 때 <span class="arithmatex">\(x_t=x_0\)</span>인가?</li>
+<li><span class="arithmatex">\(t=1\)</span>일 때 <span class="arithmatex">\(x_t=x_1\)</span>인가?</li>
+<li>직선 경로에서 <span class="arithmatex">\(u_t=x_1-x_0\)</span>인가?</li>
+<li>모델 출력 shape가 입력 shape와 같은가?</li>
+<li>ODE sampler가 step 수에 맞게 <span class="arithmatex">\(t\)</span>를 증가시키는가?</li>
+</ol>
+<p>이런 테스트는 성능을 보장하지는 않지만, 구현 오류를 초기에 잡아 준다.</p>
+<h2 id="_5">그림 후보<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>코드 모듈 구조도</strong>: dataset, path sampler, model, trainer, solver, logger가 어떻게 연결되는지 보여 준다.</li>
+<li><strong>training step 흐름도</strong>: batch에서 loss까지 이어지는 텐서 흐름을 단계별로 표시한다.</li>
+<li><strong>시간 구간별 loss plot</strong>: 전체 loss 하나보다 시간 구간별 난이도를 보여 주는 그래프를 제안한다.</li>
+</ul>
+<h2 id="_6">요약<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<ul>
+<li>PyTorch 구현에서는 path sampler, model, trainer, solver를 분리하면 실험 확장이 쉬워진다.</li>
+<li>학습 step의 핵심은 <span class="arithmatex">\(x_0\)</span>, <span class="arithmatex">\(x_1\)</span>, <span class="arithmatex">\(t\)</span>에서 <span class="arithmatex">\(x_t\)</span>와 목표 속도 <span class="arithmatex">\(u_t\)</span>를 만들고 모델 출력과 MSE를 계산하는 것이다.</li>
+<li>시간 임베딩은 모델이 시각별로 다른 속도장을 표현하도록 돕는다.</li>
+<li>config에는 path type과 ODE solver 설정을 반드시 남겨야 재현이 가능하다.</li>
+<li>shape, boundary condition, velocity sign, sampler time grid는 작은 테스트로 확인하는 것이 좋다.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../10-toy-flow-matching/" class="md-footer__link md-footer__link--prev" aria-label="이전: 10장. 2차원 Toy Example로 Flow Matching 실습하기">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                10장. 2차원 Toy Example로 Flow Matching 실습하기
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../12-image-example/" class="md-footer__link md-footer__link--next" aria-label="다음: 12장. 작은 이미지 예제로 확장하기">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                12장. 작은 이미지 예제로 확장하기
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+  </body>
+</html>

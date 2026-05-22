@@ -1,0 +1,1851 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="생성 모델, diffusion, Flow Matching, 로보틱스 응용을 연결하는 개발자용 입문서">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/flow-matching-guide/07-conditional-to-marginal/">
+
+
+        <link rel="prev" href="../06-flow-matching-definition/">
+
+
+        <link rel="next" href="../08-cfm-loss/">
+
+
+
+
+
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>7장. Conditional Flow에서 Marginal Flow로 - Flow Matching 가이드북</title>
+
+
+
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#7-conditional-flow-marginal-flow" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href=".." title="Flow Matching 가이드북" class="md-header__button md-logo" aria-label="Flow Matching 가이드북" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flow Matching 가이드북
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              7장. Conditional Flow에서 Marginal Flow로
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Flow Matching 가이드북" class="md-nav__button md-logo" aria-label="Flow Matching 가이드북" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flow Matching 가이드북
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    머릿말
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    프롤로그
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    프롤로그
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../00-why-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    0장. 생성 모델은 어떻게 여기까지 왔을까?
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    1부. 생성 모델을 위한 수학 언어
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    1부. 생성 모델을 위한 수학 언어
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../01-probability-language/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    1장. 생성 모델을 위한 확률 언어
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../02-conditional-probability-marginalization/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    2장. 조건부 확률과 주변화
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../03-moving-distributions/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    3장. 분포를 움직인다는 생각
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../04-noisy-dynamics/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    4장. 노이즈가 들어간 동역학
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-continuity-score/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. 확률 질량 보존과 score
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    2부. Flow Matching의 핵심 아이디어
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    2부. Flow Matching의 핵심 아이디어
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-flow-matching-definition/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. Flow Matching의 한 문장 정의
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Conditional Flow에서 Marginal Flow로
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Conditional Flow에서 Marginal Flow로
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        이 장의 질문
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        조건부 경로부터 시작하기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#marginal-path" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Marginal path는 조건부 경로의 평균이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#mse" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        왜 MSE로 조건부 속도를 맞춰도 되는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        샘플 쌍을 조건으로 쓰는 경우
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        조건부 분포가 넓은 경우
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        직관적 비유
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        구현에서 보이는 형태
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        그림 후보
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        요약
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08-cfm-loss/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Conditional Flow Matching Loss 뜯어보기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../09-diffusion-vs-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. Diffusion과 Flow Matching 비교
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+
+
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    3부. 구현과 실험
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    3부. 구현과 실험
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../10-toy-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. 2차원 Toy Example로 Flow Matching 실습하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../11-pytorch-training-loop/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. PyTorch Training Loop 설계
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../12-image-example/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    12장. 작은 이미지 예제로 확장하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../13-path-parameterization/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    13장. Path Parameterization 선택
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../14-sampling-ode-solver/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    14장. Sampling과 ODE Solver
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+
+
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    4부. 논문 로드맵과 확장
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    4부. 논문 로드맵과 확장
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../15-paper-roadmap/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    15장. 논문 로드맵
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../16-guidance-conditional-generation/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    16장. Guidance와 Conditional Generation
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../17-broader-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    17장. Flow Matching의 확장 지형
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../18-flow-matching-robotics/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    18장. 로보틱스에서의 Flow Matching
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+
+
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    부록
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-a-references/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 A. 참고문헌과 읽기 지도
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-b-symbols-glossary/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 B. 주요 기호와 용어 정리
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-c-math-supplement/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 C. 수학 보충 설명
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-d-implementation-checklist/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 D. 구현 체크리스트
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-e-visual-checklist/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 E. 시각 자료 제작 체크리스트
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        이 장의 질문
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        조건부 경로부터 시작하기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#marginal-path" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Marginal path는 조건부 경로의 평균이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#mse" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        왜 MSE로 조건부 속도를 맞춰도 되는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        샘플 쌍을 조건으로 쓰는 경우
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        조건부 분포가 넓은 경우
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        직관적 비유
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        구현에서 보이는 형태
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_7" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        그림 후보
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_8" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        요약
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="7-conditional-flow-marginal-flow">7장. Conditional Flow에서 Marginal Flow로<a class="headerlink" href="#7-conditional-flow-marginal-flow" title="Permanent link">&para;</a></h1>
+<h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>실제 학습에서는 데이터 샘플과 노이즈 샘플을 하나씩 뽑아 그 사이의 조건부 경로를 만든다. 그런데 우리가 최종적으로 원하는 것은 특정 샘플 쌍 하나의 이동이 아니라 전체 분포 <span class="arithmatex">\(p_0\)</span>가 데이터 분포 <span class="arithmatex">\(p_1\)</span>로 이동하는 것이다. 조건부로 만든 작은 흐름들을 평균 내면 정말 전체 분포의 흐름이 되는 걸까?</p>
+<p>이 장은 Conditional Flow Matching의 핵심 직관을 다룬다. 샘플 쌍마다 쉬운 경로를 만들고, 그 경로들의 평균 효과가 전체 분포의 경로를 만든다는 관점이다. 이 연결을 이해하면 CFM loss가 단순한 편의적 트릭이 아니라 확률적으로 의미 있는 학습 목표라는 점이 보인다.</p>
+<h2 id="_2">조건부 경로부터 시작하기<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>먼저 조건 변수 <span class="arithmatex">\(z\)</span>를 도입하자. <span class="arithmatex">\(z\)</span>는 어떤 경로를 선택했는지를 나타내는 정보다. 가장 쉬운 예에서는 <span class="arithmatex">\(z=(x_0,x_1)\)</span>이다. 즉 노이즈 샘플 하나와 데이터 샘플 하나를 뽑아 그 둘을 잇는 경로를 만든다.</p>
+<p>조건부 경로는 다음처럼 쓸 수 있다.</p>
+<div class="arithmatex">\[
+p_t(x|z).
+\]</div>
+<p>이 식은 “조건 <span class="arithmatex">\(z\)</span>가 주어졌을 때 시각 <span class="arithmatex">\(t\)</span>의 샘플 분포”를 뜻한다. 만약 경로가 결정론적이라면 <span class="arithmatex">\(x_t\)</span>는 <span class="arithmatex">\(z\)</span>와 <span class="arithmatex">\(t\)</span>에 의해 정해진다.</p>
+<p>예를 들어 직선 경로에서는 다음과 같다.</p>
+<div class="arithmatex">\[
+x_t = (1-t)x_0 + tx_1.
+\]</div>
+<p>이때 조건부 속도는</p>
+<div class="arithmatex">\[
+u_t(x|z)=x_1-x_0
+\]</div>
+<p>처럼 단순해진다. 조건 <span class="arithmatex">\(z\)</span>가 주어지면 목표 속도를 바로 계산할 수 있다.</p>
+<h2 id="marginal-path">Marginal path는 조건부 경로의 평균이다<a class="headerlink" href="#marginal-path" title="Permanent link">&para;</a></h2>
+<p>전체 분포 관점에서는 특정 <span class="arithmatex">\(z\)</span> 하나가 아니라 가능한 모든 조건을 고려해야 한다. 조건 <span class="arithmatex">\(z\)</span>가 분포 <span class="arithmatex">\(q(z)\)</span>에서 온다고 하자. 그러면 marginal path는 조건부 경로를 <span class="arithmatex">\(z\)</span>에 대해 적분한 것이다.</p>
+<div class="arithmatex">\[
+p_t(x)=\int p_t(x|z)q(z)\,dz.
+\]</div>
+<p>이 식은 조건부 확률에서 배운 주변화와 같다. <span class="arithmatex">\(z\)</span>를 직접 관측하지 않는다면, 가능한 모든 <span class="arithmatex">\(z\)</span>의 기여를 더해 전체 분포를 얻는다.</p>
+<p>문제는 속도장이다. 조건부 속도 <span class="arithmatex">\(u_t(x|z)\)</span>를 알고 있을 때 marginal velocity <span class="arithmatex">\(u_t(x)\)</span>는 어떻게 되는가? 핵심은 위치 <span class="arithmatex">\(x\)</span>에 도착한 여러 조건부 경로들의 속도를 조건부 평균으로 모은다는 점이다.</p>
+<div class="arithmatex">\[
+u_t(x)=\mathbb{E}\left[u_t(x|z)\mid x_t=x\right].
+\]</div>
+<p>즉 같은 위치 <span class="arithmatex">\(x\)</span>에 여러 경로가 지나갈 수 있다. 그 경로들이 제안하는 속도를 평균하면 marginal path를 움직이는 속도장이 된다.</p>
+<h2 id="mse">왜 MSE로 조건부 속도를 맞춰도 되는가<a class="headerlink" href="#mse" title="Permanent link">&para;</a></h2>
+<p>모델은 실제로 <span class="arithmatex">\(u_t(x)\)</span>를 직접 보지 않는다. 대신 학습 데이터로 <span class="arithmatex">\((x_t,t,u_t(x_t|z))\)</span>를 받는다. 손실은 다음과 같다.</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\mathrm{CFM}}(\theta)
+=\mathbb{E}_{t,z,x_t}\left[\left\|v_\theta(x_t,t)-u_t(x_t|z)\right\|^2\right].
+\]</div>
+<p>MSE 회귀에서 중요한 성질이 있다. 입력이 <span class="arithmatex">\(x_t,t\)</span>로 고정되어 있을 때 MSE를 최소화하는 예측값은 목표값의 조건부 평균이다.</p>
+<div class="arithmatex">\[
+v^*(x,t)=\mathbb{E}\left[u_t(x|z)\mid x_t=x\right].
+\]</div>
+<p>그런데 오른쪽이 바로 marginal velocity <span class="arithmatex">\(u_t(x)\)</span>다. 따라서 조건부 속도를 목표로 학습해도, 충분한 데이터와 모델 용량이 있다면 모델은 marginal velocity를 배우게 된다.</p>
+<p>이것이 Conditional Flow Matching의 핵심이다. 계산하기 어려운 전체 속도장을 직접 만들지 않고, 계산하기 쉬운 조건부 속도를 샘플링해서 학습한다.</p>
+<h2 id="_3">샘플 쌍을 조건으로 쓰는 경우<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>가장 직관적인 조건은 <span class="arithmatex">\(z=(x_0,x_1)\)</span>이다.</p>
+<div class="arithmatex">\[
+x_0\sim p_0, \qquad x_1\sim p_1.
+\]</div>
+<p>이 둘을 독립적으로 뽑으면 각 학습 샘플마다 하나의 경로가 생긴다. 직선 경로에서는</p>
+<div class="arithmatex">\[
+x_t=(1-t)x_0+tx_1,
+\]</div>
+<div class="arithmatex">\[
+u_t=x_1-x_0.
+\]</div>
+<p>이 방식은 구현이 매우 단순하다. 하지만 모든 노이즈 샘플과 모든 데이터 샘플을 무작위로 연결하면 경로가 비효율적일 수 있다. 서로 멀리 떨어진 점들을 무작위로 연결하면 속도장이 복잡해지고, 생성 시 ODE가 구불구불해질 수 있다.</p>
+<p>이 문제 때문에 optimal transport 기반 pairing, rectified flow, 더 나은 path parameterization이 등장한다. 하지만 기본 원리는 변하지 않는다. 조건부로 쉬운 경로를 만들고, 그 경로들의 평균 속도를 모델이 학습한다.</p>
+<h2 id="_4">조건부 분포가 넓은 경우<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>조건부 경로가 항상 결정론적일 필요는 없다. 어떤 방법은 조건 <span class="arithmatex">\(z\)</span>가 주어져도 <span class="arithmatex">\(x_t\)</span>가 가우시안 분포를 따르도록 설계한다.</p>
+<div class="arithmatex">\[
+p_t(x|z)=\mathcal{N}(\mu_t(z),\sigma_t^2 I).
+\]</div>
+<p>이 경우에는 <span class="arithmatex">\(x_t\)</span>를 샘플링해야 하며, 조건부 속도도 평균과 분산의 시간 변화에 따라 달라질 수 있다. 장점은 diffusion과 비슷한 노이즈 구조를 표현할 수 있다는 점이다. 단점은 수식이 더 복잡해지고 구현에서 broadcasting과 scale 처리를 조심해야 한다는 점이다.</p>
+<p>조건부 경로가 결정론적이든 확률적이든 핵심은 같다.</p>
+<div class="arithmatex">\[
+\text{쉬운 조건부 문제들을 모아 어려운 marginal 문제를 푼다.}
+\]</div>
+<h2 id="_5">직관적 비유<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>전체 데이터 분포를 한 번에 이동시키는 것은 도시 전체의 교통 흐름을 직접 설계하는 것과 비슷하다. 너무 복잡해서 모든 도로의 평균 이동 방향을 한 번에 계산하기 어렵다.</p>
+<p>대신 개별 사람의 출발지와 도착지를 알고 있다고 하자. 각 사람에게는 단순한 이동 경로를 정해 줄 수 있다. 같은 도로 위에서 여러 사람이 다른 방향을 원할 수 있지만, 그들의 평균 이동 방향을 보면 그 도로의 전체 흐름을 추정할 수 있다.</p>
+<p>Conditional Flow Matching은 이와 비슷하다. 개별 경로는 단순하게 만들고, 모델은 같은 위치와 시간에서 관측되는 속도들의 평균적인 방향을 배운다.</p>
+<h2 id="_6">구현에서 보이는 형태<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<p>미니배치 학습에서는 다음 순서가 된다.</p>
+<ol>
+<li>데이터 배치 <span class="arithmatex">\(x_1\)</span>을 가져온다.</li>
+<li>같은 shape의 노이즈 <span class="arithmatex">\(x_0\)</span>를 샘플링한다.</li>
+<li><span class="arithmatex">\(t\sim \mathrm{Uniform}(0,1)\)</span>을 샘플링한다.</li>
+<li><span class="arithmatex">\(x_t\)</span>를 만든다.</li>
+<li>목표 속도 <span class="arithmatex">\(u_t\)</span>를 만든다.</li>
+<li>모델이 <span class="arithmatex">\(v_\theta(x_t,t)\)</span>를 예측한다.</li>
+<li>MSE를 계산한다.</li>
+</ol>
+<p>직선 경로라면 4번과 5번은 매우 짧은 코드가 된다.</p>
+<div class="arithmatex">\[
+x_t=(1-t)x_0+tx_1,
+\]</div>
+<div class="arithmatex">\[
+u_t=x_1-x_0.
+\]</div>
+<p>하지만 이 짧은 코드 뒤에는 조건부 경로와 marginal velocity의 연결이 숨어 있다. 이 연결을 모르면 구현은 쉬워 보이지만 왜 작동하는지 이해하기 어렵다.</p>
+<h2 id="_7">그림 후보<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>조건부 경로 묶음 그림</strong>: 여러 개의 <span class="arithmatex">\(x_0\)</span>와 <span class="arithmatex">\(x_1\)</span> 쌍을 선으로 연결하고, 같은 중간 영역을 지나는 선들의 평균 방향을 굵은 화살표로 표시한다.</li>
+<li><strong>주변화 그림</strong>: <span class="arithmatex">\(p_t(x|z_1)\)</span>, <span class="arithmatex">\(p_t(x|z_2)\)</span>, <span class="arithmatex">\(p_t(x|z_3)\)</span>가 겹쳐져 전체 <span class="arithmatex">\(p_t(x)\)</span>를 만드는 모습을 반투명 곡선으로 보여 준다.</li>
+<li><strong>MSE 조건부 평균 그림</strong>: 같은 위치 <span class="arithmatex">\(x\)</span>에서 여러 목표 속도 화살표가 있고, 모델 예측은 그 평균 화살표를 향하는 구조로 표현한다.</li>
+</ul>
+<h2 id="_8">요약<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Conditional Flow Matching은 계산하기 쉬운 조건부 경로 <span class="arithmatex">\(p_t(x|z)\)</span>와 조건부 속도 <span class="arithmatex">\(u_t(x|z)\)</span>에서 출발한다.</li>
+<li>전체 marginal path는 조건부 경로를 조건 <span class="arithmatex">\(z\)</span>에 대해 주변화해서 얻는다.</li>
+<li>MSE 회귀의 최적 예측값은 조건부 평균이므로, 조건부 속도를 학습하면 marginal velocity를 배울 수 있다.</li>
+<li>샘플 쌍 <span class="arithmatex">\(z=(x_0,x_1)\)</span>을 조건으로 쓰면 구현은 단순하지만 경로 효율성은 pairing 방식에 영향을 받는다.</li>
+<li>CFM의 핵심은 쉬운 조건부 문제들을 많이 샘플링해 어려운 전체 분포 이동 문제를 푸는 것이다.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../06-flow-matching-definition/" class="md-footer__link md-footer__link--prev" aria-label="이전: 6장. Flow Matching의 한 문장 정의">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                6장. Flow Matching의 한 문장 정의
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../08-cfm-loss/" class="md-footer__link md-footer__link--next" aria-label="다음: 8장. Conditional Flow Matching Loss 뜯어보기">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                8장. Conditional Flow Matching Loss 뜯어보기
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+  </body>
+</html>

@@ -1,0 +1,2007 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="생성 모델, diffusion, Flow Matching, 로보틱스 응용을 연결하는 개발자용 입문서">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/flow-matching-guide/18-flow-matching-robotics/">
+
+
+        <link rel="prev" href="../17-broader-flow-matching/">
+
+
+        <link rel="next" href="../appendix-a-references/">
+
+
+
+
+
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>18장. 로보틱스에서의 Flow Matching - Flow Matching 가이드북</title>
+
+
+
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#18-flow-matching" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href=".." title="Flow Matching 가이드북" class="md-header__button md-logo" aria-label="Flow Matching 가이드북" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Flow Matching 가이드북
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              18장. 로보틱스에서의 Flow Matching
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="Flow Matching 가이드북" class="md-nav__button md-logo" aria-label="Flow Matching 가이드북" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Flow Matching 가이드북
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    머릿말
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    프롤로그
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    프롤로그
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../00-why-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    0장. 생성 모델은 어떻게 여기까지 왔을까?
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    1부. 생성 모델을 위한 수학 언어
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    1부. 생성 모델을 위한 수학 언어
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../01-probability-language/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    1장. 생성 모델을 위한 확률 언어
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../02-conditional-probability-marginalization/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    2장. 조건부 확률과 주변화
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../03-moving-distributions/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    3장. 분포를 움직인다는 생각
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../04-noisy-dynamics/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    4장. 노이즈가 들어간 동역학
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-continuity-score/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. 확률 질량 보존과 score
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    2부. Flow Matching의 핵심 아이디어
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    2부. Flow Matching의 핵심 아이디어
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-flow-matching-definition/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. Flow Matching의 한 문장 정의
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07-conditional-to-marginal/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Conditional Flow에서 Marginal Flow로
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08-cfm-loss/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Conditional Flow Matching Loss 뜯어보기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../09-diffusion-vs-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. Diffusion과 Flow Matching 비교
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+
+
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    3부. 구현과 실험
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    3부. 구현과 실험
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../10-toy-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. 2차원 Toy Example로 Flow Matching 실습하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../11-pytorch-training-loop/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. PyTorch Training Loop 설계
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../12-image-example/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    12장. 작은 이미지 예제로 확장하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../13-path-parameterization/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    13장. Path Parameterization 선택
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../14-sampling-ode-solver/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    14장. Sampling과 ODE Solver
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+
+
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    4부. 논문 로드맵과 확장
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    4부. 논문 로드맵과 확장
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../15-paper-roadmap/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    15장. 논문 로드맵
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../16-guidance-conditional-generation/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    16장. Guidance와 Conditional Generation
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../17-broader-flow-matching/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    17장. Flow Matching의 확장 지형
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    18장. 로보틱스에서의 Flow Matching
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    18장. 로보틱스에서의 Flow Matching
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        이 장의 질문
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#ai" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        AI 로보틱스 관점에서 보는 핵심 변화
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        로봇 정책은 왜 생성 모델 문제가 되는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#flow-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        왜 Flow Matching을 적용하기 시작했는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#action-chunk" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        가장 기본적인 적용: action chunk 생성
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#motion-planning-trajectory" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Motion planning에서는 trajectory를 생성한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#affordance" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Affordance와 결합한 조작
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#riemannian-flow-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        로봇 상태 공간의 기하: Riemannian Flow Matching
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#equivariant-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        공간 대칭성과 equivariant policy
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#vla-action-expert" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        VLA 모델에서의 action expert
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        안전성과 제약 조건
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#2026-5" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        최신 연구 동향: 2026년 5월 기준
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        로보틱스 적용을 읽을 때의 체크리스트
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        그림 후보
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        요약
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+
+
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    부록
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-a-references/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 A. 참고문헌과 읽기 지도
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-b-symbols-glossary/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 B. 주요 기호와 용어 정리
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-c-math-supplement/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 C. 수학 보충 설명
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-d-implementation-checklist/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 D. 구현 체크리스트
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../appendix-e-visual-checklist/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    부록 E. 시각 자료 제작 체크리스트
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        이 장의 질문
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#ai" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        AI 로보틱스 관점에서 보는 핵심 변화
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        로봇 정책은 왜 생성 모델 문제가 되는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#flow-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        왜 Flow Matching을 적용하기 시작했는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#action-chunk" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        가장 기본적인 적용: action chunk 생성
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#motion-planning-trajectory" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Motion planning에서는 trajectory를 생성한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#affordance" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Affordance와 결합한 조작
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#riemannian-flow-matching" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        로봇 상태 공간의 기하: Riemannian Flow Matching
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#equivariant-policy" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        공간 대칭성과 equivariant policy
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#vla-action-expert" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        VLA 모델에서의 action expert
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        안전성과 제약 조건
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#2026-5" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        최신 연구 동향: 2026년 5월 기준
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        로보틱스 적용을 읽을 때의 체크리스트
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        그림 후보
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        요약
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="18-flow-matching">18장. 로보틱스에서의 Flow Matching<a class="headerlink" href="#18-flow-matching" title="Permanent link">&para;</a></h1>
+<h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>로봇은 이미지를 한 장 만드는 모델과 다르다. 로봇 정책은 지금 보는 장면, 언어 지시, 로봇 관절 상태를 보고 다음 행동을 빠르게 만들어야 하며, 그 행동은 안전하고 부드럽고 물리적으로 실행 가능해야 한다. 그렇다면 왜 로보틱스 연구자들은 diffusion policy 이후 Flow Matching을 로봇 조작과 motion planning에 적용하기 시작했을까?</p>
+<p>이 장은 Flow Matching이 로보틱스에서 쓰이는 방식을 정리한다. 이 책의 독자는 로보틱스와 AI에 관심이 많은 개발자 또는 연구 지망자를 상정한다. 따라서 로봇 제어 이론을 깊게 파고들기보다, diffusion policy, imitation learning, VLA, action expert 같은 AI 로보틱스 흐름 속에서 Flow Matching이 어떤 역할을 맡는지에 초점을 둔다. 핵심은 이미지 생성이 아니라 <strong>행동 분포를 생성하는 정책</strong>이다. 로봇이 해야 할 action sequence 또는 trajectory를 하나의 샘플로 보고, 노이즈에서 그 행동 샘플로 가는 흐름을 학습한다. 2026년 5월 기준 최신 흐름까지 포함해, 왜 적용했는지, 어떻게 적용했는지, 어떤 효과가 보고되었는지, 앞으로 어떤 방향으로 가는지 살펴본다.</p>
+<h2 id="ai">AI 로보틱스 관점에서 보는 핵심 변화<a class="headerlink" href="#ai" title="Permanent link">&para;</a></h2>
+<p>로보틱스와 AI에 관심이 많은 독자라면 이 장을 “Flow Matching의 응용 사례” 정도로만 읽지 않는 편이 좋다. 더 큰 변화는 로봇 정책을 deterministic controller가 아니라 조건부 생성 모델로 보기 시작했다는 점이다.</p>
+<p>예전에는 로봇 정책을 다음처럼 생각하기 쉬웠다.</p>
+<div class="arithmatex">\[
+\text{관측} \rightarrow \text{정답 행동}
+\]</div>
+<p>하지만 최근 AI 로보틱스에서는 다음 관점이 점점 중요해지고 있다.</p>
+<div class="arithmatex">\[
+\text{관측과 지시} \rightarrow \text{가능한 행동 분포} \rightarrow \text{실행할 action sequence}
+\]</div>
+<p>이 변화는 LLM이나 image generation에서 배운 generative modeling의 감각이 로봇 제어로 들어오는 과정이다. VLA 모델은 언어와 시각 이해를 담당하고, Flow Matching이나 diffusion 계열 action head는 연속 행동을 생성한다. 따라서 이 장의 초점은 “로봇 제어를 Flow Matching으로 대체한다”가 아니라, <strong>AI foundation model과 실제 로봇 action 사이의 접점에서 Flow Matching이 왜 유용한가</strong>이다.</p>
+<h2 id="_2">로봇 정책은 왜 생성 모델 문제가 되는가<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>전통적인 behavior cloning은 관측 <span class="arithmatex">\(o\)</span>가 주어졌을 때 전문가 행동 <span class="arithmatex">\(a\)</span>를 직접 예측한다.</p>
+<div class="arithmatex">\[
+a=f_\theta(o).
+\]</div>
+<p>이 접근은 단순하지만 로봇 조작에서는 한계가 있다. 같은 장면에서도 성공적인 행동이 여러 개일 수 있기 때문이다. 컵을 집을 때 왼쪽에서 접근할 수도 있고, 오른쪽에서 접근할 수도 있다. 서랍을 여는 동작도 손잡이 위치, 장애물, 로봇 자세에 따라 여러 trajectory가 가능하다.</p>
+<p>따라서 로봇 정책은 단일 평균 행동보다 조건부 행동 분포를 다루어야 한다.</p>
+<div class="arithmatex">\[
+a \sim p(a|o).
+\]</div>
+<p>여기서 <span class="arithmatex">\(o\)</span>는 이미지, 언어 지시, proprioception, goal state 등을 포함할 수 있다. 행동 <span class="arithmatex">\(a\)</span>는 단일 action일 수도 있고, 여러 step의 action chunk일 수도 있으며, 전체 trajectory일 수도 있다.</p>
+<p>이 관점에서 imitation learning은 다음 문제가 된다.</p>
+<div class="arithmatex">\[
+\text{관측 } o \text{가 주어졌을 때 가능한 성공 행동들의 분포 } p(a|o) \text{를 학습한다.}
+\]</div>
+<p>Diffusion policy가 로보틱스에서 주목받은 이유도 여기에 있다. diffusion은 multi-modal action distribution을 잘 표현할 수 있고, 단순한 평균 행동으로 붕괴되는 문제를 줄여 준다. Flow Matching은 같은 문제를 더 직접적인 velocity field 학습과 빠른 sampling 관점에서 다시 다룬다.</p>
+<h2 id="flow-matching">왜 Flow Matching을 적용하기 시작했는가<a class="headerlink" href="#flow-matching" title="Permanent link">&para;</a></h2>
+<p>로보틱스에서 Flow Matching이 주목받은 이유는 네 가지로 정리할 수 있다.</p>
+<p>첫째, 행동은 연속값이다. 로봇의 joint position, end-effector pose, gripper command는 대부분 연속 공간에 있다. Flow Matching은 연속 공간의 샘플을 노이즈에서 데이터로 이동시키는 방법이므로 action trajectory 생성과 잘 맞는다.</p>
+<p>둘째, 추론 속도가 중요하다. 로봇 제어는 이미지 생성보다 latency에 민감하다. diffusion policy는 여러 denoising step이 필요할 수 있는데, Flow Matching은 비교적 단순한 ODE 또는 적은 step의 flow sampling으로 action을 만들 수 있다는 기대가 있다.</p>
+<p>셋째, trajectory smoothness가 중요하다. 로봇 행동은 보기 좋은 샘플이면 충분하지 않다. 속도와 가속도가 너무 급격하면 실제 로봇에서 흔들림, 충돌, 제어 실패가 생긴다. Flow Matching의 velocity field 관점은 trajectory dynamics와 자연스럽게 연결된다.</p>
+<p>넷째, 조건부 생성 구조가 명확하다. 관측 <span class="arithmatex">\(o\)</span>와 시간 <span class="arithmatex">\(t\)</span>를 조건으로 넣어 action chunk의 흐름을 만들 수 있다.</p>
+<div class="arithmatex">\[
+v_\theta(a_t,t,o).
+\]</div>
+<p>이 구조는 vision-language-action 모델, affordance 기반 조작, motion planning 모두에 적용할 수 있다.</p>
+<h2 id="action-chunk">가장 기본적인 적용: action chunk 생성<a class="headerlink" href="#action-chunk" title="Permanent link">&para;</a></h2>
+<p>로봇 정책에서 가장 직관적인 방식은 action sequence를 생성 샘플로 보는 것이다. 길이가 <span class="arithmatex">\(H\)</span>인 action chunk를</p>
+<div class="arithmatex">\[
+A=(a_1,a_2,\ldots,a_H)
+\]</div>
+<p>라고 하자. 각 action이 <span class="arithmatex">\(d_a\)</span>차원이라면</p>
+<div class="arithmatex">\[
+A\in\mathbb{R}^{H\times d_a}.
+\]</div>
+<p>관측 <span class="arithmatex">\(o\)</span>가 주어졌을 때 전문가 데이터에서 action chunk <span class="arithmatex">\(A_1\)</span>을 가져오고, 같은 shape의 노이즈 <span class="arithmatex">\(A_0\)</span>를 샘플링한다.</p>
+<div class="arithmatex">\[
+A_0\sim\mathcal{N}(0,I), \qquad A_1\sim p_{\mathrm{data}}(A|o).
+\]</div>
+<p>직선 경로를 쓰면 중간 action chunk는</p>
+<div class="arithmatex">\[
+A_t=(1-t)A_0+tA_1
+\]</div>
+<p>이고 목표 속도는</p>
+<div class="arithmatex">\[
+U_t=A_1-A_0.
+\]</div>
+<p>정책은 다음 loss를 학습한다.</p>
+<div class="arithmatex">\[
+\mathcal{L}(\theta)=\mathbb{E}\left[\left\|v_\theta(A_t,t,o)-U_t\right\|^2\right].
+\]</div>
+<p>sampling 때는 관측 <span class="arithmatex">\(o\)</span>와 노이즈 action chunk <span class="arithmatex">\(A_0\)</span>에서 시작해 ODE를 적분한다.</p>
+<div class="arithmatex">\[
+\frac{dA_t}{dt}=v_\theta(A_t,t,o).
+\]</div>
+<p>그 결과 <span class="arithmatex">\(A_1\)</span>에 가까운 action chunk를 얻고, 실제 로봇에는 첫 action 또는 chunk 일부를 실행한다. 이후 새 관측을 받고 다시 action chunk를 생성하는 receding horizon 방식으로 사용할 수 있다.</p>
+<h2 id="motion-planning-trajectory">Motion planning에서는 trajectory를 생성한다<a class="headerlink" href="#motion-planning-trajectory" title="Permanent link">&para;</a></h2>
+<p>조작 정책이 action chunk를 생성한다면, motion planning에서는 전체 trajectory를 생성 샘플로 볼 수 있다. 예를 들어 로봇 관절 trajectory를</p>
+<div class="arithmatex">\[
+\tau=(q_1,q_2,\ldots,q_H)
+\]</div>
+<p>라고 하자. 여기서 <span class="arithmatex">\(q_i\)</span>는 joint configuration이다. planning 문제의 조건은 시작 상태, 목표 상태, 장애물, 환경 지도일 수 있다.</p>
+<div class="arithmatex">\[
+c=(q_{\mathrm{start}},q_{\mathrm{goal}},\mathrm{environment}).
+\]</div>
+<p>Flow Matching planner는 다음 형태가 된다.</p>
+<div class="arithmatex">\[
+v_\theta(\tau_t,t,c).
+\]</div>
+<p>즉 노이즈 trajectory를 조건 <span class="arithmatex">\(c\)</span>에 맞는 실행 가능한 trajectory로 흐르게 만든다. 2025년 FlowMP는 conditional flow matching을 robot planning에 적용하면서, 단순 위치 velocity뿐 아니라 second-order trajectory dynamics, 즉 acceleration 효과를 명시적 또는 암묵적으로 반영하려 했다. 논문은 이런 acceleration-aware motion field가 더 부드럽고 물리적으로 실행 가능한 motion을 만드는 데 도움이 된다고 보고한다. 참고: <a href="https://arxiv.org/abs/2503.06135">FlowMP: Learning Motion Fields for Robot Planning with Conditional Flow Matching</a>.</p>
+<p>이 흐름은 14장에서 본 solver 문제와도 연결된다. 로봇 trajectory는 조금만 거칠어도 실행성이 떨어지므로, 단순히 task success만 보는 것이 아니라 smoothness, acceleration, collision, dynamic feasibility를 함께 봐야 한다.</p>
+<h2 id="affordance">Affordance와 결합한 조작<a class="headerlink" href="#affordance" title="Permanent link">&para;</a></h2>
+<p>로봇은 “어디를 잡아야 하는지”, “어느 부분이 열리는지”, “어떤 표면이 조작 가능한지”를 알아야 한다. 이를 affordance라고 부른다. Affordance 기반 조작에서는 시각 모델이 장면의 조작 가능 영역을 예측하고, Flow Matching policy가 그 정보를 조건으로 action trajectory를 생성한다.</p>
+<p>2024년 Affordance-based Robot Manipulation with Flow Matching은 frozen vision model에 prompt tuning을 적용해 affordance를 예측하고, 그 affordance에 grounded된 robot action trajectory를 supervised flow matching으로 학습했다. 논문은 random waypoint를 desired robot action trajectory로 흐르게 하는 조건부 과정으로 visuomotor policy를 표현한다. 또한 ADL 활동 관련 실제 데이터셋에서 안정적인 학습과 빠른 inference, diffusion policy와 비슷하거나 일부 경우 더 나은 일반화를 보고했다. 참고: <a href="https://arxiv.org/abs/2409.01083">Affordance-based Robot Manipulation with Flow Matching</a>.</p>
+<p>이 사례는 Flow Matching이 단독 policy로만 쓰이는 것이 아니라 perception module과 결합될 수 있음을 보여 준다. 로봇 시스템에서는 보통 perception, language understanding, planning, control이 분리되거나 부분적으로 결합되기 때문에 이런 modular conditioning 구조가 중요하다.</p>
+<h2 id="riemannian-flow-matching">로봇 상태 공간의 기하: Riemannian Flow Matching<a class="headerlink" href="#riemannian-flow-matching" title="Permanent link">&para;</a></h2>
+<p>로봇의 상태는 항상 단순한 유클리드 공간에 있지 않다. 회전은 <span class="arithmatex">\(SO(3)\)</span> 위에 있고, end-effector pose는 <span class="arithmatex">\(SE(3)\)</span>와 연결되며, joint configuration도 제약을 가질 수 있다. 이때 단순한 직선 보간이 공간의 기하를 무시할 수 있다.</p>
+<p>Riemannian Flow Matching Policy는 로봇 motion learning에서 상태가 Riemannian manifold 위에 있다는 점을 반영한다. 이 접근은 Flow Matching의 효율적인 학습과 inference 장점을 가져오면서, 로봇 상태 공간의 기하 구조를 정책에 포함하려는 시도다. 논문은 state-based와 vision-conditioned motion policy 모두에 적용하고, diffusion policy와 비교해 더 낮은 inference time과 smoother action trajectory를 보고한다. 참고: <a href="https://arxiv.org/abs/2403.10672">Riemannian Flow Matching Policy for Robot Motion Learning</a>.</p>
+<p>이 내용은 17장의 manifold 확장과 직접 연결된다. 로봇에서는 기하 구조가 추상적인 수학 장식이 아니라 실제 실행 가능성과 일반화에 영향을 주는 요소다.</p>
+<h2 id="equivariant-policy">공간 대칭성과 equivariant policy<a class="headerlink" href="#equivariant-policy" title="Permanent link">&para;</a></h2>
+<p>로봇 조작은 공간 구조를 가진다. 물체가 회전하거나 이동하면 적절한 행동도 같은 방식으로 변해야 한다. 이를 equivariance라고 부른다. Flow Matching policy에 이런 inductive bias를 넣으면 더 적은 demonstration으로도 일반화가 좋아질 수 있다.</p>
+<p>ActionFlow는 spatial symmetry inductive bias와 Flow Matching을 결합해 action sequence를 생성하는 정책이다. SE(3) 관계를 반영하는 representation과 Flow Matching 기반 action generation을 결합해 simulated와 real-world manipulation task에서 정확하고 효율적인 policy를 얻는 방향을 제안했다. 참고: <a href="https://arxiv.org/abs/2409.04576">ActionFlow: Equivariant, Accurate, and Efficient Policies with Spatially Symmetric Flow Matching</a>.</p>
+<p>2026년에는 bimanual mobile manipulation에서 형태학적 대칭을 더 직접적으로 쓰는 흐름도 등장했다. Morphologically Equivariant Flow Matching은 양팔 로봇의 좌우 반사 대칭을 <span class="arithmatex">\(\mathbb{C}_2\)</span>-equivariance로 모델링하고, 대칭 regularization 또는 equivariant velocity network로 반영한다. 공개된 초록 기준으로는 sample efficiency와 mirrored configuration에 대한 zero-shot generalization을 개선하고 실제 TIAGo++ 로봇에서 검증했다고 보고한다. 참고: <a href="https://papers.cool/arxiv/2605.12228">Morphologically Equivariant Flow Matching for Bimanual Mobile Manipulation</a>.</p>
+<p>이 방향은 로봇 foundation model이 커지는 상황에서도 중요하다. 데이터만 많이 넣는 대신, 로봇 몸체와 환경의 대칭을 정책 구조에 넣어 sample efficiency를 높이려는 시도이기 때문이다.</p>
+<h2 id="vla-action-expert">VLA 모델에서의 action expert<a class="headerlink" href="#vla-action-expert" title="Permanent link">&para;</a></h2>
+<p>최근 로보틱스의 큰 흐름은 Vision-Language-Action 모델이다. VLA 모델은 이미지와 언어 지시를 입력으로 받아 로봇 action을 출력한다. 여기서 Flow Matching은 action expert로 자주 등장한다.</p>
+<p><span class="arithmatex">\(\pi_0\)</span>는 pretrained vision-language model 위에 Flow Matching action architecture를 올린 generalist robot policy다. 논문은 single-arm, dual-arm, mobile manipulator 등 다양한 platform의 데이터를 사용하고, zero-shot 수행, 언어 지시 따르기, fine-tuning을 통한 새 skill 획득을 평가한다. 참고: <a href="https://arxiv.org/abs/2410.24164"><span class="arithmatex">\(\pi_0\)</span>: A Vision-Language-Action Flow Model for General Robot Control</a>.</p>
+<p>이 구조에서 VLM은 장면과 언어의 의미를 제공하고, Flow Matching action expert는 연속 action trajectory를 생성한다. 즉 언어 모델이 바로 joint command를 한 토큰씩 내는 것이 아니라, 로봇 제어에 맞는 연속 action distribution을 별도의 생성 모델이 담당한다.</p>
+<p>SmolVLA도 비슷한 방향의 중요한 사례다. Hugging Face의 설명에 따르면 SmolVLA는 compact VLA로, flow matching objective를 사용해 noisy sample을 ground-truth action으로 되돌리도록 학습하며, Transformers와 flow-matching decoder를 결합하고 low-latency inference를 목표로 설계되었다. 참고: <a href="https://huggingface.co/blog/smolvla">SmolVLA blog</a>, <a href="https://arxiv.org/abs/2506.01844">SmolVLA paper page</a>.</p>
+<p>이 흐름은 Flow Matching이 단지 작은 실험용 policy가 아니라, robot foundation model의 action generation 모듈로 들어가고 있음을 보여 준다.</p>
+<h2 id="_3">안전성과 제약 조건<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>로봇에서는 안전이 선택 사항이 아니다. 생성 모델이 그럴듯한 trajectory를 만들더라도 장애물과 충돌하거나 joint limit을 넘으면 사용할 수 없다. 그래서 최근 연구는 Flow Matching에 safety constraint를 결합하려 한다.</p>
+<p>Safe Flow Matching은 control barrier function을 Flow Matching 기반 motion planning에 결합해, test time에도 trajectory가 safe region 안에 머물도록 하려는 접근이다. 논문은 unseen obstacle이나 state-action constraint가 있을 때도 safety enforcement를 제공하고, planar navigation과 7-DoF manipulation에서 안전성과 planning 성능을 비교한다. 참고: <a href="https://arxiv.org/abs/2504.08661">Safe Flow Matching: Robot Motion Planning with Control Barrier Functions</a>.</p>
+<p>이 방향은 중요한 질문을 던진다.</p>
+<div class="arithmatex">\[
+\text{생성 모델의 다양성과 로봇 제어의 안전 보장을 어떻게 함께 만족할 것인가?}
+\]</div>
+<p>Flow Matching은 빠른 sampling과 trajectory distribution 표현에 장점이 있지만, 실제 배포에서는 constraint handling, verification, fallback controller가 함께 필요하다.</p>
+<h2 id="2026-5">최신 연구 동향: 2026년 5월 기준<a class="headerlink" href="#2026-5" title="Permanent link">&para;</a></h2>
+<p>2026년 5월 기준으로 로보틱스에서 Flow Matching은 다음 방향으로 빠르게 확장되고 있다.</p>
+<p>첫째, <strong>diffusion policy의 대안 또는 보완재</strong>로 쓰인다. 핵심 동기는 multi-modal action distribution을 유지하면서 inference step을 줄이고, 제어 주기에 맞는 빠른 action generation을 얻는 것이다.</p>
+<p>둘째, <strong>VLA action expert</strong>로 들어간다. <span class="arithmatex">\(\pi_0\)</span>, SmolVLA, AsyncVLA 같은 흐름에서는 VLM backbone이 장면과 언어 이해를 담당하고, Flow Matching 계열 action module이 연속 제어를 담당한다. AsyncVLA는 synchronous flow matching의 고정 time schedule이 long-horizon task에서 불안정할 수 있다고 보고, action context-aware asynchronous schedule과 self-correction을 제안한다. 참고: <a href="https://arxiv.org/abs/2511.14148">AsyncVLA</a>.</p>
+<p>셋째, <strong>적은 inference step</strong>을 향한다. ManiFlow는 consistency flow training을 사용해 high-dimensional action을 1-2 inference step으로 생성하는 방향을 제안하고, dexterous manipulation benchmark와 real-world task에서 개선을 보고한다. 참고: <a href="https://arxiv.org/abs/2509.01819">ManiFlow</a>.</p>
+<p>넷째, <strong>기하와 대칭성</strong>을 policy 구조에 넣는다. RFMP, ActionFlow, Morphologically Equivariant Flow Matching은 로봇 상태 공간, SE(3) 공간 관계, 양팔 로봇의 좌우 대칭을 반영하려는 흐름이다.</p>
+<p>다섯째, <strong>안전과 동역학 제약</strong>을 결합한다. SafeFM과 FlowMP는 단순 action 생성이 아니라 실제 실행 가능한 trajectory, acceleration-aware motion, barrier-function 기반 safety를 강조한다.</p>
+<p>여섯째, <strong>multi-modality 붕괴를 줄이는 구조</strong>가 연구된다. 로봇 조작은 같은 목표에도 여러 성공 경로가 있으므로, 단순 평균화는 위험하다. VFP 같은 연구는 variational latent prior, optimal transport alignment, mixture-of-experts decoder를 통해 multi-modal robot manipulation policy를 개선하려는 방향을 제안한다. 참고: <a href="https://arxiv.org/abs/2508.01622">VFP: Variational Flow-Matching Policy for Multi-Modal Robot Manipulation</a>.</p>
+<h2 id="_4">로보틱스 적용을 읽을 때의 체크리스트<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>Flow Matching 로보틱스 논문을 읽을 때는 다음 질문을 사용하면 좋다.</p>
+<ol>
+<li>생성하는 대상은 single action인가, action chunk인가, full trajectory인가?</li>
+<li>조건 <span class="arithmatex">\(o\)</span>에는 이미지, 언어, robot state, goal, obstacle 중 무엇이 들어가는가?</li>
+<li>경로는 action space에서 정의되는가, trajectory space에서 정의되는가, latent space에서 정의되는가?</li>
+<li>sampling은 몇 step 또는 몇 NFE가 필요한가?</li>
+<li>실제 제어 주기에서 latency를 만족하는가?</li>
+<li>trajectory smoothness, acceleration, jerk, collision, joint limit을 평가하는가?</li>
+<li>diffusion policy, ACT, behavior cloning, classical planner와 어떤 기준으로 비교하는가?</li>
+<li>simulation뿐 아니라 real robot에서 검증했는가?</li>
+<li>실패 시 안전하게 멈추거나 재계획하는 장치가 있는가?</li>
+</ol>
+<p>이 질문은 논문이 “Flow Matching을 썼다”는 사실보다 더 중요하다. 로봇에서는 생성 모델의 예쁜 수식보다 실행성과 안전성이 최종 판단 기준이기 때문이다.</p>
+<h2 id="_5">그림 후보<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>action chunk flow 그림</strong>: 노이즈 action chunk <span class="arithmatex">\(A_0\)</span>가 관측 <span class="arithmatex">\(o\)</span>를 조건으로 전문가 action chunk <span class="arithmatex">\(A_1\)</span>로 흐르는 과정을 시간축 위에 표시한다.</li>
+<li><strong>로봇 policy 구조도</strong>: 카메라 이미지, 언어 지시, proprioception이 VLM 또는 encoder로 들어가고 Flow Matching action expert가 action sequence를 생성하는 구조.</li>
+<li><strong>trajectory smoothness 비교</strong>: behavior cloning, diffusion policy, Flow Matching planner의 trajectory와 acceleration profile을 비교한다.</li>
+<li><strong>연구 동향 지도</strong>: manipulation policy, motion planning, VLA action expert, safety, equivariance, consistency training을 하나의 지도로 배치한다.</li>
+</ul>
+<h2 id="_6">요약<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<ul>
+<li>로보틱스에서 Flow Matching은 이미지 생성보다 action distribution 또는 trajectory distribution을 생성하는 정책으로 이해하는 편이 좋다.</li>
+<li>적용 동기는 multi-modal 행동 표현, 빠른 inference, smooth trajectory, 조건부 생성 구조, diffusion policy 대비 효율성이다.</li>
+<li>기본 구현은 관측 <span class="arithmatex">\(o\)</span>를 조건으로 노이즈 action chunk <span class="arithmatex">\(A_0\)</span>를 전문가 action chunk <span class="arithmatex">\(A_1\)</span>로 흐르게 하는 velocity model <span class="arithmatex">\(v_\theta(A_t,t,o)\)</span>를 학습한다.</li>
+<li>최신 흐름은 VLA action expert, safety-constrained planning, acceleration-aware trajectory generation, geometric/equivariant policy, consistency 기반 적은-step sampling으로 확장되고 있다.</li>
+<li>로봇 적용에서는 task success뿐 아니라 latency, smoothness, dynamic feasibility, collision safety, real robot 검증을 함께 확인해야 한다.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../17-broader-flow-matching/" class="md-footer__link md-footer__link--prev" aria-label="이전: 17장. Flow Matching의 확장 지형">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                17장. Flow Matching의 확장 지형
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../appendix-a-references/" class="md-footer__link md-footer__link--next" aria-label="다음: 부록 A. 참고문헌과 읽기 지도">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                부록 A. 참고문헌과 읽기 지도
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+
+  </body>
+</html>
