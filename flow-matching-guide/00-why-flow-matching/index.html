@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v8.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v9.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1623,7 +1623,7 @@
 <h1 id="0">0장. 생성 모델은 어떻게 여기까지 왔을까?<a class="headerlink" href="#0" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:09 KST</span>
-  <span>최종 업데이트: 2026-05-24 00:17 KST</span>
+  <span>최종 업데이트: 2026-05-24 00:36 KST</span>
 </div>
 
 <blockquote>
@@ -1642,7 +1642,7 @@
 <p>생성 모델의 역사는 이 질문에 대한 여러 답변의 역사로 볼 수 있다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-00-01.svg" alt="그림 0-1. 생성 모델의 기본 문제">
-  <figcaption>그림 0-1. 생성 모델의 기본 문제. 생성 모델은 개별 샘플을 복사하는 것이 아니라, 샘플들이 나온 분포를 학습하려 한다.</figcaption>
+  <figcaption><strong>그림 0-1. 생성 모델의 기본 문제.</strong><br>생성 모델은 개별 샘플을 복사하는 것이 아니라, 샘플들이 나온 분포를 학습하려 한다.</figcaption>
 </figure>
 
 <h2 id="vae-gan-flow">VAE, GAN, Flow가 남긴 질문<a class="headerlink" href="#vae-gan-flow" title="Permanent link">&para;</a></h2>
@@ -1652,9 +1652,9 @@
 <p>Normalizing flow는 다른 방향에서 문제를 풀었다. 단순한 분포의 샘플을 invertible transformation으로 복잡한 데이터 분포의 샘플로 바꾸고, 그 변환의 likelihood를 정확히 계산할 수 있게 만든다. 이 접근은 수학적으로 매력적이다. 하지만 invertibility와 Jacobian 계산 가능성 같은 제약 때문에 모델 구조 선택이 제한될 수 있다.</p>
 <p>이 지점에서 Normalizing Flow 계열의 다음 질문이 생긴다. 변환을 꼭 몇 개의 이산적인 층으로 쌓아야 할까? ResNet의 잔차 연결을 아주 작은 시간 간격의 Euler step으로 보면, 층을 무한히 촘촘하게 만든 극한은 ODE로 해석할 수 있다. 이 관점이 Neural ODE와 CNF(Continuous Normalizing Flow)로 이어진다. CNF는 discrete invertible block 대신 연속 시간 velocity field를 사용해 분포를 흘려보낸다. 구조 제약은 줄어들지만, 학습 때마다 ODE trajectory를 풀고 그 경로를 통해 likelihood와 gradient를 계산해야 하는 부담이 생긴다.</p>
 <p>Flow Matching은 이 계보에서 중요한 전환점으로 볼 수 있다. “ODE로 분포를 이동시킨다”는 CNF의 장점은 유지하되, 학습할 때 매번 ODE를 시뮬레이션하지 않도록 문제를 바꾼다. 경로를 먼저 정하면 중간 샘플 <span class="arithmatex">\(x_t\)</span>와 정답 속도 <span class="arithmatex">\(u_t\)</span>를 직접 만들 수 있고, 신경망은 그 속도를 회귀하면 된다. 따라서 Flow Matching은 normalizing flow의 정확한 분포 이동 언어, CNF의 연속 시간 ODE 관점, diffusion 이후의 simulation-free 학습 감각이 만나는 지점에 있다.</p>
-<figure class="book-figure">
+<figure class="book-figure book-figure-wide">
   <img src="../assets/figures/fig-00-07.svg" alt="그림 0-7. NF에서 CNF와 Flow Matching으로 이어지는 계보">
-  <figcaption>그림 0-7. NF는 가역 변환을 쌓고, CNF는 이를 연속 ODE로 바꾸며, Flow Matching은 경로를 고정해 속도 회귀 문제로 바꾼다.</figcaption>
+  <figcaption><strong>그림 0-7. NF는 가역 변환을 쌓고, CNF는 이를 연속 ODE로 바꾸며, Flow Matching은 경로를 고정해 속도 회귀 문제로 바꾼다.</strong></figcaption>
 </figure>
 
 <p>세 접근은 모두 생성 모델의 중요한 길을 열었다. 동시에 다음과 같은 질문을 남겼다.</p>
@@ -1667,7 +1667,7 @@
 <p>Diffusion model은 이 질문들에 대해 새로운 답을 제시했다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-00-02.svg" alt="그림 0-2. diffusion 이전 생성 모델의 세 갈래">
-  <figcaption>그림 0-2. diffusion 이전 생성 모델의 세 갈래. diffusion 이전의 모델들은 각자 강점을 가졌지만, 안정성, 품질, 구조 제약 사이의 trade-off를 남겼다.</figcaption>
+  <figcaption><strong>그림 0-2. diffusion 이전 생성 모델의 세 갈래.</strong><br>diffusion 이전의 모델들은 각자 강점을 가졌지만, 안정성, 품질, 구조 제약 사이의 trade-off를 남겼다.</figcaption>
 </figure>
 
 <h2 id="diffusion">Diffusion의 직관: 조금씩 망가뜨리고, 거꾸로 되돌리기<a class="headerlink" href="#diffusion" title="Permanent link">&para;</a></h2>
@@ -1685,7 +1685,7 @@
 <p>Diffusion model의 성공은 단순히 이미지 품질이 좋아서만은 아니다. 이 모델은 생성 과정을 시간에 따른 변화로 바라보게 만들었다. 샘플은 한 번에 생기는 것이 아니라, 시간 <span class="arithmatex">\(t\)</span>에 따라 noise에서 data로 이동한다. 이 이동을 설명하려면 자연스럽게 path, score, SDE, ODE 같은 언어가 필요해진다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-00-03.svg" alt="그림 0-3. diffusion의 forward와 reverse">
-  <figcaption>그림 0-3. diffusion의 forward와 reverse. diffusion은 어려운 생성을 많은 작은 denoising 단계로 나누어 해결한다.</figcaption>
+  <figcaption><strong>그림 0-3. diffusion의 forward와 reverse.</strong><br>diffusion은 어려운 생성을 많은 작은 denoising 단계로 나누어 해결한다.</figcaption>
 </figure>
 
 <h2 id="score">Score라는 언어가 등장한 이유<a class="headerlink" href="#score" title="Permanent link">&para;</a></h2>
@@ -1700,7 +1700,7 @@
 <p>이 질문이 Flow Matching으로 이어진다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-00-04.svg" alt="그림 0-4. score field와 velocity field의 직관 차이">
-  <figcaption>그림 0-4. score field와 velocity field의 직관 차이. score는 density가 증가하는 방향을 말하고, velocity는 path를 따라 샘플이 실제로 움직이는 방향을 말한다.</figcaption>
+  <figcaption><strong>그림 0-4. score field와 velocity field의 직관 차이.</strong><br>score는 density가 증가하는 방향을 말하고, velocity는 path를 따라 샘플이 실제로 움직이는 방향을 말한다.</figcaption>
 </figure>
 
 <h2 id="flow-matching">Flow Matching의 문제의식: 속도를 직접 맞추기<a class="headerlink" href="#flow-matching" title="Permanent link">&para;</a></h2>
@@ -1721,7 +1721,7 @@
 <p>이 책에서 중요한 태도는 “Diffusion vs Flow Matching”처럼 승패를 가르는 것이 아니다. 두 방법이 어떤 질문을 공유하고, 어떤 수학 언어를 다르게 쓰며, 구현에서는 무엇이 달라지는지를 차분히 비교하는 것이다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-00-05.svg" alt="그림 0-5. Flow Matching의 기본 그림">
-  <figcaption>그림 0-5. Flow Matching의 기본 그림. Flow Matching은 noise에서 data로 가는 path를 따라 샘플이 움직일 속도를 학습한다.</figcaption>
+  <figcaption><strong>그림 0-5. Flow Matching의 기본 그림.</strong><br>Flow Matching은 noise에서 data로 가는 path를 따라 샘플이 움직일 속도를 학습한다.</figcaption>
 </figure>
 
 <h2 id="_2">왜 수학을 먼저 배워야 하는가<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
@@ -1744,7 +1744,7 @@
 <p>따라서 이 책의 수학 파트는 증명을 위한 증명이 아니다. 논문을 읽고 구현을 이해하기 위해 필요한 최소한의 언어를 만드는 과정이다. 각 수학 장은 독립적인 수학 교과서처럼 쓰지 않는다. 모든 장은 Flow Matching과 diffusion의 본론으로 돌아오기 위한 징검다리 역할을 한다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-00-06.svg" alt="그림 0-6. 이 책에서 사용할 수학 지도">
-  <figcaption>그림 0-6. 이 책에서 사용할 수학 지도. 수학 파트는 본론을 늦추는 장벽이 아니라, Flow Matching을 읽기 위한 공통 언어를 만드는 구간이다.</figcaption>
+  <figcaption><strong>그림 0-6. 이 책에서 사용할 수학 지도.</strong><br>수학 파트는 본론을 늦추는 장벽이 아니라, Flow Matching을 읽기 위한 공통 언어를 만드는 구간이다.</figcaption>
 </figure>
 
 <h2 id="_3">이 책의 읽는 순서<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>

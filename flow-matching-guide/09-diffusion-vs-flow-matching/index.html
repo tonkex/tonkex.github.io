@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v8.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v9.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1667,7 +1667,7 @@
 <h1 id="9-diffusion-flow-matching">9장. Diffusion과 Flow Matching 비교<a class="headerlink" href="#9-diffusion-flow-matching" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:43 KST</span>
-  <span>최종 업데이트: 2026-05-24 00:17 KST</span>
+  <span>최종 업데이트: 2026-05-24 00:36 KST</span>
 </div>
 
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -1790,9 +1790,9 @@ J_t(x)=f_t(x)p_t(x)-D_t\nabla p_t(x).
 J_t(x)=p_t(x)u_t(x).
 \]</div>
 <p>즉 확산항 없이 velocity field가 확률 질량을 운반하는 Liouville equation 관점에 가깝다. 이 설명은 “확산항 <span class="arithmatex">\(D\)</span>를 켜면 diffusion, 끄면 Flow Matching”이라는 좋은 직관을 준다. 다만 이것은 모든 Flow Matching 변형을 완전히 환원하는 엄밀한 분류라기보다, 두 방법의 공통 기반을 이해하기 위한 지도라고 보는 편이 안전하다.</p>
-<figure class="book-figure">
+<figure class="book-figure book-figure-wide">
   <img src="../assets/figures/fig-09-fpe-switch.svg" alt="그림 9-2. Fokker-Planck 관점에서 본 Diffusion과 Flow Matching">
-  <figcaption>그림 9-2. 연속방정식의 flux를 drift와 diffusion 항으로 나누면, Flow Matching과 Diffusion의 차이를 같은 좌표계에서 비교할 수 있다.</figcaption>
+  <figcaption><strong>그림 9-2. 연속방정식의 flux를 drift와 diffusion 항으로 나누면, Flow Matching과 Diffusion의 차이를 같은 좌표계에서 비교할 수 있다.</strong></figcaption>
 </figure>
 
 <p>이 관점을 더하면 비교표도 조금 달라진다.</p>
@@ -1862,7 +1862,7 @@ J_t(x)=p_t(x)u_t(x).
 <h2 id="_6">시각 자료<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <figure class="book-figure">
   <img src="../assets/figures/fig-09-overview.svg" alt="9장 핵심 시각 자료">
-  <figcaption>9장 핵심 시각 자료.</figcaption>
+  <figcaption><strong>9장 핵심 시각 자료.</strong></figcaption>
 </figure>
 
 <ul>

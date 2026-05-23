@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v8.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v9.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1667,7 +1667,7 @@
 <h1 id="1">1장. 생성 모델을 위한 확률 언어<a class="headerlink" href="#1" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:14 KST</span>
-  <span>최종 업데이트: 2026-05-24 00:17 KST</span>
+  <span>최종 업데이트: 2026-05-24 00:36 KST</span>
 </div>
 
 <blockquote>
@@ -1692,7 +1692,7 @@
 <p>여기서 중요한 구분이 있다. 데이터셋은 분포 자체가 아니다. 데이터셋은 분포에서 뽑힌 유한한 관찰 결과다. 우리가 갖고 있는 것은 데이터셋뿐이지만, 생성 모델이 궁극적으로 흉내 내고 싶은 것은 그 뒤에 있는 분포다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-01-01.svg" alt="그림 1-1. 샘플과 분포의 차이">
-  <figcaption>그림 1-1. 샘플과 분포의 차이. 데이터셋은 분포에서 관찰한 샘플들의 모음이고, 생성 모델은 그 뒤의 분포를 배우려 한다.</figcaption>
+  <figcaption><strong>그림 1-1. 샘플과 분포의 차이.</strong><br>데이터셋은 분포에서 관찰한 샘플들의 모음이고, 생성 모델은 그 뒤의 분포를 배우려 한다.</figcaption>
 </figure>
 
 <h2 id="_2">확률변수는 샘플을 만들어내는 자리다<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
@@ -1722,7 +1722,7 @@ X \sim \mathcal{N}(0, 1)
 <p>이미지 데이터에서는 차원이 훨씬 높다. <span class="arithmatex">\(28 \times 28\)</span> 흑백 이미지는 784차원 벡터로 볼 수 있다. 이 공간에서 density를 직접 상상하기는 어렵다. 하지만 기본 생각은 같다. 손글씨 숫자처럼 보이는 이미지들은 어떤 영역에 많이 모여 있고, 무작위 noise 이미지는 다른 영역에 놓여 있다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-01-02.svg" alt="그림 1-2. 1차원 Gaussian density">
-  <figcaption>그림 1-2. 1차원 Gaussian density. density는 특정 값 주변에 샘플이 얼마나 자주 나타나는지를 나타낸다.</figcaption>
+  <figcaption><strong>그림 1-2. 1차원 Gaussian density.</strong><br>density는 특정 값 주변에 샘플이 얼마나 자주 나타나는지를 나타낸다.</figcaption>
 </figure>
 
 <h2 id="histogram-density">Histogram과 density는 어떻게 다를까<a class="headerlink" href="#histogram-density" title="Permanent link">&para;</a></h2>
@@ -1738,7 +1738,7 @@ X \sim \mathcal{N}(0, 1)
 <p>2차원 toy example에서는 이 차이를 쉽게 볼 수 있다. 샘플 점들을 scatter plot으로 찍고, 그 위에 density contour를 그리면 샘플들이 어떤 모양의 분포를 따르는지 더 잘 보인다. 10장에서 만들 첫 Flow Matching 구현도 이런 2D 분포에서 시작할 것이다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-01-03.svg" alt="그림 1-3. 샘플 점, histogram, density contour">
-  <figcaption>그림 1-3. 샘플 점, histogram, density contour. 관찰된 샘플을 통해 보이지 않는 분포의 모양을 추정한다.</figcaption>
+  <figcaption><strong>그림 1-3. 샘플 점, histogram, density contour.</strong><br>관찰된 샘플을 통해 보이지 않는 분포의 모양을 추정한다.</figcaption>
 </figure>
 
 <h2 id="_3">샘플링은 분포에서 값을 뽑는 일이다<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
@@ -1775,7 +1775,7 @@ x_1 \sim p_1
 <p>Flow Matching의 loss도 같은 방식으로 읽을 수 있다. 나중에 CFM(Conditional Flow Matching) loss를 보면 시간 <span class="arithmatex">\(t\)</span>, 데이터 샘플, noise 샘플, 중간 샘플 <span class="arithmatex">\(x_t\)</span>에 대한 expectation이 등장한다. 처음에는 복잡해 보이지만, 구현에서는 결국 무작위로 batch를 만들고 각 샘플의 loss를 평균내는 구조가 된다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-01-04.svg" alt="그림 1-4. expectation과 minibatch 평균">
-  <figcaption>그림 1-4. expectation과 minibatch 평균. 논문의 expectation은 학습 코드에서 minibatch 평균으로 근사된다.</figcaption>
+  <figcaption><strong>그림 1-4. expectation과 minibatch 평균.</strong><br>논문의 expectation은 학습 코드에서 minibatch 평균으로 근사된다.</figcaption>
 </figure>
 
 <h2 id="gaussian-noise">왜 Gaussian noise가 자주 등장할까<a class="headerlink" href="#gaussian-noise" title="Permanent link">&para;</a></h2>
@@ -1795,7 +1795,7 @@ x_1 \sim p_1
 <p>Diffusion은 이 이동을 score와 denoising process로 설명한다. Flow Matching은 이 이동을 probability path와 velocity field로 설명한다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-01-05.svg" alt="그림 1-5. Gaussian noise와 data sample의 대비">
-  <figcaption>그림 1-5. Gaussian noise와 data sample의 대비. 생성 모델은 쉽게 샘플링 가능한 noise distribution에서 시작해 data distribution의 샘플을 만들려 한다.</figcaption>
+  <figcaption><strong>그림 1-5. Gaussian noise와 data sample의 대비.</strong><br>생성 모델은 쉽게 샘플링 가능한 noise distribution에서 시작해 data distribution의 샘플을 만들려 한다.</figcaption>
 </figure>
 
 <h2 id="p_0-p_1-p_t"><span class="arithmatex">\(p_0\)</span>, <span class="arithmatex">\(p_1\)</span>, <span class="arithmatex">\(p_t\)</span> 읽는 법<a class="headerlink" href="#p_0-p_1-p_t" title="Permanent link">&para;</a></h2>
