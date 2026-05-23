@@ -69,13 +69,17 @@ html .md-header .md-header__title {
 
 
 .md-typeset .book-figure {
-  margin: 1.1rem 0 1.35rem;
+  margin: 1.1rem auto 1.35rem;
+  text-align: center;
 }
 
 .md-typeset .book-figure img {
   display: block;
-  width: 100%;
+  width: min(100%, 48rem);
+  max-width: 100%;
   height: auto;
+  margin-left: auto;
+  margin-right: auto;
   border: 1px solid var(--md-default-fg-color--lightest);
   border-radius: 0.45rem;
   background: #f8fafc;
