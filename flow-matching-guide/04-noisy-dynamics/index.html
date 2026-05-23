@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1601,18 +1601,18 @@
 <h1 id="4">4장. 노이즈가 들어간 동역학<a class="headerlink" href="#4" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:34 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <blockquote>
 <p>Diffusion은 왜 일부러 데이터에 noise를 넣은 뒤 다시 제거하는 길을 선택했을까?</p>
 </blockquote>
-<p>3장에서는 샘플이 velocity field를 따라 움직이고, 많은 샘플의 움직임이 분포의 변화를 만든다는 관점을 배웠다. 이때 중심에 있던 식은 ODE였다.</p>
+<p>3장에서는 샘플이 velocity field를 따라 움직이고, 많은 샘플의 움직임이 분포의 변화를 만든다는 관점을 배웠다. 이때 중심에 있던 식은 ODE(Ordinary Differential Equation, 상미분방정식)였다.</p>
 <div class="arithmatex">\[
 \frac{d x_t}{dt} = v_t(x_t)
 \]</div>
 <p>이 식은 deterministic dynamics를 나타낸다. 같은 시작점에서 같은 velocity field를 따라가면 같은 경로가 나온다. 그런데 diffusion model은 여기에 noise가 들어간다. 데이터에 noise를 섞고, 그 과정을 거꾸로 되돌리는 방식으로 생성한다. 왜 굳이 이렇게 할까?</p>
-<p>이 장에서는 deterministic dynamics와 stochastic dynamics의 차이를 직관적으로 살펴본다. 그리고 diffusion model이 data와 noise를 연결하는 과정을 SDE의 언어로 어떻게 설명하는지, Flow Matching이 이와 어떤 관계를 갖는지 준비한다.</p>
+<p>이 장에서는 deterministic dynamics와 stochastic dynamics의 차이를 직관적으로 살펴본다. 그리고 diffusion model이 data와 noise를 연결하는 과정을 SDE(Stochastic Differential Equation, 확률미분방정식)의 언어로 어떻게 설명하는지, Flow Matching이 이와 어떤 관계를 갖는지 준비한다.</p>
 <h2 id="deterministic-dynamics">같은 출발점, 같은 경로: deterministic dynamics<a class="headerlink" href="#deterministic-dynamics" title="Permanent link">&para;</a></h2>
 <p>Deterministic dynamics에서는 현재 상태가 정해지면 다음 움직임도 정해진다. 3장에서 본 ODE가 대표적이다.</p>
 <div class="arithmatex">\[
@@ -1625,8 +1625,12 @@
     <span class="n">velocity</span> <span class="o">=</span> <span class="n">v</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">velocity</span>
 </code></pre></div>
-<p>여기서 <code>v(t, x)</code>가 항상 같은 값을 반환한다면, 같은 <code>x0</code>에서 시작한 실행은 항상 같은 결과를 낸다. 이런 구조는 이해하고 디버깅하기 쉽다. Flow Matching의 ODE sampling도 기본적으로 이런 deterministic dynamics의 형태로 볼 수 있다.</p>
-<p><strong>[그림 4-1: deterministic trajectory]</strong></p>
+<p>여기서 <code>v(t, x)</code>가 항상 같은 값을 반환한다면, 같은 <code>x0</code>에서 시작한 실행은 항상 같은 결과를 낸다. 이런 구조는 이해하고 디버깅하기 쉽다. Flow Matching의 ODE(Ordinary Differential Equation, 상미분방정식) sampling도 기본적으로 이런 deterministic dynamics의 형태로 볼 수 있다.</p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-04-01.svg" alt="그림 4-1. deterministic trajectory">
+  <figcaption>그림 4-1. deterministic trajectory</figcaption>
+</figure>
+
 <ul>
 <li>같은 시작점 <span class="arithmatex">\(x_0\)</span>에서 출발한 여러 번의 실행</li>
 <li>모두 같은 path를 따라가는 그림</li>
@@ -1642,8 +1646,12 @@
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">drift</span> <span class="o">+</span> <span class="n">noise_scale</span> <span class="o">*</span> <span class="n">noise</span>
 </code></pre></div>
 <p>여기서 <code>drift</code>는 평균적으로 움직이려는 방향이고, <code>noise</code>는 매번 새로 뽑히는 무작위 흔들림이다. 같은 <span class="arithmatex">\(x_0\)</span>에서 시작해도 noise가 다르면 trajectory가 달라진다.</p>
-<p>이런 dynamics를 연속 시간에서 표현하는 언어가 SDE, stochastic differential equation이다. 처음부터 엄밀하게 이해할 필요는 없다. 우선 SDE는 ODE에 noise 항이 더해진 식이라고 보면 된다.</p>
-<p><strong>[그림 4-2: deterministic path와 stochastic path 비교]</strong></p>
+<p>이런 dynamics를 연속 시간에서 표현하는 언어가 SDE(Stochastic Differential Equation, 확률미분방정식), stochastic differential equation이다. 처음부터 엄밀하게 이해할 필요는 없다. 우선 SDE는 ODE에 noise 항이 더해진 식이라고 보면 된다.</p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-04-02.svg" alt="그림 4-2. deterministic path와 stochastic path 비교">
+  <figcaption>그림 4-2. deterministic path와 stochastic path 비교</figcaption>
+</figure>
+
 <ul>
 <li>왼쪽: 같은 시작점에서 항상 같은 경로를 가는 ODE</li>
 <li>오른쪽: 같은 시작점에서도 noise 때문에 여러 경로로 퍼지는 SDE</li>
@@ -1667,7 +1675,11 @@ dx_t = f(t, x_t)\,dt + g(t)\,dW_t
 <blockquote>
 <p>샘플은 drift 방향으로 움직이면서, 동시에 시간에 따라 조절되는 noise의 영향을 받는다.</p>
 </blockquote>
-<p><strong>[그림 4-3: drift와 noise 항]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-04-03.svg" alt="그림 4-3. drift와 noise 항">
+  <figcaption>그림 4-3. drift와 noise 항</figcaption>
+</figure>
+
 <ul>
 <li>한 위치에서 drift 화살표 하나</li>
 <li>주변으로 작은 무작위 흔들림 화살표 여러 개</li>
@@ -1694,7 +1706,11 @@ x_t = \sqrt{\alpha_t}x_0 + \sqrt{1-\alpha_t}\epsilon,
 <li><span class="arithmatex">\(\sqrt{\alpha_t}\)</span>: 데이터 성분의 크기</li>
 <li><span class="arithmatex">\(\sqrt{1-\alpha_t}\)</span>: noise 성분의 크기</li>
 </ul>
-<p><strong>[그림 4-4: forward noising]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-04-04.svg" alt="그림 4-4. forward noising">
+  <figcaption>그림 4-4. forward noising</figcaption>
+</figure>
+
 <ul>
 <li>왼쪽: 깨끗한 이미지 <span class="arithmatex">\(x_0\)</span></li>
 <li>가운데: noise가 조금 섞인 <span class="arithmatex">\(x_t\)</span></li>
@@ -1710,7 +1726,11 @@ x_t = \sqrt{\alpha_t}x_0 + \sqrt{1-\alpha_t}\epsilon,
 \nabla_x \log p_t(x)
 \]</div>
 <p>현재 위치에서 density가 증가하는 방향을 알려주는 벡터다. Reverse process는 이 score 정보를 사용해 noise 상태의 샘플을 더 그럴듯한 data 쪽으로 움직인다. 5장에서 score를 더 자세히 다룰 것이므로, 지금은 diffusion의 reverse dynamics가 score와 깊게 연결된다는 점만 기억하면 된다.</p>
-<p><strong>[그림 4-5: reverse denoising]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-04-05.svg" alt="그림 4-5. reverse denoising">
+  <figcaption>그림 4-5. reverse denoising</figcaption>
+</figure>
+
 <ul>
 <li>왼쪽: Gaussian noise</li>
 <li>가운데: denoising 중간 단계</li>
@@ -1729,7 +1749,11 @@ x_t = \sqrt{\alpha_t}x_0 + \sqrt{1-\alpha_t}\epsilon,
 <li>둘 다 시간별 분포 <span class="arithmatex">\(p_t\)</span>의 변화를 설명할 수 있다.</li>
 <li>Flow Matching은 velocity field를 직접 학습하는 쪽에 초점을 둔다.</li>
 </ul>
-<p><strong>[그림 4-6: SDE와 ODE의 두 관점]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-04-06.svg" alt="그림 4-6. SDE와 ODE의 두 관점">
+  <figcaption>그림 4-6. SDE와 ODE의 두 관점</figcaption>
+</figure>
+
 <ul>
 <li>왼쪽: noise 때문에 흔들리는 여러 SDE trajectory</li>
 <li>오른쪽: deterministic ODE trajectory</li>

@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1363,10 +1363,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#5-ode-euler" class="md-nav__link">
+  <a href="#5-odeordinary-differential-equation-euler" class="md-nav__link">
     <span class="md-ellipsis">
 
-        5. ODE 적분과 Euler 방법
+        5. ODE(Ordinary Differential Equation, 상미분방정식) 적분과 Euler 방법
 
     </span>
   </a>
@@ -1549,10 +1549,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#5-ode-euler" class="md-nav__link">
+  <a href="#5-odeordinary-differential-equation-euler" class="md-nav__link">
     <span class="md-ellipsis">
 
-        5. ODE 적분과 Euler 방법
+        5. ODE(Ordinary Differential Equation, 상미분방정식) 적분과 Euler 방법
 
     </span>
   </a>
@@ -1601,7 +1601,7 @@
 <h1 id="c">부록 C. 수학 보충 설명<a class="headerlink" href="#c" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 02:18 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <h2 id="_1">부록의 목적<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -1617,7 +1617,7 @@
 \]</div>
 <p>Flow Matching loss도 대부분 이런 Monte Carlo 평균으로 학습된다. 미니배치에서 <span class="arithmatex">\(t\)</span>, <span class="arithmatex">\(x_0\)</span>, <span class="arithmatex">\(x_1\)</span>을 샘플링하고 loss 평균을 계산하는 것이 바로 이 근사다.</p>
 <h2 id="2-mse">2. 조건부 평균과 MSE의 관계<a class="headerlink" href="#2-mse" title="Permanent link">&para;</a></h2>
-<p>Conditional Flow Matching에서 중요한 성질은 MSE 회귀의 최적 예측값이 조건부 평균이라는 점이다. 입력을 <span class="arithmatex">\(X\)</span>라고 하고 목표값을 <span class="arithmatex">\(Y\)</span>라고 하자. 우리는 함수 <span class="arithmatex">\(f(X)\)</span>로 <span class="arithmatex">\(Y\)</span>를 예측하려 한다.</p>
+<p>Conditional Flow Matching에서 중요한 성질은 MSE(Mean Squared Error, 평균제곱오차) 회귀의 최적 예측값이 조건부 평균이라는 점이다. 입력을 <span class="arithmatex">\(X\)</span>라고 하고 목표값을 <span class="arithmatex">\(Y\)</span>라고 하자. 우리는 함수 <span class="arithmatex">\(f(X)\)</span>로 <span class="arithmatex">\(Y\)</span>를 예측하려 한다.</p>
 <div class="arithmatex">\[
 \mathcal{L}(f)=\mathbb{E}\left[\|f(X)-Y\|^2\right].
 \]</div>
@@ -1625,7 +1625,7 @@
 <div class="arithmatex">\[
 f^*(x)=\mathbb{E}[Y|X=x].
 \]</div>
-<p>CFM에서는 <span class="arithmatex">\(Y\)</span>가 조건부 velocity <span class="arithmatex">\(u_t(x|z)\)</span>이고, <span class="arithmatex">\(X\)</span>가 현재 중간 샘플과 시간 <span class="arithmatex">\((x_t,t)\)</span>에 해당한다. 따라서 조건부 velocity를 target으로 학습해도 모델은 같은 위치와 시간에서의 평균 velocity, 즉 marginal velocity를 배우게 된다.</p>
+<p>CFM(Conditional Flow Matching)에서는 <span class="arithmatex">\(Y\)</span>가 조건부 velocity <span class="arithmatex">\(u_t(x|z)\)</span>이고, <span class="arithmatex">\(X\)</span>가 현재 중간 샘플과 시간 <span class="arithmatex">\((x_t,t)\)</span>에 해당한다. 따라서 조건부 velocity를 target으로 학습해도 모델은 같은 위치와 시간에서의 평균 velocity, 즉 marginal velocity를 배우게 된다.</p>
 <h2 id="3-target-velocity">3. 시간 미분으로 target velocity 구하기<a class="headerlink" href="#3-target-velocity" title="Permanent link">&para;</a></h2>
 <p>경로가 다음처럼 정의되어 있다고 하자.</p>
 <div class="arithmatex">\[
@@ -1652,8 +1652,8 @@ x_t=\alpha_t x_1+\sigma_t x_0
 \]</div>
 <p>첫 항은 한 위치에서 density가 시간에 따라 얼마나 변하는지를 나타낸다. 두 번째 항은 그 위치 주변으로 확률 질량이 얼마나 흘러나가거나 들어오는지를 나타낸다. 둘의 합이 0이라는 것은 density 변화가 질량의 유입과 유출로 설명된다는 뜻이다.</p>
 <p>Flow Matching은 이 식을 직접 푸는 대신, 이 식을 만족하도록 설계된 경로와 velocity를 샘플 단위로 학습한다.</p>
-<h2 id="5-ode-euler">5. ODE 적분과 Euler 방법<a class="headerlink" href="#5-ode-euler" title="Permanent link">&para;</a></h2>
-<p>학습된 velocity model이 있으면 생성은 ODE를 푸는 문제가 된다.</p>
+<h2 id="5-odeordinary-differential-equation-euler">5. ODE(Ordinary Differential Equation, 상미분방정식) 적분과 Euler 방법<a class="headerlink" href="#5-odeordinary-differential-equation-euler" title="Permanent link">&para;</a></h2>
+<p>학습된 velocity model이 있으면 생성은 ODE(Ordinary Differential Equation, 상미분방정식)를 푸는 문제가 된다.</p>
 <div class="arithmatex">\[
 \frac{dx_t}{dt}=v_\theta(x_t,t).
 \]</div>
@@ -1661,7 +1661,7 @@ x_t=\alpha_t x_1+\sigma_t x_0
 <div class="arithmatex">\[
 x_{k+1}=x_k+\Delta t\,v_\theta(x_k,t_k).
 \]</div>
-<p>이 식은 단순하지만 생성 모델에서는 매우 중요하다. sampling step 수를 늘리면 적분 오차는 줄어들 수 있지만, 모델 호출 횟수도 늘어난다. 그래서 14장에서 NFE와 품질 trade-off를 함께 봐야 한다고 설명했다.</p>
+<p>이 식은 단순하지만 생성 모델에서는 매우 중요하다. sampling step 수를 늘리면 적분 오차는 줄어들 수 있지만, 모델 호출 횟수도 늘어난다. 그래서 14장에서 NFE(Number of Function Evaluations, 함수 평가 횟수)와 품질 trade-off를 함께 봐야 한다고 설명했다.</p>
 <h2 id="6-score-velocity">6. Score와 Velocity의 차이<a class="headerlink" href="#6-score-velocity" title="Permanent link">&para;</a></h2>
 <p>Score는 다음과 같이 정의된다.</p>
 <div class="arithmatex">\[

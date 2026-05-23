@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1299,7 +1299,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
 
-        그림 후보
+        시각 자료
 
     </span>
   </a>
@@ -1717,7 +1717,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
 
-        그림 후보
+        시각 자료
 
     </span>
   </a>
@@ -1755,12 +1755,12 @@
 <h1 id="18-flow-matching">18장. 로보틱스에서의 Flow Matching<a class="headerlink" href="#18-flow-matching" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 02:01 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>로봇은 이미지를 한 장 만드는 모델과 다르다. 로봇 정책은 지금 보는 장면, 언어 지시, 로봇 관절 상태를 보고 다음 행동을 빠르게 만들어야 하며, 그 행동은 안전하고 부드럽고 물리적으로 실행 가능해야 한다. 그렇다면 왜 로보틱스 연구자들은 diffusion policy 이후 Flow Matching을 로봇 조작과 motion planning에 적용하기 시작했을까?</p>
-<p>이 장은 Flow Matching이 로보틱스에서 쓰이는 방식을 정리한다. 이 책의 독자는 로보틱스와 AI에 관심이 많은 개발자 또는 연구 지망자를 상정한다. 따라서 로봇 제어 이론을 깊게 파고들기보다, diffusion policy, imitation learning, VLA, action expert 같은 AI 로보틱스 흐름 속에서 Flow Matching이 어떤 역할을 맡는지에 초점을 둔다. 핵심은 이미지 생성이 아니라 <strong>행동 분포를 생성하는 정책</strong>이다. 로봇이 해야 할 action sequence 또는 trajectory를 하나의 샘플로 보고, 노이즈에서 그 행동 샘플로 가는 흐름을 학습한다. 2026년 5월 기준 최신 흐름까지 포함해, 왜 적용했는지, 어떻게 적용했는지, 어떤 효과가 보고되었는지, 앞으로 어떤 방향으로 가는지 살펴본다.</p>
+<p>이 장은 Flow Matching이 로보틱스에서 쓰이는 방식을 정리한다. 이 책의 독자는 로보틱스와 AI에 관심이 많은 개발자 또는 연구 지망자를 상정한다. 따라서 로봇 제어 이론을 깊게 파고들기보다, diffusion policy, imitation learning, VLA(Vision-Language-Action), action expert 같은 AI 로보틱스 흐름 속에서 Flow Matching이 어떤 역할을 맡는지에 초점을 둔다. 핵심은 이미지 생성이 아니라 <strong>행동 분포를 생성하는 정책</strong>이다. 로봇이 해야 할 action sequence 또는 trajectory를 하나의 샘플로 보고, 노이즈에서 그 행동 샘플로 가는 흐름을 학습한다. 2026년 5월 기준 최신 흐름까지 포함해, 왜 적용했는지, 어떻게 적용했는지, 어떤 효과가 보고되었는지, 앞으로 어떤 방향으로 가는지 살펴본다.</p>
 <h2 id="ai">AI 로보틱스 관점에서 보는 핵심 변화<a class="headerlink" href="#ai" title="Permanent link">&para;</a></h2>
 <p>로보틱스와 AI에 관심이 많은 독자라면 이 장을 “Flow Matching의 응용 사례” 정도로만 읽지 않는 편이 좋다. 더 큰 변화는 로봇 정책을 deterministic controller가 아니라 조건부 생성 모델로 보기 시작했다는 점이다.</p>
 <p>예전에는 로봇 정책을 다음처럼 생각하기 쉬웠다.</p>
@@ -1771,7 +1771,7 @@
 <div class="arithmatex">\[
 \text{관측과 지시} \rightarrow \text{가능한 행동 분포} \rightarrow \text{실행할 action sequence}
 \]</div>
-<p>이 변화는 LLM이나 image generation에서 배운 generative modeling의 감각이 로봇 제어로 들어오는 과정이다. VLA 모델은 언어와 시각 이해를 담당하고, Flow Matching이나 diffusion 계열 action head는 연속 행동을 생성한다. 따라서 이 장의 초점은 “로봇 제어를 Flow Matching으로 대체한다”가 아니라, <strong>AI foundation model과 실제 로봇 action 사이의 접점에서 Flow Matching이 왜 유용한가</strong>이다.</p>
+<p>이 변화는 LLM(Large Language Model, 대규모 언어 모델)이나 image generation에서 배운 generative modeling의 감각이 로봇 제어로 들어오는 과정이다. VLA 모델은 언어와 시각 이해를 담당하고, Flow Matching이나 diffusion 계열 action head는 연속 행동을 생성한다. 따라서 이 장의 초점은 “로봇 제어를 Flow Matching으로 대체한다”가 아니라, <strong>AI foundation model과 실제 로봇 action 사이의 접점에서 Flow Matching이 왜 유용한가</strong>이다.</p>
 <h2 id="_2">로봇 정책은 왜 생성 모델 문제가 되는가<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>전통적인 behavior cloning은 관측 <span class="arithmatex">\(o\)</span>가 주어졌을 때 전문가 행동 <span class="arithmatex">\(a\)</span>를 직접 예측한다.</p>
 <div class="arithmatex">\[
@@ -1791,7 +1791,7 @@ a \sim p(a|o).
 <h2 id="flow-matching">왜 Flow Matching을 적용하기 시작했는가<a class="headerlink" href="#flow-matching" title="Permanent link">&para;</a></h2>
 <p>로보틱스에서 Flow Matching이 주목받은 이유는 네 가지로 정리할 수 있다.</p>
 <p>첫째, 행동은 연속값이다. 로봇의 joint position, end-effector pose, gripper command는 대부분 연속 공간에 있다. Flow Matching은 연속 공간의 샘플을 노이즈에서 데이터로 이동시키는 방법이므로 action trajectory 생성과 잘 맞는다.</p>
-<p>둘째, 추론 속도가 중요하다. 로봇 제어는 이미지 생성보다 latency에 민감하다. diffusion policy는 여러 denoising step이 필요할 수 있는데, Flow Matching은 비교적 단순한 ODE 또는 적은 step의 flow sampling으로 action을 만들 수 있다는 기대가 있다.</p>
+<p>둘째, 추론 속도가 중요하다. 로봇 제어는 이미지 생성보다 latency에 민감하다. diffusion policy는 여러 denoising step이 필요할 수 있는데, Flow Matching은 비교적 단순한 ODE(Ordinary Differential Equation, 상미분방정식) 또는 적은 step의 flow sampling으로 action을 만들 수 있다는 기대가 있다.</p>
 <p>셋째, trajectory smoothness가 중요하다. 로봇 행동은 보기 좋은 샘플이면 충분하지 않다. 속도와 가속도가 너무 급격하면 실제 로봇에서 흔들림, 충돌, 제어 실패가 생긴다. Flow Matching의 velocity field 관점은 trajectory dynamics와 자연스럽게 연결된다.</p>
 <p>넷째, 조건부 생성 구조가 명확하다. 관측 <span class="arithmatex">\(o\)</span>와 시간 <span class="arithmatex">\(t\)</span>를 조건으로 넣어 action chunk의 흐름을 만들 수 있다.</p>
 <div class="arithmatex">\[
@@ -1845,7 +1845,7 @@ v_\theta(\tau_t,t,c).
 <p>이 흐름은 14장에서 본 solver 문제와도 연결된다. 로봇 trajectory는 조금만 거칠어도 실행성이 떨어지므로, 단순히 task success만 보는 것이 아니라 smoothness, acceleration, collision, dynamic feasibility를 함께 봐야 한다.</p>
 <h2 id="affordance">Affordance와 결합한 조작<a class="headerlink" href="#affordance" title="Permanent link">&para;</a></h2>
 <p>로봇은 “어디를 잡아야 하는지”, “어느 부분이 열리는지”, “어떤 표면이 조작 가능한지”를 알아야 한다. 이를 affordance라고 부른다. Affordance 기반 조작에서는 시각 모델이 장면의 조작 가능 영역을 예측하고, Flow Matching policy가 그 정보를 조건으로 action trajectory를 생성한다.</p>
-<p>2024년 Affordance-based Robot Manipulation with Flow Matching은 frozen vision model에 prompt tuning을 적용해 affordance를 예측하고, 그 affordance에 grounded된 robot action trajectory를 supervised flow matching으로 학습했다. 논문은 random waypoint를 desired robot action trajectory로 흐르게 하는 조건부 과정으로 visuomotor policy를 표현한다. 또한 ADL 활동 관련 실제 데이터셋에서 안정적인 학습과 빠른 inference, diffusion policy와 비슷하거나 일부 경우 더 나은 일반화를 보고했다. 참고: <a href="https://arxiv.org/abs/2409.01083">Affordance-based Robot Manipulation with Flow Matching</a>.</p>
+<p>2024년 Affordance-based Robot Manipulation with Flow Matching은 frozen vision model에 prompt tuning을 적용해 affordance를 예측하고, 그 affordance에 grounded된 robot action trajectory를 supervised flow matching으로 학습했다. 논문은 random waypoint를 desired robot action trajectory로 흐르게 하는 조건부 과정으로 visuomotor policy를 표현한다. 또한 ADL(Activities of Daily Living, 일상생활동작) 활동 관련 실제 데이터셋에서 안정적인 학습과 빠른 inference, diffusion policy와 비슷하거나 일부 경우 더 나은 일반화를 보고했다. 참고: <a href="https://arxiv.org/abs/2409.01083">Affordance-based Robot Manipulation with Flow Matching</a>.</p>
 <p>이 사례는 Flow Matching이 단독 policy로만 쓰이는 것이 아니라 perception module과 결합될 수 있음을 보여 준다. 로봇 시스템에서는 보통 perception, language understanding, planning, control이 분리되거나 부분적으로 결합되기 때문에 이런 modular conditioning 구조가 중요하다.</p>
 <h2 id="riemannian-flow-matching">로봇 상태 공간의 기하: Riemannian Flow Matching<a class="headerlink" href="#riemannian-flow-matching" title="Permanent link">&para;</a></h2>
 <p>로봇의 상태는 항상 단순한 유클리드 공간에 있지 않다. 회전은 <span class="arithmatex">\(SO(3)\)</span> 위에 있고, end-effector pose는 <span class="arithmatex">\(SE(3)\)</span>와 연결되며, joint configuration도 제약을 가질 수 있다. 이때 단순한 직선 보간이 공간의 기하를 무시할 수 있다.</p>
@@ -1859,7 +1859,7 @@ v_\theta(\tau_t,t,c).
 <h2 id="vla-action-expert">VLA 모델에서의 action expert<a class="headerlink" href="#vla-action-expert" title="Permanent link">&para;</a></h2>
 <p>최근 로보틱스의 큰 흐름은 Vision-Language-Action 모델이다. VLA 모델은 이미지와 언어 지시를 입력으로 받아 로봇 action을 출력한다. 여기서 Flow Matching은 action expert로 자주 등장한다.</p>
 <p><span class="arithmatex">\(\pi_0\)</span>는 pretrained vision-language model 위에 Flow Matching action architecture를 올린 generalist robot policy다. 논문은 single-arm, dual-arm, mobile manipulator 등 다양한 platform의 데이터를 사용하고, zero-shot 수행, 언어 지시 따르기, fine-tuning을 통한 새 skill 획득을 평가한다. 참고: <a href="https://arxiv.org/abs/2410.24164"><span class="arithmatex">\(\pi_0\)</span>: A Vision-Language-Action Flow Model for General Robot Control</a>.</p>
-<p>이 구조에서 VLM은 장면과 언어의 의미를 제공하고, Flow Matching action expert는 연속 action trajectory를 생성한다. 즉 언어 모델이 바로 joint command를 한 토큰씩 내는 것이 아니라, 로봇 제어에 맞는 연속 action distribution을 별도의 생성 모델이 담당한다.</p>
+<p>이 구조에서 VLM(Vision-Language Model)은 장면과 언어의 의미를 제공하고, Flow Matching action expert는 연속 action trajectory를 생성한다. 즉 언어 모델이 바로 joint command를 한 토큰씩 내는 것이 아니라, 로봇 제어에 맞는 연속 action distribution을 별도의 생성 모델이 담당한다.</p>
 <p>SmolVLA도 비슷한 방향의 중요한 사례다. Hugging Face의 설명에 따르면 SmolVLA는 compact VLA로, flow matching objective를 사용해 noisy sample을 ground-truth action으로 되돌리도록 학습하며, Transformers와 flow-matching decoder를 결합하고 low-latency inference를 목표로 설계되었다. 참고: <a href="https://huggingface.co/blog/smolvla">SmolVLA blog</a>, <a href="https://arxiv.org/abs/2506.01844">SmolVLA paper page</a>.</p>
 <p>이 흐름은 Flow Matching이 단지 작은 실험용 policy가 아니라, robot foundation model의 action generation 모듈로 들어가고 있음을 보여 준다.</p>
 <h2 id="_3">안전성과 제약 조건<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
@@ -1873,7 +1873,7 @@ v_\theta(\tau_t,t,c).
 <h2 id="2026-5">최신 연구 동향: 2026년 5월 기준<a class="headerlink" href="#2026-5" title="Permanent link">&para;</a></h2>
 <p>2026년 5월 기준으로 로보틱스에서 Flow Matching은 다음 방향으로 빠르게 확장되고 있다.</p>
 <p>첫째, <strong>diffusion policy의 대안 또는 보완재</strong>로 쓰인다. 핵심 동기는 multi-modal action distribution을 유지하면서 inference step을 줄이고, 제어 주기에 맞는 빠른 action generation을 얻는 것이다.</p>
-<p>둘째, <strong>VLA action expert</strong>로 들어간다. <span class="arithmatex">\(\pi_0\)</span>, SmolVLA, AsyncVLA 같은 흐름에서는 VLM backbone이 장면과 언어 이해를 담당하고, Flow Matching 계열 action module이 연속 제어를 담당한다. AsyncVLA는 synchronous flow matching의 고정 time schedule이 long-horizon task에서 불안정할 수 있다고 보고, action context-aware asynchronous schedule과 self-correction을 제안한다. 참고: <a href="https://arxiv.org/abs/2511.14148">AsyncVLA</a>.</p>
+<p>둘째, <strong>VLA action expert</strong>로 들어간다. <span class="arithmatex">\(\pi_0\)</span>, SmolVLA, AsyncVLA 같은 흐름에서는 VLM(Vision-Language Model) backbone이 장면과 언어 이해를 담당하고, Flow Matching 계열 action module이 연속 제어를 담당한다. AsyncVLA는 synchronous flow matching의 고정 time schedule이 long-horizon task에서 불안정할 수 있다고 보고, action context-aware asynchronous schedule과 self-correction을 제안한다. 참고: <a href="https://arxiv.org/abs/2511.14148">AsyncVLA</a>.</p>
 <p>셋째, <strong>적은 inference step</strong>을 향한다. ManiFlow는 consistency flow training을 사용해 high-dimensional action을 1-2 inference step으로 생성하는 방향을 제안하고, dexterous manipulation benchmark와 real-world task에서 개선을 보고한다. 참고: <a href="https://arxiv.org/abs/2509.01819">ManiFlow</a>.</p>
 <p>넷째, <strong>기하와 대칭성</strong>을 policy 구조에 넣는다. RFMP, ActionFlow, Morphologically Equivariant Flow Matching은 로봇 상태 공간, SE(3) 공간 관계, 양팔 로봇의 좌우 대칭을 반영하려는 흐름이다.</p>
 <p>다섯째, <strong>안전과 동역학 제약</strong>을 결합한다. SafeFM과 FlowMP는 단순 action 생성이 아니라 실제 실행 가능한 trajectory, acceleration-aware motion, barrier-function 기반 safety를 강조한다.</p>
@@ -1884,15 +1884,20 @@ v_\theta(\tau_t,t,c).
 <li>생성하는 대상은 single action인가, action chunk인가, full trajectory인가?</li>
 <li>조건 <span class="arithmatex">\(o\)</span>에는 이미지, 언어, robot state, goal, obstacle 중 무엇이 들어가는가?</li>
 <li>경로는 action space에서 정의되는가, trajectory space에서 정의되는가, latent space에서 정의되는가?</li>
-<li>sampling은 몇 step 또는 몇 NFE가 필요한가?</li>
+<li>sampling은 몇 step 또는 몇 NFE(Number of Function Evaluations, 함수 평가 횟수)가 필요한가?</li>
 <li>실제 제어 주기에서 latency를 만족하는가?</li>
 <li>trajectory smoothness, acceleration, jerk, collision, joint limit을 평가하는가?</li>
-<li>diffusion policy, ACT, behavior cloning, classical planner와 어떤 기준으로 비교하는가?</li>
+<li>diffusion policy, ACT(Action Chunking Transformer), behavior cloning, classical planner와 어떤 기준으로 비교하는가?</li>
 <li>simulation뿐 아니라 real robot에서 검증했는가?</li>
 <li>실패 시 안전하게 멈추거나 재계획하는 장치가 있는가?</li>
 </ol>
 <p>이 질문은 논문이 “Flow Matching을 썼다”는 사실보다 더 중요하다. 로봇에서는 생성 모델의 예쁜 수식보다 실행성과 안전성이 최종 판단 기준이기 때문이다.</p>
-<h2 id="_5">그림 후보<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_5">시각 자료<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-18-overview.svg" alt="18장 핵심 시각 자료">
+  <figcaption>18장 핵심 시각 자료. 아래 후보들을 한 장의 도식으로 묶어 읽을 수 있다.</figcaption>
+</figure>
+
 <ul>
 <li><strong>action chunk flow 그림</strong>: 노이즈 action chunk <span class="arithmatex">\(A_0\)</span>가 관측 <span class="arithmatex">\(o\)</span>를 조건으로 전문가 action chunk <span class="arithmatex">\(A_1\)</span>로 흐르는 과정을 시간축 위에 표시한다.</li>
 <li><strong>로봇 policy 구조도</strong>: 카메라 이미지, 언어 지시, proprioception이 VLM 또는 encoder로 들어가고 Flow Matching action expert가 action sequence를 생성하는 구조.</li>

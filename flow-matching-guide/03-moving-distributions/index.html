@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1623,14 +1623,14 @@
 <h1 id="3">3장. 분포를 움직인다는 생각<a class="headerlink" href="#3" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:26 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <blockquote>
 <p>분포 전체가 시간에 따라 움직인다면, 우리는 무엇을 학습해야 할까?</p>
 </blockquote>
 <p>2장에서는 조건부 path와 marginal path를 구분했다. 조건이 주어진 작은 path들을 모으면 전체 분포의 path를 생각할 수 있었다. 이제 다음 질문으로 넘어가자. 분포가 시간에 따라 움직인다는 말을 조금 더 직접적으로 이해하려면 무엇이 필요할까?</p>
-<p>Flow Matching은 결국 “좋은 velocity field를 학습하는 문제”로 볼 수 있다. 하지만 velocity field라는 말은 처음에는 추상적이다. 이 장에서는 샘플 하나가 시간에 따라 움직이는 모습에서 시작해, 많은 샘플이 함께 움직일 때 분포가 어떻게 변하는지 살펴본다. 그리고 이 움직임을 ODE와 vector field의 언어로 정리한다.</p>
+<p>Flow Matching은 결국 “좋은 velocity field를 학습하는 문제”로 볼 수 있다. 하지만 velocity field라는 말은 처음에는 추상적이다. 이 장에서는 샘플 하나가 시간에 따라 움직이는 모습에서 시작해, 많은 샘플이 함께 움직일 때 분포가 어떻게 변하는지 살펴본다. 그리고 이 움직임을 ODE(Ordinary Differential Equation, 상미분방정식)와 vector field의 언어로 정리한다.</p>
 <p>이 장을 지나면 뒤에서 나올 다음 문장을 더 자연스럽게 읽을 수 있다.</p>
 <blockquote>
 <p>모델 <span class="arithmatex">\(v_\theta(t, x)\)</span>는 시간 <span class="arithmatex">\(t\)</span>와 위치 <span class="arithmatex">\(x\)</span>에서 샘플이 움직여야 할 속도를 예측한다.</p>
@@ -1650,7 +1650,11 @@ x_0 \sim p_0, \qquad x_1 \sim p_1
 x_t = (1-t)x_0 + tx_1
 \]</div>
 <p>이 식은 <span class="arithmatex">\(t=0\)</span>일 때 <span class="arithmatex">\(x_0\)</span>가 되고, <span class="arithmatex">\(t=1\)</span>일 때 <span class="arithmatex">\(x_1\)</span>이 된다. 중간 시간에서는 두 샘플 사이를 선형 보간한다. 이미지에서는 이 직선 보간이 항상 자연스럽게 보이지 않을 수 있지만, 수학적으로 path의 개념을 이해하기에는 가장 단순하다.</p>
-<p><strong>[그림 3-1: 샘플 하나의 trajectory]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-03-01.svg" alt="그림 3-1. 샘플 하나의 trajectory">
+  <figcaption>그림 3-1. 샘플 하나의 trajectory</figcaption>
+</figure>
+
 <ul>
 <li>왼쪽: <span class="arithmatex">\(t=0\)</span>의 noise 샘플 <span class="arithmatex">\(x_0\)</span></li>
 <li>오른쪽: <span class="arithmatex">\(t=1\)</span>의 data 샘플 <span class="arithmatex">\(x_1\)</span></li>
@@ -1665,7 +1669,11 @@ x_t = (1-t)x_0 + tx_1
 x_t \sim p_t
 \]</div>
 <p>이 구분은 Flow Matching에서 매우 중요하다. 모델은 개별 샘플 <span class="arithmatex">\(x_t\)</span>를 입력으로 받지만, 우리가 원하는 것은 전체 분포 <span class="arithmatex">\(p_0\)</span>를 <span class="arithmatex">\(p_1\)</span>로 옮기는 것이다. 개별 샘플의 움직임을 잘 만들면, 많은 샘플의 집합이 원하는 분포의 움직임을 만들어야 한다.</p>
-<p><strong>[그림 3-2: sample trajectory와 distribution trajectory]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-03-02.svg" alt="그림 3-2. sample trajectory와 distribution trajectory">
+  <figcaption>그림 3-2. sample trajectory와 distribution trajectory</figcaption>
+</figure>
+
 <ul>
 <li>위쪽: 샘플 하나가 시간에 따라 움직이는 선</li>
 <li>아래쪽: 많은 샘플이 움직이며 시간별 density snapshot을 만드는 그림</li>
@@ -1685,7 +1693,11 @@ v_t(x)
 <li>크기: 얼마나 빠르게 움직여야 하는가</li>
 </ul>
 <p>따라서 velocity field는 단순히 “오른쪽으로 가라”가 아니라, “이 위치에서는 이 방향으로 이 정도 빠르게 움직여라”라는 지도다.</p>
-<p><strong>[그림 3-3: 2D vector field]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-03-03.svg" alt="그림 3-3. 2D vector field">
+  <figcaption>그림 3-3. 2D vector field</figcaption>
+</figure>
+
 <ul>
 <li>2차원 평면 위의 여러 점</li>
 <li>각 점에 짧은 화살표 배치</li>
@@ -1709,8 +1721,12 @@ v_t(x)
     <span class="n">velocity</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">velocity</span>
 </code></pre></div>
-<p>이 코드는 정확한 ODE solver가 아니라 Euler method의 직관적 형태다. 하지만 Flow Matching의 sampling이 어떤 구조인지 보여주기에는 충분하다. 모델이 velocity를 예측하고, 그 velocity를 따라 샘플을 조금씩 업데이트한다.</p>
-<p><strong>[그림 3-4: ODE sampling의 직관]</strong></p>
+<p>이 코드는 정확한 ODE(Ordinary Differential Equation, 상미분방정식) solver가 아니라 Euler method의 직관적 형태다. 하지만 Flow Matching의 sampling이 어떤 구조인지 보여주기에는 충분하다. 모델이 velocity를 예측하고, 그 velocity를 따라 샘플을 조금씩 업데이트한다.</p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-03-04.svg" alt="그림 3-4. ODE sampling의 직관">
+  <figcaption>그림 3-4. ODE sampling의 직관</figcaption>
+</figure>
+
 <ul>
 <li>시작점 <span class="arithmatex">\(x_0\)</span></li>
 <li>각 step에서 velocity arrow</li>
@@ -1733,7 +1749,11 @@ x_t = (1-t)x_0 + tx_1
 <blockquote>
 <p>Flow Matching에서 path를 고른다는 것은 모델이 배울 velocity field의 모양을 고르는 일이다.</p>
 </blockquote>
-<p><strong>[그림 3-5: straight path와 curved path]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-03-05.svg" alt="그림 3-5. straight path와 curved path">
+  <figcaption>그림 3-5. straight path와 curved path</figcaption>
+</figure>
+
 <ul>
 <li>같은 <span class="arithmatex">\(x_0\)</span>와 <span class="arithmatex">\(x_1\)</span>을 잇는 직선 path와 곡선 path 비교</li>
 <li>path 위에 시간별 위치 표시</li>
@@ -1747,7 +1767,11 @@ x_t = (1-t)x_0 + tx_1
 <p>어떤 velocity field가 주어졌을 때, 분포 <span class="arithmatex">\(p_t\)</span>는 어떻게 변할까?</p>
 </blockquote>
 <p>이 질문은 5장의 continuity equation으로 이어진다. Continuity equation은 velocity field와 density 변화 사이의 관계를 설명한다. 하지만 지금 당장 그 식을 깊게 들어갈 필요는 없다. 이 장에서는 velocity field가 샘플을 움직이고, 많은 샘플의 움직임이 분포의 변화를 만든다는 직관만 잡으면 된다.</p>
-<p><strong>[그림 3-6: vector field가 density를 바꾸는 모습]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-03-06.svg" alt="그림 3-6. vector field가 density를 바꾸는 모습">
+  <figcaption>그림 3-6. vector field가 density를 바꾸는 모습</figcaption>
+</figure>
+
 <ul>
 <li>왼쪽: 초기 샘플 구름</li>
 <li>가운데: vector field를 따라 이동하는 샘플들</li>
@@ -1774,7 +1798,7 @@ v_\theta(t, x)
 \frac{d x_t}{dt} = v_t(x_t)
 \]</div>
 <p>이 식은 이후 모델이 예측하는 velocity field <span class="arithmatex">\(v_\theta(t, x)\)</span>로 이어진다. 6장 이후에는 이 velocity field를 어떤 objective로 학습할지 다룬다. 하지만 그 전에 하나 더 필요한 배경이 있다. Diffusion model은 deterministic ODE만이 아니라 noise가 들어간 stochastic dynamics의 언어로도 설명된다.</p>
-<p>다음 장에서는 deterministic dynamics와 stochastic dynamics의 차이를 살펴본다. 이를 통해 ODE와 SDE가 생성 모델에서 어떤 역할을 하는지, 그리고 Flow Matching이 diffusion과 어디서 만나고 어디서 달라지는지 이해할 준비를 한다.</p>
+<p>다음 장에서는 deterministic dynamics와 stochastic dynamics의 차이를 살펴본다. 이를 통해 ODE와 SDE(Stochastic Differential Equation, 확률미분방정식)가 생성 모델에서 어떤 역할을 하는지, 그리고 Flow Matching이 diffusion과 어디서 만나고 어디서 달라지는지 이해할 준비를 한다.</p>
 <h2 id="_4">요약<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <ul>
 <li>분포를 움직인다는 것은 많은 샘플이 시간에 따라 이동하고, 그 결과 시간별 분포 <span class="arithmatex">\(p_t\)</span>가 바뀐다는 뜻이다.</li>

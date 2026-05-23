@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -904,10 +904,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#mlp" class="md-nav__link">
+  <a href="#mlpmulti-layer-perceptron" class="md-nav__link">
     <span class="md-ellipsis">
 
-        작은 MLP 모델
+        작은 MLP(Multi-Layer Perceptron, 다층 퍼셉트론) 모델
 
     </span>
   </a>
@@ -962,7 +962,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
 
-        그림 후보
+        시각 자료
 
     </span>
   </a>
@@ -1571,10 +1571,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#mlp" class="md-nav__link">
+  <a href="#mlpmulti-layer-perceptron" class="md-nav__link">
     <span class="md-ellipsis">
 
-        작은 MLP 모델
+        작은 MLP(Multi-Layer Perceptron, 다층 퍼셉트론) 모델
 
     </span>
   </a>
@@ -1629,7 +1629,7 @@
   <a href="#_7" class="md-nav__link">
     <span class="md-ellipsis">
 
-        그림 후보
+        시각 자료
 
     </span>
   </a>
@@ -1667,11 +1667,11 @@
 <h1 id="10-2-toy-example-flow-matching">10장. 2차원 Toy Example로 Flow Matching 실습하기<a class="headerlink" href="#10-2-toy-example-flow-matching" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:43 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>수식으로는 Flow Matching을 이해한 것 같지만, 실제로 점들이 어떻게 움직이는지는 아직 막연할 수 있다. 2차원 toy example을 만들면 분포, 경로, 속도장, ODE sampling을 눈으로 확인할 수 있다. 복잡한 이미지 모델로 가기 전에 작은 평면에서 모든 개념을 검증해 보자.</p>
+<p>수식으로는 Flow Matching을 이해한 것 같지만, 실제로 점들이 어떻게 움직이는지는 아직 막연할 수 있다. 2차원 toy example을 만들면 분포, 경로, 속도장, ODE(Ordinary Differential Equation, 상미분방정식) sampling을 눈으로 확인할 수 있다. 복잡한 이미지 모델로 가기 전에 작은 평면에서 모든 개념을 검증해 보자.</p>
 <p>이 장은 실습 중심이다. 목표는 고성능 모델을 만드는 것이 아니라 Flow Matching의 구성 요소가 실제 코드에서 어떻게 만나는지 확인하는 것이다. 2차원 데이터는 시각화가 쉽고, 실패 원인도 눈으로 파악하기 좋다.</p>
 <h2 id="2">왜 2차원부터 시작하는가<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
 <p>이미지 데이터는 차원이 크다. 모델이 실패했을 때 원인이 경로인지, 네트워크인지, normalization인지, sampler인지 구분하기 어렵다. 반면 2차원 데이터는 모든 샘플을 산점도로 볼 수 있다.</p>
@@ -1719,9 +1719,9 @@ u_t=x_1-x_0.
     <span class="k">return</span> <span class="n">xt</span><span class="p">,</span> <span class="n">ut</span>
 </code></pre></div>
 <p>2차원에서는 <span class="arithmatex">\(t_view\)</span>의 shape가 <span class="arithmatex">\(B\times 1\)</span>이면 충분하다. 이미지에서는 <span class="arithmatex">\(B\times 1\times 1\times 1\)</span>이 필요했지만 원리는 같다.</p>
-<h2 id="mlp">작은 MLP 모델<a class="headerlink" href="#mlp" title="Permanent link">&para;</a></h2>
-<p>2차원 실습에서는 큰 U-Net이 필요 없다. 입력은 <span class="arithmatex">\(x_t\in\mathbb{R}^2\)</span>와 시간 <span class="arithmatex">\(t\)</span>이고, 출력은 속도 <span class="arithmatex">\(v_\theta(x_t,t)\in\mathbb{R}^2\)</span>다.</p>
-<p>가장 단순하게는 <span class="arithmatex">\(x_t\)</span>와 <span class="arithmatex">\(t\)</span>를 concatenate해서 MLP에 넣을 수 있다.</p>
+<h2 id="mlpmulti-layer-perceptron">작은 MLP(Multi-Layer Perceptron, 다층 퍼셉트론) 모델<a class="headerlink" href="#mlpmulti-layer-perceptron" title="Permanent link">&para;</a></h2>
+<p>2차원 실습에서는 큰 U-Net(인코더-디코더형 convolution network)이 필요 없다. 입력은 <span class="arithmatex">\(x_t\in\mathbb{R}^2\)</span>와 시간 <span class="arithmatex">\(t\)</span>이고, 출력은 속도 <span class="arithmatex">\(v_\theta(x_t,t)\in\mathbb{R}^2\)</span>다.</p>
+<p>가장 단순하게는 <span class="arithmatex">\(x_t\)</span>와 <span class="arithmatex">\(t\)</span>를 concatenate해서 MLP(Multi-Layer Perceptron, 다층 퍼셉트론)에 넣을 수 있다.</p>
 <div class="arithmatex">\[
 \mathrm{input}=[x_t,t]\in\mathbb{R}^3.
 \]</div>
@@ -1731,7 +1731,7 @@ v_\theta:\mathbb{R}^2\times[0,1]\to\mathbb{R}^2.
 \]</div>
 <p>시간 임베딩을 더 정교하게 만들 수도 있지만, toy example에서는 먼저 단순한 입력 결합으로 충분하다.</p>
 <h2 id="_4">학습 루프<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p>학습 루프는 CFM loss의 구조를 그대로 따른다.</p>
+<p>학습 루프는 CFM(Conditional Flow Matching) loss의 구조를 그대로 따른다.</p>
 <div class="highlight"><pre><span></span><code><span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_steps</span><span class="p">):</span>
     <span class="n">x1</span> <span class="o">=</span> <span class="n">sample_data</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
     <span class="n">x0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
@@ -1788,7 +1788,12 @@ x_{t+\Delta t}=x_t+\Delta t\,v_\theta(x_t,t).
 <li>Euler step 수가 너무 적다.</li>
 </ul>
 <p>특히 부호 오류는 생성 샘플이 데이터로 가지 않고 더 퍼지는 형태로 나타난다. 이때 trajectory를 그려 보면 바로 확인할 수 있다.</p>
-<h2 id="_7">그림 후보<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<h2 id="_7">시각 자료<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-10-overview.svg" alt="10장 핵심 시각 자료">
+  <figcaption>10장 핵심 시각 자료. 아래 후보들을 한 장의 도식으로 묶어 읽을 수 있다.</figcaption>
+</figure>
+
 <ul>
 <li><strong>학습 전후 산점도</strong>: 노이즈, 데이터, 생성 샘플을 같은 축에 배치한다.</li>
 <li><strong>velocity field quiver plot</strong>: 평면 격자에서 모델이 예측한 방향을 화살표로 표시한다.</li>

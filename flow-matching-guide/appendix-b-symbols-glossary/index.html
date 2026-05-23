@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1458,10 +1458,10 @@
 </li>
 
           <li class="md-nav__item">
-  <a href="#vla" class="md-nav__link">
+  <a href="#vlavision-language-action" class="md-nav__link">
     <span class="md-ellipsis">
 
-        VLA
+        VLA(Vision-Language-Action)
 
     </span>
   </a>
@@ -1822,10 +1822,10 @@
 </li>
 
           <li class="md-nav__item">
-  <a href="#vla" class="md-nav__link">
+  <a href="#vlavision-language-action" class="md-nav__link">
     <span class="md-ellipsis">
 
-        VLA
+        VLA(Vision-Language-Action)
 
     </span>
   </a>
@@ -1901,7 +1901,7 @@
 <h1 id="b">부록 B. 주요 기호와 용어<a class="headerlink" href="#b" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 02:18 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <h2 id="_1">부록의 목적<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -2039,11 +2039,11 @@
 <h3 id="conditional-flow-matching">Conditional Flow Matching<a class="headerlink" href="#conditional-flow-matching" title="Permanent link">&para;</a></h3>
 <p>Conditional Flow Matching은 조건부 경로에서 계산하기 쉬운 target velocity를 샘플링해 학습하는 방식이다.</p>
 <div class="arithmatex">\[
-\mathcal{L}_{\mathrm{CFM}}(\theta)=\mathbb{E}\left[\left\|v_\theta(x_t,t)-u_t(x_t|z)\right\|^2\right].
+\mathcal{L}_{\mathrm{CFM(Conditional Flow Matching)}}(\theta)=\mathbb{E}\left[\left\|v_\theta(x_t,t)-u_t(x_t|z)\right\|^2\right].
 \]</div>
-<p>조건부 target을 학습해도 MSE의 조건부 평균 성질 때문에 marginal velocity를 배울 수 있다는 점이 핵심이다.</p>
+<p>조건부 target을 학습해도 MSE(Mean Squared Error, 평균제곱오차)의 조건부 평균 성질 때문에 marginal velocity를 배울 수 있다는 점이 핵심이다.</p>
 <h3 id="simulation-free-training">Simulation-Free Training<a class="headerlink" href="#simulation-free-training" title="Permanent link">&para;</a></h3>
-<p>학습 중에 ODE trajectory 전체를 매번 적분하지 않고, 임의의 시간 <span class="arithmatex">\(t\)</span>에서 <span class="arithmatex">\(x_t\)</span>와 target velocity를 직접 만들어 회귀 학습하는 방식을 말한다. 생성할 때는 여전히 ODE solver를 사용한다.</p>
+<p>학습 중에 ODE(Ordinary Differential Equation, 상미분방정식) trajectory 전체를 매번 적분하지 않고, 임의의 시간 <span class="arithmatex">\(t\)</span>에서 <span class="arithmatex">\(x_t\)</span>와 target velocity를 직접 만들어 회귀 학습하는 방식을 말한다. 생성할 때는 여전히 ODE solver를 사용한다.</p>
 <h3 id="path-sampler">Path Sampler<a class="headerlink" href="#path-sampler" title="Permanent link">&para;</a></h3>
 <p>Path sampler는 <span class="arithmatex">\(x_0\)</span>, <span class="arithmatex">\(x_1\)</span>, <span class="arithmatex">\(t\)</span>를 받아 중간 샘플 <span class="arithmatex">\(x_t\)</span>와 목표 속도 <span class="arithmatex">\(u_t\)</span>를 반환하는 코드 단위다.</p>
 <div class="highlight"><pre><span></span><code><span class="n">xt</span><span class="p">,</span> <span class="n">ut</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
@@ -2061,7 +2061,7 @@
 \]</div>
 <p>현재 위치에서 density가 증가하는 방향을 나타낸다. diffusion의 reverse dynamics에서 핵심 역할을 한다.</p>
 <h3 id="probability-flow-ode">Probability Flow ODE<a class="headerlink" href="#probability-flow-ode" title="Permanent link">&para;</a></h3>
-<p>Score 기반 SDE와 같은 marginal distribution을 갖는 ODE 관점이다. diffusion과 Flow Matching이 ODE 언어로 만나는 지점 중 하나다.</p>
+<p>Score 기반 SDE(Stochastic Differential Equation, 확률미분방정식)와 같은 marginal distribution을 갖는 ODE 관점이다. diffusion과 Flow Matching이 ODE 언어로 만나는 지점 중 하나다.</p>
 <h2 id="_3">로보틱스 관련 용어<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <h3 id="action-chunk">Action Chunk<a class="headerlink" href="#action-chunk" title="Permanent link">&para;</a></h3>
 <p>한 번에 생성하는 여러 step의 action sequence다.</p>
@@ -2069,10 +2069,10 @@
 A=(a_1,a_2,\ldots,a_H).
 \]</div>
 <p>로봇 정책에서는 매 순간 단일 action만 예측하기보다 action chunk를 생성하고 일부를 실행한 뒤 다시 계획하는 방식이 많이 쓰인다.</p>
-<h3 id="vla">VLA<a class="headerlink" href="#vla" title="Permanent link">&para;</a></h3>
+<h3 id="vlavision-language-action">VLA(Vision-Language-Action)<a class="headerlink" href="#vlavision-language-action" title="Permanent link">&para;</a></h3>
 <p>Vision-Language-Action 모델의 약자다. 이미지와 언어 지시를 입력으로 받아 로봇 행동을 출력하는 모델 계열을 말한다.</p>
 <h3 id="action-expert">Action Expert<a class="headerlink" href="#action-expert" title="Permanent link">&para;</a></h3>
-<p>VLA 구조에서 시각/언어 backbone이 만든 표현을 받아 실제 연속 action을 생성하는 모듈이다. 최근 Flow Matching은 이 action expert로 자주 쓰인다.</p>
+<p>VLA(Vision-Language-Action) 구조에서 시각/언어 backbone이 만든 표현을 받아 실제 연속 action을 생성하는 모듈이다. 최근 Flow Matching은 이 action expert로 자주 쓰인다.</p>
 <h3 id="dynamic-feasibility">Dynamic Feasibility<a class="headerlink" href="#dynamic-feasibility" title="Permanent link">&para;</a></h3>
 <p>생성된 trajectory가 실제 로봇의 속도, 가속도, joint limit, 물리 제약 안에서 실행 가능한지를 뜻한다.</p>
 <h3 id="equivariance">Equivariance<a class="headerlink" href="#equivariance" title="Permanent link">&para;</a></h3>

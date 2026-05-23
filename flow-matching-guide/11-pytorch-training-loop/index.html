@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -990,7 +990,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
 
-        그림 후보
+        시각 자료
 
     </span>
   </a>
@@ -1629,7 +1629,7 @@
   <a href="#_5" class="md-nav__link">
     <span class="md-ellipsis">
 
-        그림 후보
+        시각 자료
 
     </span>
   </a>
@@ -1667,7 +1667,7 @@
 <h1 id="11-pytorch-training-loop">11장. PyTorch Training Loop 설계<a class="headerlink" href="#11-pytorch-training-loop" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:43 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -1682,7 +1682,7 @@
 <li>velocity model</li>
 <li>loss function</li>
 <li>optimizer와 scheduler</li>
-<li>sampler 또는 ODE solver</li>
+<li>sampler 또는 ODE(Ordinary Differential Equation, 상미분방정식) solver</li>
 <li>evaluation과 visualization</li>
 <li>checkpoint와 config</li>
 </ul>
@@ -1792,7 +1792,12 @@ v_\theta(x_t,t)=f_\theta(x_t,\phi(t)),
 <li>ODE sampler가 step 수에 맞게 <span class="arithmatex">\(t\)</span>를 증가시키는가?</li>
 </ol>
 <p>이런 테스트는 성능을 보장하지는 않지만, 구현 오류를 초기에 잡아 준다.</p>
-<h2 id="_5">그림 후보<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<h2 id="_5">시각 자료<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-11-overview.svg" alt="11장 핵심 시각 자료">
+  <figcaption>11장 핵심 시각 자료. 아래 후보들을 한 장의 도식으로 묶어 읽을 수 있다.</figcaption>
+</figure>
+
 <ul>
 <li><strong>코드 모듈 구조도</strong>: dataset, path sampler, model, trainer, solver, logger가 어떻게 연결되는지 보여 준다.</li>
 <li><strong>training step 흐름도</strong>: batch에서 loss까지 이어지는 텐서 흐름을 단계별로 표시한다.</li>
@@ -1801,7 +1806,7 @@ v_\theta(x_t,t)=f_\theta(x_t,\phi(t)),
 <h2 id="_6">요약<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <ul>
 <li>PyTorch 구현에서는 path sampler, model, trainer, solver를 분리하면 실험 확장이 쉬워진다.</li>
-<li>학습 step의 핵심은 <span class="arithmatex">\(x_0\)</span>, <span class="arithmatex">\(x_1\)</span>, <span class="arithmatex">\(t\)</span>에서 <span class="arithmatex">\(x_t\)</span>와 목표 속도 <span class="arithmatex">\(u_t\)</span>를 만들고 모델 출력과 MSE를 계산하는 것이다.</li>
+<li>학습 step의 핵심은 <span class="arithmatex">\(x_0\)</span>, <span class="arithmatex">\(x_1\)</span>, <span class="arithmatex">\(t\)</span>에서 <span class="arithmatex">\(x_t\)</span>와 목표 속도 <span class="arithmatex">\(u_t\)</span>를 만들고 모델 출력과 MSE(Mean Squared Error, 평균제곱오차)를 계산하는 것이다.</li>
 <li>시간 임베딩은 모델이 시각별로 다른 속도장을 표현하도록 돕는다.</li>
 <li>config에는 path type과 ODE solver 설정을 반드시 남겨야 재현이 가능하다.</li>
 <li>shape, boundary condition, velocity sign, sampler time grid는 작은 테스트로 확인하는 것이 좋다.</li>

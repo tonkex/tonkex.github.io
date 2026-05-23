@@ -51,7 +51,7 @@
 
 
 
-      <link rel="stylesheet" href="stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1653,14 +1653,14 @@
 <h1 id="flow-matching">Flow Matching 가이드북<a class="headerlink" href="#flow-matching" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 02:10 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <p><img alt="Flow Matching 대표 이미지" src="assets/cover-flow-matching-robotics.svg" /></p>
 <h2 id="_1">머릿말<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>생성 모델을 공부하다 보면 어느 순간 diffusion model, score, SDE, ODE, probability path, velocity field 같은 개념이 한꺼번에 등장한다. 각각은 따로 보면 이해할 수 있을 것 같지만, 실제 논문을 읽거나 구현을 따라가려 하면 서로 어떻게 연결되는지 흐릿해지기 쉽다. 이 책은 그 흐릿한 지점을 정리하기 위해 쓰였다.</p>
+<p>생성 모델을 공부하다 보면 어느 순간 diffusion model, score, SDE(Stochastic Differential Equation, 확률미분방정식), ODE(Ordinary Differential Equation, 상미분방정식), probability path, velocity field 같은 개념이 한꺼번에 등장한다. 각각은 따로 보면 이해할 수 있을 것 같지만, 실제 논문을 읽거나 구현을 따라가려 하면 서로 어떻게 연결되는지 흐릿해지기 쉽다. 이 책은 그 흐릿한 지점을 정리하기 위해 쓰였다.</p>
 <p>이 책의 목적은 Flow Matching을 단순히 “diffusion보다 빠른 새 생성 모델”로 소개하는 것이 아니다. 더 중요한 목표는 생성 모델을 <strong>분포를 움직이는 문제</strong>로 이해하고, diffusion과 Flow Matching을 같은 지도 위에서 비교할 수 있게 만드는 것이다. 독자가 이 책을 읽고 나면 probability path, velocity field, Conditional Flow Matching, ODE sampling이 각각 어떤 역할을 하는지 설명할 수 있어야 한다.</p>
-<p>또 하나의 중요한 독자상은 로보틱스와 AI에 관심이 많은 개발자와 연구 지망자다. 최근 로봇 정책은 deterministic controller만이 아니라 action distribution을 생성하는 모델로 바뀌고 있다. Diffusion policy, VLA, action expert, Flow Matching policy는 모두 이 변화와 연결된다. 이 책은 Flow Matching의 기본 수학과 구현 감각을 쌓은 뒤, 로보틱스 응용까지 자연스럽게 이어지도록 구성했다.</p>
+<p>또 하나의 중요한 독자상은 로보틱스와 AI에 관심이 많은 개발자와 연구 지망자다. 최근 로봇 정책은 deterministic controller만이 아니라 action distribution을 생성하는 모델로 바뀌고 있다. Diffusion policy, VLA(Vision-Language-Action), action expert, Flow Matching policy는 모두 이 변화와 연결된다. 이 책은 Flow Matching의 기본 수학과 구현 감각을 쌓은 뒤, 로보틱스 응용까지 자연스럽게 이어지도록 구성했다.</p>
 <h2 id="_2">이 책의 특징<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>수학을 건너뛰지 않되, 수식만으로 밀어붙이지 않는다.</strong> 확률, 조건부 분포, ODE/SDE, continuity equation, score를 Flow Matching에 필요한 만큼 천천히 설명한다.</li>
@@ -1673,7 +1673,7 @@
 <h2 id="_3">전체 구성<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <h3 id="_4">프롤로그<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
 <p><strong>0장. 생성 모델은 어떻게 여기까지 왔을까?</strong></p>
-<p>생성 모델의 큰 흐름을 VAE, GAN, normalizing flow, diffusion, Flow Matching으로 이어지는 문제의식으로 설명한다. 이 장의 목표는 독자가 왜 noise에서 data로 가는 path를 배워야 하는지 납득하게 만드는 것이다.</p>
+<p>생성 모델의 큰 흐름을 VAE(Variational Autoencoder, 변분 오토인코더), GAN(Generative Adversarial Network, 생성적 적대 신경망), normalizing flow, diffusion, Flow Matching으로 이어지는 문제의식으로 설명한다. 이 장의 목표는 독자가 왜 noise에서 data로 가는 path를 배워야 하는지 납득하게 만드는 것이다.</p>
 <h3 id="1">1부. 생성 모델을 위한 수학 언어<a class="headerlink" href="#1" title="Permanent link">&para;</a></h3>
 <p><strong>1장. 생성 모델을 위한 확률 언어</strong></p>
 <p>확률변수, 샘플, 분포, density, expectation, Gaussian noise를 소개한다. 이후 계속 등장하는 <span class="arithmatex">\(p_0\)</span>, <span class="arithmatex">\(p_1\)</span>, <span class="arithmatex">\(p_t\)</span>, <span class="arithmatex">\(x_t\)</span> 표기를 이해하기 위한 기초를 만든다.</p>
@@ -1689,9 +1689,9 @@
 <p><strong>6장. Flow Matching의 한 문장 정의</strong></p>
 <p>Flow Matching을 확률 경로 <span class="arithmatex">\(p_t\)</span>와 속도장 <span class="arithmatex">\(u_t(x)\)</span>를 맞추는 문제로 정의한다. 학습과 sampling이 어떻게 분리되는지 설명한다.</p>
 <p><strong>7장. Conditional Flow에서 Marginal Flow로</strong></p>
-<p>조건부 경로를 여러 개 모으면 전체 분포의 흐름이 된다는 아이디어를 다룬다. CFM이 왜 실용적인지 이해하는 핵심 장이다.</p>
+<p>조건부 경로를 여러 개 모으면 전체 분포의 흐름이 된다는 아이디어를 다룬다. CFM(Conditional Flow Matching)이 왜 실용적인지 이해하는 핵심 장이다.</p>
 <p><strong>8장. Conditional Flow Matching Loss 뜯어보기</strong></p>
-<p>CFM loss를 tensor shape와 PyTorch 학습 루프 관점에서 해부한다. <span class="arithmatex">\(x_t\)</span>, 목표 속도 <span class="arithmatex">\(u_t\)</span>, 모델 출력의 관계를 코드와 연결한다.</p>
+<p>CFM(Conditional Flow Matching) loss를 tensor shape와 PyTorch 학습 루프 관점에서 해부한다. <span class="arithmatex">\(x_t\)</span>, 목표 속도 <span class="arithmatex">\(u_t\)</span>, 모델 출력의 관계를 코드와 연결한다.</p>
 <p><strong>9장. Diffusion과 Flow Matching 비교</strong></p>
 <p>두 방법의 공통점과 차이를 정리한다. score, noise prediction, velocity prediction, probability flow ODE가 어떻게 연결되는지 비교한다.</p>
 <h3 id="3">3부. 구현과 실험<a class="headerlink" href="#3" title="Permanent link">&para;</a></h3>
@@ -1700,14 +1700,14 @@
 <p><strong>11장. PyTorch Training Loop 설계</strong></p>
 <p>dataset, path sampler, model, trainer, solver를 어떻게 분리할지 다룬다. 재현 가능한 실험 구조와 logging/checkpoint 기준을 정리한다.</p>
 <p><strong>12장. 작은 이미지 예제로 확장하기</strong></p>
-<p>2D toy example에서 이미지 tensor로 확장한다. normalization, U-Net, time embedding, sample grid, ODE step 비교를 설명한다.</p>
+<p>2D toy example에서 이미지 tensor로 확장한다. normalization, U-Net(인코더-디코더형 convolution network), time embedding, sample grid, ODE step 비교를 설명한다.</p>
 <p><strong>13장. Path Parameterization 선택</strong></p>
 <p>직선 경로, Gaussian path, optimal transport, rectified flow 관점을 비교한다. 경로 선택이 학습 target과 sampling 효율에 어떤 영향을 주는지 다룬다.</p>
 <p><strong>14장. Sampling과 ODE Solver</strong></p>
-<p>Euler, midpoint, NFE, step 수 실험을 설명한다. 모델 문제와 solver 문제를 구분하는 기준을 제시한다.</p>
+<p>Euler, midpoint, NFE(Number of Function Evaluations, 함수 평가 횟수), step 수 실험을 설명한다. 모델 문제와 solver 문제를 구분하는 기준을 제시한다.</p>
 <h3 id="4">4부. 논문 로드맵과 확장<a class="headerlink" href="#4" title="Permanent link">&para;</a></h3>
 <p><strong>15장. 논문 로드맵</strong></p>
-<p>Diffusion, score-based model, Flow Matching, CFM, Rectified Flow, OT, 조건부 생성 논문을 어떤 순서와 질문으로 읽을지 정리한다.</p>
+<p>Diffusion, score-based model, Flow Matching, CFM, Rectified Flow, OT(Optimal Transport, 최적 수송), 조건부 생성 논문을 어떤 순서와 질문으로 읽을지 정리한다.</p>
 <p><strong>16장. Guidance와 Conditional Generation</strong></p>
 <p>조건부 생성과 classifier-free guidance를 Flow Matching 관점에서 설명한다. class/text condition, null condition, guidance scale의 trade-off를 다룬다.</p>
 <p><strong>17장. Flow Matching의 확장 지형</strong></p>

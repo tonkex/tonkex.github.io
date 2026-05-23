@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1046,7 +1046,7 @@
   <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
 
-        그림 후보
+        시각 자료
 
     </span>
   </a>
@@ -1629,7 +1629,7 @@
   <a href="#_8" class="md-nav__link">
     <span class="md-ellipsis">
 
-        그림 후보
+        시각 자료
 
     </span>
   </a>
@@ -1667,11 +1667,11 @@
 <h1 id="13-path-parameterization">13장. Path Parameterization 선택<a class="headerlink" href="#13-path-parameterization" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:43 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p>Flow Matching에서 “경로를 정한다”는 말은 단순한 세부 구현이 아니다. 같은 시작 분포와 데이터 분포를 잇더라도 어떤 경로를 택하느냐에 따라 모델이 배워야 하는 속도장이 달라지고, sampling에 필요한 ODE step 수도 달라진다. 그렇다면 좋은 path parameterization은 무엇을 기준으로 골라야 할까?</p>
+<p>Flow Matching에서 “경로를 정한다”는 말은 단순한 세부 구현이 아니다. 같은 시작 분포와 데이터 분포를 잇더라도 어떤 경로를 택하느냐에 따라 모델이 배워야 하는 속도장이 달라지고, sampling에 필요한 ODE(Ordinary Differential Equation, 상미분방정식) step 수도 달라진다. 그렇다면 좋은 path parameterization은 무엇을 기준으로 골라야 할까?</p>
 <p>이 장에서는 직선 경로, 가우시안 경로, optimal transport 관점의 경로, rectified flow 계열의 생각을 비교한다. 목표는 모든 수식을 완벽히 외우는 것이 아니라, 논문에서 새로운 경로가 등장했을 때 무엇을 확인해야 하는지 기준을 세우는 것이다.</p>
 <h2 id="_2">경로 선택이 중요한 이유<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>Flow Matching은 확률 경로 <span class="arithmatex">\(p_t\)</span>를 따라가는 속도장을 학습한다.</p>
@@ -1697,7 +1697,7 @@ x_t=(1-t)x_0+tx_1.
 <div class="arithmatex">\[
 u_t=x_1-x_0.
 \]</div>
-<p>장점은 명확하다. 구현이 쉽고, 수식이 직관적이며, CFM loss를 설명하기 좋다. 입문 실습에서는 직선 경로가 가장 좋은 출발점이다.</p>
+<p>장점은 명확하다. 구현이 쉽고, 수식이 직관적이며, CFM(Conditional Flow Matching) loss를 설명하기 좋다. 입문 실습에서는 직선 경로가 가장 좋은 출발점이다.</p>
 <p>하지만 단점도 있다. <span class="arithmatex">\(x_0\)</span>와 <span class="arithmatex">\(x_1\)</span>을 무작위로 연결하면 멀리 떨어진 점들이 많이 연결될 수 있다. 이 경우 각 샘플의 조건부 경로는 단순하지만, 전체 marginal velocity는 복잡해질 수 있다.</p>
 <p>즉 직선 경로는 “개별 경로는 쉽지만 전체 평균 흐름은 꼭 쉽지 않을 수 있다”는 특징을 갖는다.</p>
 <h2 id="_4">가우시안 경로<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
@@ -1717,7 +1717,7 @@ u_t=\dot{\alpha}_t x_1+\dot{\sigma}_t x_0.
 <p>직관적으로 말하면 다음 차이다.</p>
 <ul>
 <li>무작위 pairing: 아무 출발점과 아무 도착점을 연결한다.</li>
-<li>OT-like pairing: 가능한 한 이동이 덜 어색한 출발점과 도착점을 연결한다.</li>
+<li>OT(Optimal Transport, 최적 수송)-like pairing: 가능한 한 이동이 덜 어색한 출발점과 도착점을 연결한다.</li>
 </ul>
 <p>이렇게 하면 각 경로의 길이가 짧아지고, 전체 속도장도 더 정돈될 수 있다. 결과적으로 sampling step을 줄이는 데 도움이 될 수 있다.</p>
 <p>다만 실제 고차원 데이터에서 정확한 optimal transport를 계산하는 것은 쉽지 않다. 그래서 논문들은 근사 방법이나 미니배치 기반 방법을 사용한다.</p>
@@ -1740,7 +1740,7 @@ u_t=\dot{\alpha}_t x_1+\dot{\sigma}_t x_0.
 <h2 id="_6">경로가 모델 학습 난이도에 주는 영향<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
 <p>경로 선택은 단지 sampling 단계의 문제가 아니다. 학습 데이터 자체가 경로에 의해 만들어지기 때문에 모델이 보는 입력 분포와 target 분포가 함께 바뀐다.</p>
 <p>직선 경로에서는 목표 속도가 일정하지만, 같은 위치 근처에 서로 다른 조건부 경로가 많이 겹칠 수 있다. 이때 모델은 그 속도들의 조건부 평균을 배운다. 겹치는 경로들의 방향이 서로 크게 다르면 평균 속도는 흐릿해지고, 모델은 더 많은 데이터와 용량을 필요로 할 수 있다.</p>
-<p>반대로 경로가 데이터 구조와 잘 맞으면 같은 위치를 지나는 조건부 속도들이 비교적 일관된 방향을 가질 수 있다. 그러면 MSE 회귀가 더 안정적이고, sampling trajectory도 덜 흔들릴 수 있다.</p>
+<p>반대로 경로가 데이터 구조와 잘 맞으면 같은 위치를 지나는 조건부 속도들이 비교적 일관된 방향을 가질 수 있다. 그러면 MSE(Mean Squared Error, 평균제곱오차) 회귀가 더 안정적이고, sampling trajectory도 덜 흔들릴 수 있다.</p>
 <p>이 관점에서 path parameterization은 다음 세 요소를 동시에 결정한다.</p>
 <ul>
 <li>학습 입력 <span class="arithmatex">\(x_t\)</span>의 분포</li>
@@ -1759,10 +1759,15 @@ u_t=\dot{\alpha}_t x_1+\dot{\sigma}_t x_0.
 <li>같은 모델 구조</li>
 <li>같은 학습 step</li>
 <li>같은 optimizer 설정</li>
-<li>같은 solver와 NFE</li>
+<li>같은 solver와 NFE(Number of Function Evaluations, 함수 평가 횟수)</li>
 </ul>
 <p>그 다음 path만 바꾸어 loss, sample quality, trajectory, velocity norm을 비교한다. 이 방식이 경로 선택의 효과를 가장 명확히 보여 준다.</p>
-<h2 id="_8">그림 후보<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<h2 id="_8">시각 자료<a class="headerlink" href="#_8" title="Permanent link">&para;</a></h2>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-13-overview.svg" alt="13장 핵심 시각 자료">
+  <figcaption>13장 핵심 시각 자료. 아래 후보들을 한 장의 도식으로 묶어 읽을 수 있다.</figcaption>
+</figure>
+
 <ul>
 <li><strong>경로 비교 그림</strong>: 같은 <span class="arithmatex">\(x_0\)</span>와 <span class="arithmatex">\(x_1\)</span> 사이에서 직선 경로, 곡선 경로, 더 정돈된 경로를 나란히 보여 준다.</li>
 <li><strong>pairing 비교 그림</strong>: 무작위 pairing과 OT-like pairing에서 선들이 얼마나 교차하는지 비교한다.</li>

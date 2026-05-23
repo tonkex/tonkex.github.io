@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -380,10 +380,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#vae-gan-flow" class="md-nav__link">
+  <a href="#vaevariational-autoencoder-gangenerative-adversarial-network-flow" class="md-nav__link">
     <span class="md-ellipsis">
 
-        VAE, GAN, Flow가 남긴 질문
+        VAE(Variational Autoencoder, 변분 오토인코더), GAN(Generative Adversarial Network, 생성적 적대 신경망), Flow가 남긴 질문
 
     </span>
   </a>
@@ -1516,10 +1516,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#vae-gan-flow" class="md-nav__link">
+  <a href="#vaevariational-autoencoder-gangenerative-adversarial-network-flow" class="md-nav__link">
     <span class="md-ellipsis">
 
-        VAE, GAN, Flow가 남긴 질문
+        VAE(Variational Autoencoder, 변분 오토인코더), GAN(Generative Adversarial Network, 생성적 적대 신경망), Flow가 남긴 질문
 
     </span>
   </a>
@@ -1623,14 +1623,14 @@
 <h1 id="0">0장. 생성 모델은 어떻게 여기까지 왔을까?<a class="headerlink" href="#0" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:09 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <blockquote>
 <p>우리는 왜 굳이 noise에서 data로 가는 복잡한 길을 배워야 할까?</p>
 </blockquote>
-<p>Flow Matching을 처음 만나면 가장 먼저 드는 생각은 대개 비슷하다. 이미 diffusion model도 어렵다. score, SDE, denoising, reverse process 같은 단어를 겨우 따라가기 시작했는데, 이제는 probability path와 velocity field까지 배워야 한다고 한다. 도대체 왜 생성 모델은 이렇게 돌아가는 길을 택했을까?</p>
-<p>이 장의 목표는 수식을 시작하기 전에 큰 지도를 먼저 그리는 것이다. 생성 모델이 무엇을 하려는 모델인지, diffusion model은 왜 그렇게 큰 성공을 거두었는지, 그리고 Flow Matching은 diffusion 이후 어떤 문제의식 속에서 등장했는지 살펴본다. 이 흐름을 이해하면 뒤에서 나오는 확률, ODE, SDE, score, velocity field가 따로 떨어진 수학 용어가 아니라 하나의 질문에 답하기 위한 언어로 보이기 시작한다.</p>
+<p>Flow Matching을 처음 만나면 가장 먼저 드는 생각은 대개 비슷하다. 이미 diffusion model도 어렵다. score, SDE(Stochastic Differential Equation, 확률미분방정식), denoising, reverse process 같은 단어를 겨우 따라가기 시작했는데, 이제는 probability path와 velocity field까지 배워야 한다고 한다. 도대체 왜 생성 모델은 이렇게 돌아가는 길을 택했을까?</p>
+<p>이 장의 목표는 수식을 시작하기 전에 큰 지도를 먼저 그리는 것이다. 생성 모델이 무엇을 하려는 모델인지, diffusion model은 왜 그렇게 큰 성공을 거두었는지, 그리고 Flow Matching은 diffusion 이후 어떤 문제의식 속에서 등장했는지 살펴본다. 이 흐름을 이해하면 뒤에서 나오는 확률, ODE(Ordinary Differential Equation, 상미분방정식), SDE, score, velocity field가 따로 떨어진 수학 용어가 아니라 하나의 질문에 답하기 위한 언어로 보이기 시작한다.</p>
 <h2 id="_1">생성 모델은 무엇을 배우는가<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>이미지 분류 모델을 생각해보자. 입력으로 이미지가 들어오면 모델은 “고양이”, “자동차”, “숫자 7” 같은 label을 예측한다. 이때 모델의 역할은 이미 주어진 데이터를 판단하는 것이다. 반면 생성 모델의 목표는 조금 다르다. 생성 모델은 데이터가 어디서 왔는지, 더 정확히는 데이터가 어떤 분포에서 나왔는지를 배우고, 그 분포에서 새로운 샘플을 만들어내려 한다.</p>
 <p>예를 들어 손글씨 숫자 이미지가 많이 있다고 하자. 생성 모델이 해야 할 일은 훈련 데이터의 이미지를 그대로 외우는 것이 아니다. 숫자 3처럼 보이는 다양한 필기체가 어떤 범위 안에서 나타나는지, 숫자 8의 두 원은 어떻게 변형될 수 있는지, 배경 noise와 실제 stroke는 어떻게 구분되는지를 배워야 한다. 좋은 생성 모델은 이전에 본 적 없는 손글씨 이미지를 만들지만, 그 이미지는 여전히 우리가 기대하는 손글씨 숫자처럼 보여야 한다.</p>
@@ -1640,15 +1640,19 @@
 <p>알 수 없는 복잡한 데이터 분포에서 어떻게 샘플을 뽑을 수 있을까?</p>
 </blockquote>
 <p>생성 모델의 역사는 이 질문에 대한 여러 답변의 역사로 볼 수 있다.</p>
-<p><strong>[그림 0-1: 생성 모델의 기본 문제]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-00-01.svg" alt="그림 0-1. 생성 모델의 기본 문제">
+  <figcaption>그림 0-1. 생성 모델의 기본 문제</figcaption>
+</figure>
+
 <ul>
 <li>왼쪽: 실제 데이터셋의 샘플들</li>
 <li>가운데: 보이지 않는 데이터 분포 <span class="arithmatex">\(p_{\text{data}}\)</span></li>
 <li>오른쪽: 모델이 만들어낸 새 샘플들</li>
 <li>캡션: 생성 모델은 개별 샘플을 복사하는 것이 아니라, 샘플들이 나온 분포를 학습하려 한다.</li>
 </ul>
-<h2 id="vae-gan-flow">VAE, GAN, Flow가 남긴 질문<a class="headerlink" href="#vae-gan-flow" title="Permanent link">&para;</a></h2>
-<p>Diffusion model이 등장하기 전에도 생성 모델에는 여러 강력한 접근이 있었다. 대표적으로 VAE, GAN, normalizing flow를 들 수 있다. 이 책이 이 모델들을 자세히 다루지는 않지만, 이들이 남긴 질문을 이해하면 diffusion과 Flow Matching이 왜 매력적이었는지 더 잘 보인다.</p>
+<h2 id="vaevariational-autoencoder-gangenerative-adversarial-network-flow">VAE(Variational Autoencoder, 변분 오토인코더), GAN(Generative Adversarial Network, 생성적 적대 신경망), Flow가 남긴 질문<a class="headerlink" href="#vaevariational-autoencoder-gangenerative-adversarial-network-flow" title="Permanent link">&para;</a></h2>
+<p>Diffusion model이 등장하기 전에도 생성 모델에는 여러 강력한 접근이 있었다. 대표적으로 VAE(Variational Autoencoder, 변분 오토인코더), GAN(Generative Adversarial Network, 생성적 적대 신경망), normalizing flow를 들 수 있다. 이 책이 이 모델들을 자세히 다루지는 않지만, 이들이 남긴 질문을 이해하면 diffusion과 Flow Matching이 왜 매력적이었는지 더 잘 보인다.</p>
 <p>VAE는 latent variable을 사용해 데이터를 설명한다. 복잡한 이미지를 직접 만들기보다, 먼저 더 단순한 잠재 공간의 변수 <span class="arithmatex">\(z\)</span>를 뽑고, decoder가 <span class="arithmatex">\(z\)</span>를 이미지 <span class="arithmatex">\(x\)</span>로 바꾸도록 학습한다. 이 접근은 확률적 해석이 깔끔하고 latent representation을 다루기 좋다. 하지만 이미지 품질 측면에서는 한동안 GAN보다 흐릿한 결과를 보이는 경우가 많았다.</p>
 <p>GAN은 generator와 discriminator의 경쟁으로 생성 모델을 학습한다. generator는 가짜 이미지를 만들고, discriminator는 진짜와 가짜를 구분한다. 이 경쟁이 잘 맞물리면 매우 선명한 이미지를 만들 수 있다. 하지만 학습이 불안정하고 mode collapse처럼 분포의 일부만 잘 만드는 문제가 생기기 쉽다. 좋은 결과를 얻으려면 구조와 학습 세부 설정에 많은 경험이 필요했다.</p>
 <p>Normalizing flow는 다른 방향에서 문제를 풀었다. 단순한 분포의 샘플을 invertible transformation으로 복잡한 데이터 분포의 샘플로 바꾸고, 그 변환의 likelihood를 정확히 계산할 수 있게 만든다. 이 접근은 수학적으로 매력적이다. 하지만 invertibility와 Jacobian 계산 가능성 같은 제약 때문에 모델 구조 선택이 제한될 수 있다.</p>
@@ -1660,7 +1664,11 @@
 <li>likelihood, sample quality, training stability 사이의 균형을 더 잘 잡을 수 있을까?</li>
 </ul>
 <p>Diffusion model은 이 질문들에 대해 새로운 답을 제시했다.</p>
-<p><strong>[그림 0-2: diffusion 이전 생성 모델의 세 갈래]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-00-02.svg" alt="그림 0-2. diffusion 이전 생성 모델의 세 갈래">
+  <figcaption>그림 0-2. diffusion 이전 생성 모델의 세 갈래</figcaption>
+</figure>
+
 <ul>
 <li>VAE: latent variable과 decoder</li>
 <li>GAN: generator와 discriminator의 경쟁</li>
@@ -1680,7 +1688,11 @@
 <li>마지막에는 데이터 분포에 가까운 샘플을 얻는다.</li>
 </ol>
 <p>Diffusion model의 성공은 단순히 이미지 품질이 좋아서만은 아니다. 이 모델은 생성 과정을 시간에 따른 변화로 바라보게 만들었다. 샘플은 한 번에 생기는 것이 아니라, 시간 <span class="arithmatex">\(t\)</span>에 따라 noise에서 data로 이동한다. 이 이동을 설명하려면 자연스럽게 path, score, SDE, ODE 같은 언어가 필요해진다.</p>
-<p><strong>[그림 0-3: diffusion의 forward와 reverse]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-00-03.svg" alt="그림 0-3. diffusion의 forward와 reverse">
+  <figcaption>그림 0-3. diffusion의 forward와 reverse</figcaption>
+</figure>
+
 <ul>
 <li>위쪽 화살표: data에서 noise로 가는 forward noising</li>
 <li>아래쪽 화살표: noise에서 data로 가는 reverse denoising</li>
@@ -1697,7 +1709,11 @@
 </blockquote>
 <p>Diffusion의 성공 이후 연구자들은 이 질문을 여러 방식으로 다시 보기 시작했다. Score를 학습하는 대신, 샘플이 시간에 따라 움직여야 할 속도 자체를 학습할 수는 없을까? Noise에서 data로 이어지는 path를 먼저 정하고, 그 path를 따라가는 velocity field를 모델이 맞추도록 학습할 수는 없을까?</p>
 <p>이 질문이 Flow Matching으로 이어진다.</p>
-<p><strong>[그림 0-4: score field와 velocity field의 직관 차이]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-00-04.svg" alt="그림 0-4. score field와 velocity field의 직관 차이">
+  <figcaption>그림 0-4. score field와 velocity field의 직관 차이</figcaption>
+</figure>
+
 <ul>
 <li>왼쪽: density contour와 score vector</li>
 <li>오른쪽: noise에서 data로 이동하는 trajectory와 velocity vector</li>
@@ -1719,7 +1735,11 @@
 <li>Flow Matching은 diffusion을 완전히 버리는 것이 아니라, noise-to-data 생성을 더 넓은 동역학 관점에서 정리한다.</li>
 </ul>
 <p>이 책에서 중요한 태도는 “Diffusion vs Flow Matching”처럼 승패를 가르는 것이 아니다. 두 방법이 어떤 질문을 공유하고, 어떤 수학 언어를 다르게 쓰며, 구현에서는 무엇이 달라지는지를 차분히 비교하는 것이다.</p>
-<p><strong>[그림 0-5: Flow Matching의 기본 그림]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-00-05.svg" alt="그림 0-5. Flow Matching의 기본 그림">
+  <figcaption>그림 0-5. Flow Matching의 기본 그림</figcaption>
+</figure>
+
 <ul>
 <li>왼쪽: Gaussian noise 샘플 구름</li>
 <li>오른쪽: data 샘플 구름</li>
@@ -1745,7 +1765,11 @@
 </blockquote>
 <p>확률은 “분포를 다룬다”는 말을 정확하게 해준다. 조건부 확률과 주변화는 conditional path에서 marginal path로 넘어가는 핵심 언어다. ODE와 SDE는 샘플이 시간에 따라 어떻게 움직이는지 설명한다. Continuity equation은 분포가 움직일 때 확률 질량이 어떻게 보존되는지 말해준다. Score는 diffusion을 이해하는 열쇠이고, velocity field는 Flow Matching을 이해하는 열쇠다.</p>
 <p>따라서 이 책의 수학 파트는 증명을 위한 증명이 아니다. 논문을 읽고 구현을 이해하기 위해 필요한 최소한의 언어를 만드는 과정이다. 각 수학 장은 독립적인 수학 교과서처럼 쓰지 않는다. 모든 장은 Flow Matching과 diffusion의 본론으로 돌아오기 위한 징검다리 역할을 한다.</p>
-<p><strong>[그림 0-6: 이 책에서 사용할 수학 지도]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-00-06.svg" alt="그림 0-6. 이 책에서 사용할 수학 지도">
+  <figcaption>그림 0-6. 이 책에서 사용할 수학 지도</figcaption>
+</figure>
+
 <ul>
 <li>확률 언어 -&gt; 조건부/주변화 -&gt; 분포의 이동 -&gt; ODE/SDE -&gt; score/continuity -&gt; Flow Matching</li>
 <li>각 노드 아래에 이후 챕터 번호 표시</li>

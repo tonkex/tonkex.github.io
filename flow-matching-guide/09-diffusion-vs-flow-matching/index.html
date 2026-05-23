@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -852,7 +852,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
 
-        그림 후보
+        시각 자료
 
     </span>
   </a>
@@ -1607,7 +1607,7 @@
   <a href="#_6" class="md-nav__link">
     <span class="md-ellipsis">
 
-        그림 후보
+        시각 자료
 
     </span>
   </a>
@@ -1645,12 +1645,12 @@
 <h1 id="9-diffusion-flow-matching">9장. Diffusion과 Flow Matching 비교<a class="headerlink" href="#9-diffusion-flow-matching" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:43 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>Diffusion과 Flow Matching은 둘 다 노이즈에서 데이터를 만드는 연속 시간 생성 모델처럼 보인다. 둘 다 시간 <span class="arithmatex">\(t\)</span>를 쓰고, 중간 샘플을 만들고, 신경망이 어떤 벡터를 예측한다. 그렇다면 둘은 같은 방법의 다른 이름일까, 아니면 서로 다른 철학을 가진 방법일까?</p>
-<p>이 장의 목적은 “어느 쪽이 더 좋다”를 정하는 것이 아니다. 대신 두 방법이 같은 문제를 어떤 언어로 표현하는지 비교한다. Diffusion을 먼저 배운 독자는 Flow Matching의 장점을 더 선명하게 볼 수 있고, Flow Matching을 먼저 배운 독자는 diffusion 논문에서 score, noise prediction, probability flow ODE가 왜 등장하는지 이해할 수 있다.</p>
+<p>이 장의 목적은 “어느 쪽이 더 좋다”를 정하는 것이 아니다. 대신 두 방법이 같은 문제를 어떤 언어로 표현하는지 비교한다. Diffusion을 먼저 배운 독자는 Flow Matching의 장점을 더 선명하게 볼 수 있고, Flow Matching을 먼저 배운 독자는 diffusion 논문에서 score, noise prediction, probability flow ODE(Ordinary Differential Equation, 상미분방정식)가 왜 등장하는지 이해할 수 있다.</p>
 <h2 id="_2">공통점: 분포 사이를 잇는다<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>두 방법 모두 단순한 분포와 데이터 분포 사이의 관계를 다룬다.</p>
 <div class="arithmatex">\[
@@ -1672,7 +1672,7 @@ u_t=\dot{\alpha}_t x_1 + \dot{\sigma}_t x_0.
 \]</div>
 <p>즉 두 방법은 비슷한 중간 샘플을 만들 수 있지만, 그 중간 샘플을 해석하는 방식이 다르다.</p>
 <h2 id="diffusion-score-reverse-dynamics">Diffusion의 중심 언어: score와 reverse dynamics<a class="headerlink" href="#diffusion-score-reverse-dynamics" title="Permanent link">&para;</a></h2>
-<p>Diffusion model은 데이터에 점진적으로 노이즈를 더하는 forward process에서 시작한다. 연속 시간에서는 SDE로 표현할 수 있다.</p>
+<p>Diffusion model은 데이터에 점진적으로 노이즈를 더하는 forward process에서 시작한다. 연속 시간에서는 SDE(Stochastic Differential Equation, 확률미분방정식)로 표현할 수 있다.</p>
 <div class="arithmatex">\[
 dx = f(x,t)dt + g(t)dw.
 \]</div>
@@ -1686,7 +1686,7 @@ dx = f(x,t)dt + g(t)dw.
 <div class="arithmatex">\[
 \mathcal{L}(\theta)=\mathbb{E}\left[\left\|\epsilon_\theta(x_t,t)-\epsilon\right\|^2\right].
 \]</div>
-<p>이 식은 CFM loss와 겉모습이 비슷하다. 둘 다 MSE다. 하지만 예측 대상이 다르다. Diffusion에서는 경로를 만드는 데 들어간 노이즈나 score 관련 값을 예측하고, Flow Matching에서는 경로의 속도를 예측한다.</p>
+<p>이 식은 CFM(Conditional Flow Matching) loss와 겉모습이 비슷하다. 둘 다 MSE(Mean Squared Error, 평균제곱오차)다. 하지만 예측 대상이 다르다. Diffusion에서는 경로를 만드는 데 들어간 노이즈나 score 관련 값을 예측하고, Flow Matching에서는 경로의 속도를 예측한다.</p>
 <h2 id="flow-matching-velocity-field">Flow Matching의 중심 언어: velocity field<a class="headerlink" href="#flow-matching-velocity-field" title="Permanent link">&para;</a></h2>
 <p>Flow Matching은 확률 경로 <span class="arithmatex">\(p_t\)</span>와 속도장 <span class="arithmatex">\(u_t(x)\)</span>에서 시작한다.</p>
 <div class="arithmatex">\[
@@ -1702,7 +1702,7 @@ dx = f(x,t)dt + g(t)dw.
 \mathcal{L}_{\mathrm{CFM}}(\theta)
 =\mathbb{E}\left[\left\|v_\theta(x_t,t)-u_t(x_t|z)\right\|^2\right].
 \]</div>
-<p>이 관점에서는 생성이 자연스럽게 ODE 적분이 된다.</p>
+<p>이 관점에서는 생성이 자연스럽게 ODE(Ordinary Differential Equation, 상미분방정식) 적분이 된다.</p>
 <div class="arithmatex">\[
 \frac{d x_t}{dt}=v_\theta(x_t,t).
 \]</div>
@@ -1710,6 +1710,11 @@ dx = f(x,t)dt + g(t)dw.
 <p>Diffusion에도 ODE가 등장한다. 특정 SDE와 같은 marginal distribution을 갖는 probability flow ODE를 만들 수 있다. 즉 diffusion을 반드시 stochastic sampler로만 생성해야 하는 것은 아니다.</p>
 <p>이 점 때문에 diffusion과 Flow Matching의 경계가 흐릿해 보일 수 있다. 둘 다 ODE를 쓸 수 있고, 둘 다 velocity parameterization을 쓸 수 있다. 하지만 출발점은 다르다.</p>
 <p>Diffusion은 노이즈를 더하는 확률 과정과 그 역과정에서 출발한다. Flow Matching은 처음부터 확률 경로와 속도장을 정하고, 그 속도장을 맞추는 문제로 출발한다.</p>
+<p>Gaussian probability path에서는 두 언어가 더 직접적으로 연결된다. 적절한 스케줄을 쓰면 marginal velocity field <span class="arithmatex">\(u_t(x)\)</span>와 score function <span class="arithmatex">\(\nabla_x\log p_t(x)\)</span>가 다음처럼 선형 관계를 갖는다.</p>
+<div class="arithmatex">\[
+u_t(x)=a_t\nabla_x\log p_t(x)+b_t x
+\]</div>
+<p>정확한 <span class="arithmatex">\(a_t\)</span>, <span class="arithmatex">\(b_t\)</span>는 path parameterization에 따라 달라진다. 여기서 중요한 점은 score와 velocity가 완전히 다른 정보가 아니라는 것이다. Diffusion은 같은 동역학을 score 또는 noise 쪽에서 parameterize하고, Flow Matching은 velocity 쪽에서 parameterize한다고 볼 수 있다.</p>
 <p>따라서 다음처럼 정리할 수 있다.</p>
 <table>
 <thead>
@@ -1732,7 +1737,7 @@ dx = f(x,t)dt + g(t)dw.
 </tr>
 <tr>
 <td>생성은 어떻게 하는가?</td>
-<td>reverse SDE/ODE sampler</td>
+<td>reverse SDE(Stochastic Differential Equation, 확률미분방정식)/ODE sampler</td>
 <td>ODE solver</td>
 </tr>
 <tr>
@@ -1774,7 +1779,12 @@ dx = f(x,t)dt + g(t)dw.
 <li>경로 선택이 결과에 어떤 영향을 준다고 설명하는가?</li>
 </ol>
 <p>이 질문에 답하면 두 방법을 이름이 아니라 구조로 비교할 수 있다.</p>
-<h2 id="_6">그림 후보<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_6">시각 자료<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-09-overview.svg" alt="9장 핵심 시각 자료">
+  <figcaption>9장 핵심 시각 자료. 아래 후보들을 한 장의 도식으로 묶어 읽을 수 있다.</figcaption>
+</figure>
+
 <ul>
 <li><strong>두 관점 비교 그림</strong>: 같은 <span class="arithmatex">\(x_t\)</span>를 두고 diffusion은 노이즈 제거 화살표, Flow Matching은 속도장 화살표로 설명하는 그림.</li>
 <li><strong>SDE와 ODE 갈림길</strong>: diffusion forward process에서 reverse SDE와 probability flow ODE가 갈라지고, Flow Matching은 ODE 경로로 이어지는 도식.</li>

@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1645,7 +1645,7 @@
 <h1 id="d">부록 D. 구현 체크리스트<a class="headerlink" href="#d" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 02:18 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <h2 id="_1">부록의 목적<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -1678,7 +1678,7 @@
 </ul>
 <h2 id="4-loss">4. Loss<a class="headerlink" href="#4-loss" title="Permanent link">&para;</a></h2>
 <ul>
-<li>MSE가 prediction과 target velocity 사이에 계산되는지 확인한다.</li>
+<li>MSE(Mean Squared Error, 평균제곱오차)가 prediction과 target velocity 사이에 계산되는지 확인한다.</li>
 <li>target velocity에 불필요한 gradient가 흐르지 않는지 확인한다.</li>
 <li>reduction이 batch, channel, spatial 또는 action dimension에서 의도대로 적용되는지 확인한다.</li>
 <li>시간 구간별 loss를 따로 기록할 수 있으면 좋다.</li>
@@ -1687,10 +1687,10 @@
 <h2 id="5-sampling">5. Sampling<a class="headerlink" href="#5-sampling" title="Permanent link">&para;</a></h2>
 <ul>
 <li>sampling 시작점이 <span class="arithmatex">\(p_0\)</span>에서 온 noise인지 확인한다.</li>
-<li>ODE time grid가 <span class="arithmatex">\(0\)</span>에서 <span class="arithmatex">\(1\)</span>로 진행되는지 확인한다.</li>
+<li>ODE(Ordinary Differential Equation, 상미분방정식) time grid가 <span class="arithmatex">\(0\)</span>에서 <span class="arithmatex">\(1\)</span>로 진행되는지 확인한다.</li>
 <li>reverse 방향을 써야 하는 설정이라면 time direction을 명확히 기록한다.</li>
 <li>Euler, midpoint, RK 계열 중 어떤 solver를 쓰는지 기록한다.</li>
-<li>step 수와 NFE를 함께 기록한다.</li>
+<li>step 수와 NFE(Number of Function Evaluations, 함수 평가 횟수)를 함께 기록한다.</li>
 <li>같은 seed에서 step 수만 바꿔 비교한다.</li>
 </ul>
 <h2 id="6">6. 시각화와 디버깅<a class="headerlink" href="#6" title="Permanent link">&para;</a></h2>
@@ -1722,7 +1722,7 @@
 <li>training steps</li>
 <li>random seed</li>
 <li>solver type</li>
-<li>NFE 또는 sampling steps</li>
+<li>NFE(Number of Function Evaluations, 함수 평가 횟수) 또는 sampling steps</li>
 <li>checkpoint 선택 기준</li>
 <li>평가 metric과 시각화 seed</li>
 </ul>

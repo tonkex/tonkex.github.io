@@ -53,7 +53,7 @@
 
 
 
-      <link rel="stylesheet" href="../stylesheets/site-navigation-v4.css">
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v5.css">
 
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
 
@@ -1623,7 +1623,7 @@
 <h1 id="5-score">5장. 확률 질량 보존과 score<a class="headerlink" href="#5-score" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:37 KST</span>
-  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
 </div>
 
 <blockquote>
@@ -1640,7 +1640,11 @@
 \]</div>
 <p>시간이 지나도 이 값은 유지되어야 한다. 분포가 변한다는 것은 확률 질량이 공간 안에서 재배치된다는 뜻이다. 어떤 곳은 비워지고, 어떤 곳은 채워진다.</p>
 <p>이 생각을 수식으로 표현한 것이 continuity equation이다.</p>
-<p><strong>[그림 5-1: 확률 질량의 흐름]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-05-01.svg" alt="그림 5-1. 확률 질량의 흐름">
+  <figcaption>그림 5-1. 확률 질량의 흐름</figcaption>
+</figure>
+
 <ul>
 <li>왼쪽: 어떤 영역 안에 샘플이 많이 모인 상태</li>
 <li>가운데: velocity field를 따라 샘플이 밖으로 빠져나가는 모습</li>
@@ -1670,7 +1674,11 @@ p_t(x)v_t(x)
 <p>어떤 위치의 density 변화는 그 위치 주변으로 확률 질량이 얼마나 들어오고 나가는지에 의해 결정된다.</p>
 </blockquote>
 <p>이 장에서는 이 식의 엄밀한 유도보다 직관이 중요하다. Flow Matching에서 velocity field를 학습한다는 말은 단지 샘플 하나의 방향을 맞춘다는 뜻만이 아니다. 그 velocity field가 전체 분포의 density 변화를 만들어낸다는 뜻이기도 하다.</p>
-<p><strong>[그림 5-2: continuity equation 직관]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-05-02.svg" alt="그림 5-2. continuity equation 직관">
+  <figcaption>그림 5-2. continuity equation 직관</figcaption>
+</figure>
+
 <ul>
 <li>작은 박스 영역 하나</li>
 <li>박스로 들어오는 화살표와 나가는 화살표</li>
@@ -1685,8 +1693,12 @@ p_t(x)v_t(x)
 <li>개별 샘플의 trajectory를 만든다.</li>
 <li>전체 분포의 density 변화를 만든다.</li>
 </ul>
-<p>Flow Matching이 velocity field를 학습한다는 말은 이 두 수준을 모두 포함한다. Sampling할 때 우리는 개별 샘플 하나를 ODE로 움직인다. 하지만 좋은 샘플을 얻으려면 많은 샘플을 움직였을 때 전체 분포가 목표 분포 <span class="arithmatex">\(p_1\)</span>에 가까워져야 한다.</p>
-<p><strong>[그림 5-3: velocity field가 density를 바꾸는 세 가지 경우]</strong></p>
+<p>Flow Matching이 velocity field를 학습한다는 말은 이 두 수준을 모두 포함한다. Sampling할 때 우리는 개별 샘플 하나를 ODE(Ordinary Differential Equation, 상미분방정식)로 움직인다. 하지만 좋은 샘플을 얻으려면 많은 샘플을 움직였을 때 전체 분포가 목표 분포 <span class="arithmatex">\(p_1\)</span>에 가까워져야 한다.</p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-05-03.svg" alt="그림 5-3. velocity field가 density를 바꾸는 세 가지 경우">
+  <figcaption>그림 5-3. velocity field가 density를 바꾸는 세 가지 경우</figcaption>
+</figure>
+
 <ul>
 <li>평행 이동: density 모양은 유지되고 위치만 이동</li>
 <li>수축: 샘플이 모이며 density 증가</li>
@@ -1701,7 +1713,11 @@ s_t(x) = \nabla_x \log p_t(x)
 <p>여기서 <span class="arithmatex">\(p_t(x)\)</span>는 시간 <span class="arithmatex">\(t\)</span>에서의 density다. <span class="arithmatex">\(\log p_t(x)\)</span>는 density에 log를 취한 값이고, <span class="arithmatex">\(\nabla_x\)</span>는 위치 <span class="arithmatex">\(x\)</span>에 대한 gradient다.</p>
 <p>처음에는 왜 굳이 log를 취하는지 궁금할 수 있다. 엄밀한 이유는 여러 가지가 있지만, 직관적으로는 score가 “현재 위치에서 density가 상대적으로 증가하는 방향”을 알려준다고 생각하면 된다. Density가 높은 쪽으로 올라가는 방향을 가리키는 화살표다.</p>
 <p>1차원 Gaussian을 생각해보자. 평균이 0인 Gaussian에서는 <span class="arithmatex">\(x=2\)</span>에 있을 때 density가 더 높은 쪽은 왼쪽, 즉 0을 향하는 방향이다. <span class="arithmatex">\(x=-2\)</span>에 있을 때는 오른쪽이 density가 높아지는 방향이다. Score는 이런 방향 정보를 준다.</p>
-<p><strong>[그림 5-4: density contour와 score vector]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-05-04.svg" alt="그림 5-4. density contour와 score vector">
+  <figcaption>그림 5-4. density contour와 score vector</figcaption>
+</figure>
+
 <ul>
 <li>2D Gaussian contour</li>
 <li>각 위치에서 중심을 향하는 score vector</li>
@@ -1712,7 +1728,11 @@ s_t(x) = \nabla_x \log p_t(x)
 <p>Noise가 많이 섞인 샘플 <span class="arithmatex">\(x_t\)</span>를 생각하자. 이 샘플은 완전히 무작위 noise와 깨끗한 data 사이 어딘가에 있다. 이때 score <span class="arithmatex">\(\nabla_x \log p_t(x)\)</span>는 현재 noise level의 분포에서 density가 높아지는 방향을 알려준다. Density가 높은 방향은 그 시간의 분포에서 더 그럴듯한 샘플 쪽이라고 볼 수 있다.</p>
 <p>Denoising score matching은 대략적으로 이런 방향을 모델이 배우게 한다. 모델은 noise가 섞인 샘플을 보고, 그 샘플이 더 높은 density 영역으로 가려면 어떤 방향으로 움직여야 하는지 학습한다.</p>
 <p>여기서 조심할 점이 있다. Score가 곧바로 “깨끗한 이미지 정답”을 주는 것은 아니다. Score는 현재 시간 <span class="arithmatex">\(t\)</span>의 noisy distribution <span class="arithmatex">\(p_t\)</span>에서 density가 증가하는 방향을 알려준다. Reverse diffusion은 이 정보를 시간에 따라 사용해 noise에서 data로 돌아가는 dynamics를 구성한다.</p>
-<p><strong>[그림 5-5: score와 denoising]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-05-05.svg" alt="그림 5-5. score와 denoising">
+  <figcaption>그림 5-5. score와 denoising</figcaption>
+</figure>
+
 <ul>
 <li>noisy sample 하나</li>
 <li>주변 density contour</li>
@@ -1736,9 +1756,13 @@ s_t(x) = \nabla_x \log p_t(x)
 <p>이 차이는 뒤에서 diffusion과 Flow Matching을 비교할 때 중요하다.</p>
 <ul>
 <li>Diffusion: score 또는 noise 예측을 통해 reverse dynamics를 구성한다.</li>
-<li>Flow Matching: target velocity를 직접 맞추어 ODE sampling에 사용할 vector field를 학습한다.</li>
+<li>Flow Matching: target velocity를 직접 맞추어 ODE(Ordinary Differential Equation, 상미분방정식) sampling에 사용할 vector field를 학습한다.</li>
 </ul>
-<p><strong>[그림 5-6: score field와 velocity field 비교]</strong></p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-05-06.svg" alt="그림 5-6. score field와 velocity field 비교">
+  <figcaption>그림 5-6. score field와 velocity field 비교</figcaption>
+</figure>
+
 <ul>
 <li>왼쪽: density contour에서 높은 density 방향을 가리키는 score field</li>
 <li>오른쪽: noise에서 data로 이동하는 path를 따라가는 velocity field</li>
