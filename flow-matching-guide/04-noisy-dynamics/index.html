@@ -1601,7 +1601,7 @@
 <h1 id="4">4장. 노이즈가 들어간 동역학<a class="headerlink" href="#4" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:34 KST</span>
-  <span>최종 업데이트: 2026-05-24 00:36 KST</span>
+  <span>최종 업데이트: 2026-05-24 00:47 KST</span>
 </div>
 
 <blockquote>
@@ -1628,7 +1628,7 @@
 <p>여기서 <code>v(t, x)</code>가 항상 같은 값을 반환한다면, 같은 <code>x0</code>에서 시작한 실행은 항상 같은 결과를 낸다. 이런 구조는 이해하고 디버깅하기 쉽다. Flow Matching의 ODE(Ordinary Differential Equation, 상미분방정식) sampling도 기본적으로 이런 deterministic dynamics의 형태로 볼 수 있다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-04-01.svg" alt="그림 4-1. deterministic trajectory">
-  <figcaption><strong>그림 4-1. deterministic trajectory.</strong><br>deterministic dynamics에서는 같은 초기 조건과 같은 velocity field가 같은 trajectory를 만든다.</figcaption>
+  <figcaption><strong>그림 4-1. deterministic trajectory.</strong>deterministic dynamics에서는 같은 초기 조건과 같은 velocity field가 같은 trajectory를 만든다.</figcaption>
 </figure>
 
 <h2 id="stochastic-dynamics">같은 출발점, 다른 경로: stochastic dynamics<a class="headerlink" href="#stochastic-dynamics" title="Permanent link">&para;</a></h2>
@@ -1644,7 +1644,7 @@
 <p>이런 dynamics를 연속 시간에서 표현하는 언어가 SDE(Stochastic Differential Equation, 확률미분방정식), stochastic differential equation이다. 처음부터 엄밀하게 이해할 필요는 없다. 우선 SDE는 ODE에 noise 항이 더해진 식이라고 보면 된다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-04-02.svg" alt="그림 4-2. deterministic path와 stochastic path 비교">
-  <figcaption><strong>그림 4-2. deterministic path와 stochastic path 비교.</strong><br>stochastic dynamics에서는 drift 방향에 무작위 흔들림이 더해져 경로가 매번 달라질 수 있다.</figcaption>
+  <figcaption><strong>그림 4-2. deterministic path와 stochastic path 비교.</strong>stochastic dynamics에서는 drift 방향에 무작위 흔들림이 더해져 경로가 매번 달라질 수 있다.</figcaption>
 </figure>
 
 <h2 id="brownian-motion">Brownian motion의 최소 직관<a class="headerlink" href="#brownian-motion" title="Permanent link">&para;</a></h2>
@@ -1667,7 +1667,7 @@ dx_t = f(t, x_t)\,dt + g(t)\,dW_t
 </blockquote>
 <figure class="book-figure">
   <img src="../assets/figures/fig-04-03.svg" alt="그림 4-3. drift와 noise 항">
-  <figcaption><strong>그림 4-3. drift와 noise 항.</strong><br>SDE는 평균적인 이동 방향과 무작위 흔들림을 함께 표현한다.</figcaption>
+  <figcaption><strong>그림 4-3. drift와 noise 항.</strong>SDE는 평균적인 이동 방향과 무작위 흔들림을 함께 표현한다.</figcaption>
 </figure>
 
 <h2 id="diffusion-forward-process">Diffusion의 forward process<a class="headerlink" href="#diffusion-forward-process" title="Permanent link">&para;</a></h2>
@@ -1692,7 +1692,7 @@ x_t = \sqrt{\alpha_t}x_0 + \sqrt{1-\alpha_t}\epsilon,
 </ul>
 <figure class="book-figure">
   <img src="../assets/figures/fig-04-04.svg" alt="그림 4-4. forward noising">
-  <figcaption><strong>그림 4-4. forward noising.</strong><br>diffusion의 forward process는 data를 점진적으로 noise로 바꾼다.</figcaption>
+  <figcaption><strong>그림 4-4. forward noising.</strong>diffusion의 forward process는 data를 점진적으로 noise로 바꾼다.</figcaption>
 </figure>
 
 <h2 id="reverse-process-noise-data">Reverse process: noise에서 data로 돌아가기<a class="headerlink" href="#reverse-process-noise-data" title="Permanent link">&para;</a></h2>
@@ -1706,7 +1706,7 @@ x_t = \sqrt{\alpha_t}x_0 + \sqrt{1-\alpha_t}\epsilon,
 <p>현재 위치에서 density가 증가하는 방향을 알려주는 벡터다. Reverse process는 이 score 정보를 사용해 noise 상태의 샘플을 더 그럴듯한 data 쪽으로 움직인다. 5장에서 score를 더 자세히 다룰 것이므로, 지금은 diffusion의 reverse dynamics가 score와 깊게 연결된다는 점만 기억하면 된다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-04-05.svg" alt="그림 4-5. reverse denoising">
-  <figcaption><strong>그림 4-5. reverse denoising.</strong><br>reverse process는 noise에서 data로 돌아가는 생성 절차다.</figcaption>
+  <figcaption><strong>그림 4-5. reverse denoising.</strong>reverse process는 noise에서 data로 돌아가는 생성 절차다.</figcaption>
 </figure>
 
 <h2 id="ode-sde">ODE 관점과 SDE 관점은 어떻게 만날까<a class="headerlink" href="#ode-sde" title="Permanent link">&para;</a></h2>
@@ -1722,7 +1722,7 @@ x_t = \sqrt{\alpha_t}x_0 + \sqrt{1-\alpha_t}\epsilon,
 </ul>
 <figure class="book-figure">
   <img src="../assets/figures/fig-04-06.svg" alt="그림 4-6. SDE와 ODE의 두 관점">
-  <figcaption><strong>그림 4-6. SDE와 ODE의 두 관점.</strong><br>diffusion과 Flow Matching을 비교하려면 개별 경로와 시간별 분포를 구분해서 봐야 한다.</figcaption>
+  <figcaption><strong>그림 4-6. SDE와 ODE의 두 관점.</strong>diffusion과 Flow Matching을 비교하려면 개별 경로와 시간별 분포를 구분해서 봐야 한다.</figcaption>
 </figure>
 
 <h2 id="flow-matching">Flow Matching으로 이어지는 연결<a class="headerlink" href="#flow-matching" title="Permanent link">&para;</a></h2>

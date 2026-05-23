@@ -1623,7 +1623,7 @@
 <h1 id="5-score">5장. 확률 질량 보존과 score<a class="headerlink" href="#5-score" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:37 KST</span>
-  <span>최종 업데이트: 2026-05-24 00:36 KST</span>
+  <span>최종 업데이트: 2026-05-24 00:47 KST</span>
 </div>
 
 <blockquote>
@@ -1642,7 +1642,7 @@
 <p>이 생각을 수식으로 표현한 것이 continuity equation이다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-05-01.svg" alt="그림 5-1. 확률 질량의 흐름">
-  <figcaption><strong>그림 5-1. 확률 질량의 흐름.</strong><br>분포가 움직인다는 것은 확률 질량이 사라지는 것이 아니라 다른 위치로 이동한다는 뜻이다.</figcaption>
+  <figcaption><strong>그림 5-1. 확률 질량의 흐름.</strong>분포가 움직인다는 것은 확률 질량이 사라지는 것이 아니라 다른 위치로 이동한다는 뜻이다.</figcaption>
 </figure>
 
 <h2 id="continuity-equation">Continuity equation의 직관<a class="headerlink" href="#continuity-equation" title="Permanent link">&para;</a></h2>
@@ -1688,7 +1688,7 @@ J_t(x)=f_t(x)p_t(x)-D_t\nabla p_t(x).
 <p>이 장에서는 이 식의 엄밀한 유도보다 직관이 중요하다. Flow Matching에서 velocity field를 학습한다는 말은 단지 샘플 하나의 방향을 맞춘다는 뜻만이 아니다. 그 velocity field가 전체 분포의 density 변화를 만들어낸다는 뜻이기도 하다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-05-02.svg" alt="그림 5-2. continuity equation 직관">
-  <figcaption><strong>그림 5-2. continuity equation 직관.</strong><br>continuity equation은 확률 질량의 유입과 유출이 density 변화를 만든다는 사실을 표현한다.</figcaption>
+  <figcaption><strong>그림 5-2. continuity equation 직관.</strong>continuity equation은 확률 질량의 유입과 유출이 density 변화를 만든다는 사실을 표현한다.</figcaption>
 </figure>
 
 <h2 id="velocity-field-density">Velocity field와 density 변화<a class="headerlink" href="#velocity-field-density" title="Permanent link">&para;</a></h2>
@@ -1702,7 +1702,7 @@ J_t(x)=f_t(x)p_t(x)-D_t\nabla p_t(x).
 <p>Flow Matching이 velocity field를 학습한다는 말은 이 두 수준을 모두 포함한다. Sampling할 때 우리는 개별 샘플 하나를 ODE(Ordinary Differential Equation, 상미분방정식)로 움직인다. 하지만 좋은 샘플을 얻으려면 많은 샘플을 움직였을 때 전체 분포가 목표 분포 <span class="arithmatex">\(p_1\)</span>에 가까워져야 한다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-05-03.svg" alt="그림 5-3. velocity field가 density를 바꾸는 세 가지 경우">
-  <figcaption><strong>그림 5-3. velocity field가 density를 바꾸는 세 가지 경우.</strong><br>velocity field의 모양은 개별 샘플의 경로뿐 아니라 전체 density의 변화를 결정한다.</figcaption>
+  <figcaption><strong>그림 5-3. velocity field가 density를 바꾸는 세 가지 경우.</strong>velocity field의 모양은 개별 샘플의 경로뿐 아니라 전체 density의 변화를 결정한다.</figcaption>
 </figure>
 
 <h2 id="score-density">Score는 density가 증가하는 방향이다<a class="headerlink" href="#score-density" title="Permanent link">&para;</a></h2>
@@ -1715,7 +1715,7 @@ s_t(x) = \nabla_x \log p_t(x)
 <p>1차원 Gaussian을 생각해보자. 평균이 0인 Gaussian에서는 <span class="arithmatex">\(x=2\)</span>에 있을 때 density가 더 높은 쪽은 왼쪽, 즉 0을 향하는 방향이다. <span class="arithmatex">\(x=-2\)</span>에 있을 때는 오른쪽이 density가 높아지는 방향이다. Score는 이런 방향 정보를 준다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-05-04.svg" alt="그림 5-4. density contour와 score vector">
-  <figcaption><strong>그림 5-4. density contour와 score vector.</strong><br>score는 현재 위치에서 log density가 증가하는 방향을 가리킨다.</figcaption>
+  <figcaption><strong>그림 5-4. density contour와 score vector.</strong>score는 현재 위치에서 log density가 증가하는 방향을 가리킨다.</figcaption>
 </figure>
 
 <h2 id="score-denoising">Score는 denoising 방향과 연결된다<a class="headerlink" href="#score-denoising" title="Permanent link">&para;</a></h2>
@@ -1725,7 +1725,7 @@ s_t(x) = \nabla_x \log p_t(x)
 <p>여기서 조심할 점이 있다. Score가 곧바로 “깨끗한 이미지 정답”을 주는 것은 아니다. Score는 현재 시간 <span class="arithmatex">\(t\)</span>의 noisy distribution <span class="arithmatex">\(p_t\)</span>에서 density가 증가하는 방향을 알려준다. Reverse diffusion은 이 정보를 시간에 따라 사용해 noise에서 data로 돌아가는 dynamics를 구성한다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-05-05.svg" alt="그림 5-5. score와 denoising">
-  <figcaption><strong>그림 5-5. score와 denoising.</strong><br>score는 noisy distribution에서 더 그럴듯한 영역으로 이동할 방향을 제공한다.</figcaption>
+  <figcaption><strong>그림 5-5. score와 denoising.</strong>score는 noisy distribution에서 더 그럴듯한 영역으로 이동할 방향을 제공한다.</figcaption>
 </figure>
 
 <h2 id="score-field-velocity-field">Score field와 velocity field는 다르다<a class="headerlink" href="#score-field-velocity-field" title="Permanent link">&para;</a></h2>
@@ -1748,7 +1748,7 @@ s_t(x) = \nabla_x \log p_t(x)
 </ul>
 <figure class="book-figure">
   <img src="../assets/figures/fig-05-06.svg" alt="그림 5-6. score field와 velocity field 비교">
-  <figcaption><strong>그림 5-6. score field와 velocity field 비교.</strong><br>score는 density의 기울기를 말하고, velocity는 path를 따라 실제로 움직일 방향을 말한다.</figcaption>
+  <figcaption><strong>그림 5-6. score field와 velocity field 비교.</strong>score는 density의 기울기를 말하고, velocity는 path를 따라 실제로 움직일 방향을 말한다.</figcaption>
 </figure>
 
 <h2 id="flow-matching-score">왜 Flow Matching은 score 없이도 학습할 수 있을까<a class="headerlink" href="#flow-matching-score" title="Permanent link">&para;</a></h2>

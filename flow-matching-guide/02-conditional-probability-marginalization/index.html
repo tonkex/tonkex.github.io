@@ -1657,7 +1657,7 @@
 <h1 id="2">2장. 조건부 확률과 주변화<a class="headerlink" href="#2" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:21 KST</span>
-  <span>최종 업데이트: 2026-05-24 00:36 KST</span>
+  <span>최종 업데이트: 2026-05-24 00:47 KST</span>
 </div>
 
 <blockquote>
@@ -1684,7 +1684,7 @@ p(x \mid z)
 <p>이 식은 “조건 <span class="arithmatex">\(z\)</span>가 주어졌을 때 <span class="arithmatex">\(x\)</span>의 분포”라고 읽는다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-02-01.svg" alt="그림 2-1. 조건이 바꾸는 분포">
-  <figcaption><strong>그림 2-1. 조건이 바꾸는 분포.</strong><br>조건이 주어지면 가능한 샘플의 범위와 분포의 모양이 달라진다.</figcaption>
+  <figcaption><strong>그림 2-1. 조건이 바꾸는 분포.</strong>조건이 주어지면 가능한 샘플의 범위와 분포의 모양이 달라진다.</figcaption>
 </figure>
 
 <h2 id="joint-conditional-marginal">Joint, conditional, marginal<a class="headerlink" href="#joint-conditional-marginal" title="Permanent link">&para;</a></h2>
@@ -1723,7 +1723,7 @@ p(x) = \sum_z p(x \mid z)p(z)
 \]</div>
 <figure class="book-figure">
   <img src="../assets/figures/fig-02-02.svg" alt="그림 2-2. 조건별 분포를 섞어 전체 분포 만들기">
-  <figcaption><strong>그림 2-2. 조건별 분포를 섞어 전체 분포 만들기.</strong><br>marginalization은 조건부 분포들을 조건의 비중만큼 섞어 전체 분포를 만드는 과정이다.</figcaption>
+  <figcaption><strong>그림 2-2. 조건별 분포를 섞어 전체 분포 만들기.</strong>marginalization은 조건부 분포들을 조건의 비중만큼 섞어 전체 분포를 만드는 과정이다.</figcaption>
 </figure>
 
 <h2 id="_2">왜 주변화가 생성 모델에서 중요할까<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
@@ -1741,7 +1741,7 @@ x_t = (1-t)x_0 + tx_1
 <p>물론 실제 Flow Matching 논문에서는 path 설정이 더 일반적일 수 있다. 하지만 핵심 직관은 같다. 조건을 주면 path와 target velocity를 쉽게 만들 수 있다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-02-03.svg" alt="그림 2-3. 조건부 path의 직관">
-  <figcaption><strong>그림 2-3. 조건부 path의 직관.</strong><br>특정 조건이 주어지면 하나의 샘플이 따라갈 쉬운 path를 정의할 수 있다.</figcaption>
+  <figcaption><strong>그림 2-3. 조건부 path의 직관.</strong>특정 조건이 주어지면 하나의 샘플이 따라갈 쉬운 path를 정의할 수 있다.</figcaption>
 </figure>
 
 <h2 id="conditional-path-marginal-path">Conditional path와 marginal path<a class="headerlink" href="#conditional-path-marginal-path" title="Permanent link">&para;</a></h2>
@@ -1769,7 +1769,7 @@ p_t(x)=\int p_t(x,z)\,dz
 <p>직관적으로는 이렇다. 각 데이터 샘플 또는 각 조건마다 noise에서 data로 가는 작은 길을 하나씩 만든다. 그 길들을 전체 데이터셋에 대해 많이 모으면, 전체 분포가 noise에서 data로 이동하는 큰 흐름이 된다. Conditional path는 작은 길이고, marginal path는 그 작은 길들이 모여 만든 전체 흐름이다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-02-04.svg" alt="그림 2-4. conditional path와 marginal path">
-  <figcaption><strong>그림 2-4. conditional path와 marginal path.</strong><br>조건별 path를 모두 모으면 전체 분포의 시간별 이동인 marginal path를 볼 수 있다.</figcaption>
+  <figcaption><strong>그림 2-4. conditional path와 marginal path.</strong>조건별 path를 모두 모으면 전체 분포의 시간별 이동인 marginal path를 볼 수 있다.</figcaption>
 </figure>
 
 <h2 id="target-field">조건부 target을 학습해도 전체 field를 배울 수 있는 이유<a class="headerlink" href="#target-field" title="Permanent link">&para;</a></h2>
@@ -1803,7 +1803,7 @@ v_t(x) = \mathbb{E}_{z \sim p(z \mid x)}[u_t(x \mid z)]
 <p>따라서 수식의 주변화는 코드에서 “많은 조건을 무작위로 샘플링하고 평균 loss를 줄이는 학습 과정”으로 나타난다. 이것이 논문 속 expectation과 실제 minibatch 학습이 연결되는 방식이다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-02-05.svg" alt="그림 2-5. CFM 학습에서 조건부 path가 쓰이는 위치">
-  <figcaption><strong>그림 2-5. CFM 학습에서 조건부 path가 쓰이는 위치.</strong><br>구현에서는 조건부 path를 샘플링해 target velocity를 만들고, 그 평균 loss로 모델을 학습한다.</figcaption>
+  <figcaption><strong>그림 2-5. CFM 학습에서 조건부 path가 쓰이는 위치.</strong>구현에서는 조건부 path를 샘플링해 target velocity를 만들고, 그 평균 loss로 모델을 학습한다.</figcaption>
 </figure>
 
 <h2 id="flow-matching">Flow Matching으로 이어지는 연결<a class="headerlink" href="#flow-matching" title="Permanent link">&para;</a></h2>

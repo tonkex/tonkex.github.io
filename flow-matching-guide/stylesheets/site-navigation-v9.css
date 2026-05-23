@@ -106,6 +106,7 @@ html .md-header .md-header__title {
 
 .md-typeset .book-figure figcaption strong {
   display: block;
+  margin-bottom: 0.08rem;
   color: var(--md-default-fg-color);
   font-weight: 800;
 }
