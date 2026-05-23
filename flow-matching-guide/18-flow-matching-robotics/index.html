@@ -1753,6 +1753,11 @@
 
 
 <h1 id="18-flow-matching">18장. 로보틱스에서의 Flow Matching<a class="headerlink" href="#18-flow-matching" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>최초 작성: 2026-05-23 02:01 KST</span>
+  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+</div>
+
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>로봇은 이미지를 한 장 만드는 모델과 다르다. 로봇 정책은 지금 보는 장면, 언어 지시, 로봇 관절 상태를 보고 다음 행동을 빠르게 만들어야 하며, 그 행동은 안전하고 부드럽고 물리적으로 실행 가능해야 한다. 그렇다면 왜 로보틱스 연구자들은 diffusion policy 이후 Flow Matching을 로봇 조작과 motion planning에 적용하기 시작했을까?</p>
 <p>이 장은 Flow Matching이 로보틱스에서 쓰이는 방식을 정리한다. 이 책의 독자는 로보틱스와 AI에 관심이 많은 개발자 또는 연구 지망자를 상정한다. 따라서 로봇 제어 이론을 깊게 파고들기보다, diffusion policy, imitation learning, VLA, action expert 같은 AI 로보틱스 흐름 속에서 Flow Matching이 어떤 역할을 맡는지에 초점을 둔다. 핵심은 이미지 생성이 아니라 <strong>행동 분포를 생성하는 정책</strong>이다. 로봇이 해야 할 action sequence 또는 trajectory를 하나의 샘플로 보고, 노이즈에서 그 행동 샘플로 가는 흐름을 학습한다. 2026년 5월 기준 최신 흐름까지 포함해, 왜 적용했는지, 어떻게 적용했는지, 어떤 효과가 보고되었는지, 앞으로 어떤 방향으로 가는지 살펴본다.</p>

@@ -1665,6 +1665,11 @@
 
 
 <h1 id="13-path-parameterization">13장. Path Parameterization 선택<a class="headerlink" href="#13-path-parameterization" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>최초 작성: 2026-05-23 01:43 KST</span>
+  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+</div>
+
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>Flow Matching에서 “경로를 정한다”는 말은 단순한 세부 구현이 아니다. 같은 시작 분포와 데이터 분포를 잇더라도 어떤 경로를 택하느냐에 따라 모델이 배워야 하는 속도장이 달라지고, sampling에 필요한 ODE step 수도 달라진다. 그렇다면 좋은 path parameterization은 무엇을 기준으로 골라야 할까?</p>
 <p>이 장에서는 직선 경로, 가우시안 경로, optimal transport 관점의 경로, rectified flow 계열의 생각을 비교한다. 목표는 모든 수식을 완벽히 외우는 것이 아니라, 논문에서 새로운 경로가 등장했을 때 무엇을 확인해야 하는지 기준을 세우는 것이다.</p>

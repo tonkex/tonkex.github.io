@@ -1665,6 +1665,11 @@
 
 
 <h1 id="6-flow-matching">6장. Flow Matching의 한 문장 정의<a class="headerlink" href="#6-flow-matching" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>최초 작성: 2026-05-23 01:43 KST</span>
+  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+</div>
+
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>Diffusion model은 노이즈를 조금씩 걷어 내는 방식으로 이미지를 만들었다. 그렇다면 Flow Matching은 무엇을 “맞춘다”고 말하는 걸까? 이 장의 목표는 Flow Matching을 한 문장으로 정의하되, 그 문장 안에 들어 있는 확률 경로, 속도장, ODE, 학습 목표의 의미를 하나씩 분해하는 것이다.</p>
 <p>Flow Matching을 처음 접하면 이름이 주는 인상이 다소 추상적이다. flow는 분포가 움직이는 흐름이고, matching은 모델이 그 흐름의 속도를 맞춘다는 뜻이다. 이 설명은 짧지만 충분하지 않다. 우리는 실제로 어떤 분포가 움직인다고 상상해야 하는지, 그 움직임을 어떤 함수가 담당하는지, 신경망은 어떤 값을 예측하도록 학습되는지까지 알아야 한다.</p>

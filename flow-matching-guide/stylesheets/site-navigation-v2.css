@@ -42,6 +42,25 @@ html .md-header .md-header__title {
   outline-offset: 0.15rem;
 }
 
+.md-typeset .page-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.7rem;
+  margin: -0.25rem 0 1.2rem;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.md-typeset .page-meta span {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.16rem 0.42rem;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 999px;
+  background: var(--md-code-bg-color);
+}
+
 .md-typeset .book-cover {
   width: min(23rem, 100%);
   max-width: min(23rem, 100%);

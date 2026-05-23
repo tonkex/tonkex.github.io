@@ -1665,6 +1665,11 @@
 
 
 <h1 id="14-sampling-ode-solver">14장. Sampling과 ODE Solver<a class="headerlink" href="#14-sampling-ode-solver" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>최초 작성: 2026-05-23 01:43 KST</span>
+  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+</div>
+
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>학습이 끝난 모델은 속도장 <span class="arithmatex">\(v_\theta(x,t)\)</span>를 예측한다. 그렇다면 실제 샘플은 어떻게 얻을까? 답은 ODE를 적분하는 것이다. 하지만 ODE solver를 어떻게 고르느냐에 따라 속도, 품질, 재현성이 달라진다.</p>
 <p>이 장은 Flow Matching의 sampling 단계를 다룬다. Euler 방법에서 시작해 midpoint, Runge-Kutta, step 수, numerical error, NFE 같은 개념을 살펴본다. 목표는 solver를 수치해석 교과서 수준으로 파고드는 것이 아니라, 생성 모델 실험에서 필요한 판단 기준을 갖는 것이다.</p>

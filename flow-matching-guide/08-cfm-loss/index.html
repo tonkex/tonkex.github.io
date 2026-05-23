@@ -1643,6 +1643,11 @@
 
 
 <h1 id="8-conditional-flow-matching-loss">8장. Conditional Flow Matching Loss 뜯어보기<a class="headerlink" href="#8-conditional-flow-matching-loss" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>최초 작성: 2026-05-23 01:43 KST</span>
+  <span>최종 업데이트: 2026-05-23 08:54 KST</span>
+</div>
+
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>Flow Matching의 핵심 손실은 한 줄로 쓸 수 있다. 하지만 그 한 줄을 실제 코드로 옮기려면 어떤 텐서를 만들고, 어떤 차원을 맞추고, 어떤 값에 그래디언트를 흘려야 하는지 알아야 한다. CFM loss는 수식으로는 단순하지만 구현에서는 작은 실수가 결과를 크게 흔든다.</p>
 <p>이 장에서는 Conditional Flow Matching loss를 학습 루프 관점에서 해부한다. 수식의 각 기호가 실제 텐서에서 무엇을 의미하는지, 시간 <span class="arithmatex">\(t\)</span>를 어떻게 샘플링하는지, 목표 속도는 어떻게 만들며, 어떤 형태의 모델 출력과 비교해야 하는지를 정리한다.</p>
