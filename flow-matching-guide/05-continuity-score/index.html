@@ -1623,7 +1623,7 @@
 <h1 id="5-score">5장. 확률 질량 보존과 score<a class="headerlink" href="#5-score" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:37 KST</span>
-  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
+  <span>최종 업데이트: 2026-05-23 23:20 KST</span>
 </div>
 
 <blockquote>
@@ -1673,6 +1673,24 @@ p_t(x)v_t(x)
 <blockquote>
 <p>어떤 위치의 density 변화는 그 위치 주변으로 확률 질량이 얼마나 들어오고 나가는지에 의해 결정된다.</p>
 </blockquote>
+<p>이 식을 조금 더 일반적인 형태로 쓰면 flux <span class="arithmatex">\(J_t(x)\)</span>가 등장한다.</p>
+<div class="arithmatex">\[
+\frac{\partial p_t(x)}{\partial t}+\nabla\cdot J_t(x)=0.
+\]</div>
+<p>Flux는 확률 질량이 실제로 흘러가는 양과 방향을 뜻한다. Flow Matching처럼 deterministic velocity field만 있는 경우에는 보통</p>
+<div class="arithmatex">\[
+J_t(x)=p_t(x)u_t(x)
+\]</div>
+<p>로 볼 수 있다. Density가 높은 곳에서 큰 속도로 움직이면 많은 확률 질량이 이동한다는 뜻이다. 반면 diffusion 관점에서는 flux를 drift와 diffusion 항으로 나누어 읽을 수 있다.</p>
+<div class="arithmatex">\[
+J_t(x)=f_t(x)p_t(x)-D_t\nabla p_t(x).
+\]</div>
+<p>첫 번째 항 <span class="arithmatex">\(f_t(x)p_t(x)\)</span>는 바람이나 물살처럼 분포를 특정 방향으로 밀어 주는 drift다. 두 번째 항 <span class="arithmatex">\(-D_t\nabla p_t(x)\)</span>는 밀도가 높은 곳에서 낮은 곳으로 퍼지는 diffusion flux다. 이 둘을 함께 쓰면 Fokker-Planck equation의 직관으로 이어진다. 이 책에서는 엄밀한 확률과정 이론보다 다음 그림을 붙잡으면 충분하다.</p>
+<ul>
+<li>Flow Matching은 확률 질량을 velocity field로 운반하는 관점이 중심이다.</li>
+<li>Diffusion은 drift에 더해 noise가 만드는 확산 효과를 함께 다룬다.</li>
+<li>두 관점 모두 “확률 질량은 사라지지 않고 흐른다”는 continuity equation 위에 서 있다.</li>
+</ul>
 <p>이 장에서는 이 식의 엄밀한 유도보다 직관이 중요하다. Flow Matching에서 velocity field를 학습한다는 말은 단지 샘플 하나의 방향을 맞춘다는 뜻만이 아니다. 그 velocity field가 전체 분포의 density 변화를 만들어낸다는 뜻이기도 하다.</p>
 <figure class="book-figure">
   <img src="../assets/figures/fig-05-02.svg" alt="그림 5-2. continuity equation 직관">

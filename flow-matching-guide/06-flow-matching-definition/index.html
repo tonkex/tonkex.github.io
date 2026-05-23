@@ -1667,7 +1667,7 @@
 <h1 id="6-flow-matching">6장. Flow Matching의 한 문장 정의<a class="headerlink" href="#6-flow-matching" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:43 KST</span>
-  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
+  <span>최종 업데이트: 2026-05-23 23:20 KST</span>
 </div>
 
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -1797,13 +1797,25 @@ u_t = x_1-x_0.
 <p>이 표는 단순화된 비교다. 실제로는 diffusion에서도 ODE를 사용할 수 있고, velocity parameterization을 쓰는 diffusion 모델도 있다. 따라서 “완전히 다른 세계”라기보다 같은 연속 생성 모델 관점에서 서로 다른 표현과 학습 방식을 택한다고 보는 편이 정확하다.</p>
 <h2 id="simulation-free">Simulation-free라는 말의 의미<a class="headerlink" href="#simulation-free" title="Permanent link">&para;</a></h2>
 <p>Flow Matching 문헌에서 자주 등장하는 표현이 simulation-free training이다. 이것은 학습할 때 ODE를 매번 풀지 않아도 된다는 뜻이다.</p>
+<p>이 말은 CNF와 비교하면 선명해진다. CNF에서는 현재 신경망이 만든 velocity field가 곧 경로를 정의한다. 따라서 어떤 데이터의 likelihood를 계산하거나 모델을 업데이트하려면, 매번 ODE를 따라 <span class="arithmatex">\(t=0\)</span>에서 <span class="arithmatex">\(t=1\)</span>까지 흘려보고, 그 과정에서 밀도 변화와 gradient를 계산해야 한다. 비유하면 길이 맞는지 확인하려고 서울에서 부산까지 매번 직접 운전해 보는 방식이다.</p>
 <p>ODE 기반 생성 모델은 원래 다음 문제가 있다.</p>
 <ol>
 <li>어떤 파라미터 <span class="arithmatex">\(\theta\)</span>가 주어졌을 때 ODE를 풀어 샘플을 만든다.</li>
-<li>샘플과 데이터를 비교한다.</li>
+<li>샘플과 데이터를 비교하거나 likelihood를 계산한다.</li>
 <li>ODE solver를 거친 그래디언트를 계산한다.</li>
 </ol>
-<p>이 방식은 비용이 크고 구현도 복잡하다. Flow Matching은 학습 시점에 중간 샘플 <span class="arithmatex">\(x_t\)</span>와 목표 속도 <span class="arithmatex">\(u_t\)</span>를 직접 만들 수 있도록 경로를 설계한다. 그러면 학습은 일반적인 supervised regression처럼 된다.</p>
+<p>이 방식은 비용이 크고 구현도 복잡하다. 특히 학습 중 ODE 시뮬레이션은 세 가지 부담을 만든다.</p>
+<ul>
+<li><strong>메모리</strong>: trajectory와 solver 내부 상태를 저장하거나 다시 계산해야 한다.</li>
+<li><strong>속도</strong>: 한 번의 학습 step 안에 여러 번의 함수 평가가 들어간다.</li>
+<li><strong>안정성</strong>: solver tolerance, step size, 수치 오차가 학습 dynamics에 영향을 준다.</li>
+</ul>
+<p>Flow Matching은 문제를 다르게 놓는다. 학습 중에 모델이 만든 경로를 따라가며 평가하지 않고, 우리가 먼저 경로를 설계한다. 그러면 학습 시점에 중간 샘플 <span class="arithmatex">\(x_t\)</span>와 목표 속도 <span class="arithmatex">\(u_t\)</span>를 직접 만들 수 있다. 학습은 일반적인 supervised regression처럼 된다.</p>
+<p><figure class="book-figure">
+  <img src="../assets/figures/fig-06-cnf-vs-fm-training.svg" alt="그림 6-2. CNF 학습과 Flow Matching 학습의 차이">
+<br />
+<figcaption>그림 6-2. CNF는 학습 중 ODE rollout이 필요하지만, Flow Matching은 설계된 경로에서 정답 속도를 바로 만들어 회귀한다.</figcaption></p>
+</figure>
 <div class="arithmatex">\[
 (x_t,t) \mapsto u_t.
 \]</div>
@@ -1838,11 +1850,11 @@ u_t = x_1-x_0.
 </ol>
 <p>이 질문에 답할 수 있으면 대부분의 Flow Matching 방법을 구조적으로 읽을 수 있다.</p>
 <h2 id="_4">시각 자료<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
-<p><figure class="book-figure">
+<figure class="book-figure">
   <img src="../assets/figures/fig-06-overview.svg" alt="6장 핵심 시각 자료">
-<br />
-<figcaption>6장 핵심 시각 자료. 아래 후보들을 한 장의 도식으로 묶어 읽을 수 있다.</figcaption></p>
+  <figcaption>6장 핵심 시각 자료. 아래 후보들을 한 장의 도식으로 묶어 읽을 수 있다.</figcaption>
 </figure>
+
 <ul>
 <li><strong>분포 이동 그림</strong>: 왼쪽의 둥근 정규분포 구름이 오른쪽의 데이터 분포 구름으로 이동하는 흐름을 화살표로 표시한다.</li>
 <li><strong>속도장 그림</strong>: 2차원 평면 위의 여러 점마다 작은 화살표를 그려 <span class="arithmatex">\(u_t(x)\)</span>가 위치별 방향을 갖는다는 점을 보여 준다.</li>

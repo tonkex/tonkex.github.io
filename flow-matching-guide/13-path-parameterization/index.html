@@ -1667,7 +1667,7 @@
 <h1 id="13-path-parameterization">13장. Path Parameterization 선택<a class="headerlink" href="#13-path-parameterization" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:43 KST</span>
-  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
+  <span>최종 업데이트: 2026-05-23 23:20 KST</span>
 </div>
 
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -1693,11 +1693,12 @@
 <div class="arithmatex">\[
 x_t=(1-t)x_0+tx_1.
 \]</div>
+<p>이 식은 선분 위의 내분점으로 읽을 수 있다. <span class="arithmatex">\(t=0\)</span>이면 <span class="arithmatex">\(x_0\)</span>에 있고, <span class="arithmatex">\(t=1\)</span>이면 <span class="arithmatex">\(x_1\)</span>에 있다. <span class="arithmatex">\(t=0.25\)</span>라면 출발점에서 25%만큼 이동한 지점이고, <span class="arithmatex">\(t=0.75\)</span>라면 도착점에 더 가까운 지점이다. 따라서 시간 <span class="arithmatex">\(t\)</span>는 단순한 index가 아니라 “출발점에서 도착점까지 얼마나 왔는가”를 나타낸다.</p>
 <p>목표 속도는 시간에 대해 미분하면 된다.</p>
 <div class="arithmatex">\[
 u_t=x_1-x_0.
 \]</div>
-<p>장점은 명확하다. 구현이 쉽고, 수식이 직관적이며, CFM(Conditional Flow Matching) loss를 설명하기 좋다. 입문 실습에서는 직선 경로가 가장 좋은 출발점이다.</p>
+<p>장점은 명확하다. 구현이 쉽고, 수식이 직관적이며, CFM(Conditional Flow Matching) loss를 설명하기 좋다. 입문 실습에서는 직선 경로가 가장 좋은 출발점이다. 또한 학습과 sampling의 비용 구조가 분리된다. 학습에서는 위 식으로 임의의 <span class="arithmatex">\(t\)</span>에서 <span class="arithmatex">\(x_t\)</span>와 <span class="arithmatex">\(u_t\)</span>를 즉시 만들 수 있으므로 ODE solver가 필요 없다. 반면 생성에서는 학습된 <span class="arithmatex">\(v_\theta(x,t)\)</span>를 따라 ODE를 푼다. 직선 경로가 데이터 구조와 잘 맞으면 생성 trajectory가 덜 휘고 solver step을 줄이기 쉽다.</p>
 <p>하지만 단점도 있다. <span class="arithmatex">\(x_0\)</span>와 <span class="arithmatex">\(x_1\)</span>을 무작위로 연결하면 멀리 떨어진 점들이 많이 연결될 수 있다. 이 경우 각 샘플의 조건부 경로는 단순하지만, 전체 marginal velocity는 복잡해질 수 있다.</p>
 <p>즉 직선 경로는 “개별 경로는 쉽지만 전체 평균 흐름은 꼭 쉽지 않을 수 있다”는 특징을 갖는다.</p>
 <h2 id="_4">가우시안 경로<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>

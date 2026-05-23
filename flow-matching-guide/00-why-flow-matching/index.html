@@ -1623,7 +1623,7 @@
 <h1 id="0">0장. 생성 모델은 어떻게 여기까지 왔을까?<a class="headerlink" href="#0" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:09 KST</span>
-  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
+  <span>최종 업데이트: 2026-05-23 23:20 KST</span>
 </div>
 
 <blockquote>
@@ -1656,6 +1656,13 @@
 <p>VAE는 latent variable을 사용해 데이터를 설명한다. 복잡한 이미지를 직접 만들기보다, 먼저 더 단순한 잠재 공간의 변수 <span class="arithmatex">\(z\)</span>를 뽑고, decoder가 <span class="arithmatex">\(z\)</span>를 이미지 <span class="arithmatex">\(x\)</span>로 바꾸도록 학습한다. 이 접근은 확률적 해석이 깔끔하고 latent representation을 다루기 좋다. 하지만 이미지 품질 측면에서는 한동안 GAN보다 흐릿한 결과를 보이는 경우가 많았다.</p>
 <p>GAN은 generator와 discriminator의 경쟁으로 생성 모델을 학습한다. generator는 가짜 이미지를 만들고, discriminator는 진짜와 가짜를 구분한다. 이 경쟁이 잘 맞물리면 매우 선명한 이미지를 만들 수 있다. 하지만 학습이 불안정하고 mode collapse처럼 분포의 일부만 잘 만드는 문제가 생기기 쉽다. 좋은 결과를 얻으려면 구조와 학습 세부 설정에 많은 경험이 필요했다.</p>
 <p>Normalizing flow는 다른 방향에서 문제를 풀었다. 단순한 분포의 샘플을 invertible transformation으로 복잡한 데이터 분포의 샘플로 바꾸고, 그 변환의 likelihood를 정확히 계산할 수 있게 만든다. 이 접근은 수학적으로 매력적이다. 하지만 invertibility와 Jacobian 계산 가능성 같은 제약 때문에 모델 구조 선택이 제한될 수 있다.</p>
+<p>이 지점에서 Normalizing Flow 계열의 다음 질문이 생긴다. 변환을 꼭 몇 개의 이산적인 층으로 쌓아야 할까? ResNet의 잔차 연결을 아주 작은 시간 간격의 Euler step으로 보면, 층을 무한히 촘촘하게 만든 극한은 ODE로 해석할 수 있다. 이 관점이 Neural ODE와 CNF(Continuous Normalizing Flow)로 이어진다. CNF는 discrete invertible block 대신 연속 시간 velocity field를 사용해 분포를 흘려보낸다. 구조 제약은 줄어들지만, 학습 때마다 ODE trajectory를 풀고 그 경로를 통해 likelihood와 gradient를 계산해야 하는 부담이 생긴다.</p>
+<p>Flow Matching은 이 계보에서 중요한 전환점으로 볼 수 있다. “ODE로 분포를 이동시킨다”는 CNF의 장점은 유지하되, 학습할 때 매번 ODE를 시뮬레이션하지 않도록 문제를 바꾼다. 경로를 먼저 정하면 중간 샘플 <span class="arithmatex">\(x_t\)</span>와 정답 속도 <span class="arithmatex">\(u_t\)</span>를 직접 만들 수 있고, 신경망은 그 속도를 회귀하면 된다. 따라서 Flow Matching은 normalizing flow의 정확한 분포 이동 언어, CNF의 연속 시간 ODE 관점, diffusion 이후의 simulation-free 학습 감각이 만나는 지점에 있다.</p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-00-07.svg" alt="그림 0-7. NF에서 CNF와 Flow Matching으로 이어지는 계보">
+  <figcaption>그림 0-7. NF는 가역 변환을 쌓고, CNF는 이를 연속 ODE로 바꾸며, Flow Matching은 경로를 고정해 속도 회귀 문제로 바꾼다.</figcaption>
+</figure>
+
 <p>세 접근은 모두 생성 모델의 중요한 길을 열었다. 동시에 다음과 같은 질문을 남겼다.</p>
 <ul>
 <li>학습이 안정적이면서도 고품질 샘플을 만들 수 있을까?</li>

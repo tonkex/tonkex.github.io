@@ -1368,6 +1368,61 @@
 
 </li>
 
+          <li class="md-nav__item">
+  <a href="#continuous-normalizing-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Continuous Normalizing Flow
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#simulation-based-training" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Simulation-Based Training
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#flux" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Flux
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#liouville-equation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Liouville Equation
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#fokker-planck-equation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Fokker-Planck Equation
+
+    </span>
+  </a>
+
+</li>
+
       </ul>
     </nav>
 
@@ -1732,6 +1787,61 @@
 
 </li>
 
+          <li class="md-nav__item">
+  <a href="#continuous-normalizing-flow" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Continuous Normalizing Flow
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#simulation-based-training" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Simulation-Based Training
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#flux" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Flux
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#liouville-equation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Liouville Equation
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#fokker-planck-equation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Fokker-Planck Equation
+
+    </span>
+  </a>
+
+</li>
+
       </ul>
     </nav>
 
@@ -1901,7 +2011,7 @@
 <h1 id="b">부록 B. 주요 기호와 용어<a class="headerlink" href="#b" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 02:18 KST</span>
-  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
+  <span>최종 업데이트: 2026-05-23 23:20 KST</span>
 </div>
 
 <h2 id="_1">부록의 목적<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -1992,6 +2102,21 @@
 <td>4장, 9장</td>
 </tr>
 <tr>
+<td><span class="arithmatex">\(J_t(x)\)</span></td>
+<td>flux, 확률 질량이 흘러가는 양과 방향</td>
+<td>5장, 9장</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(f_t(x)\)</span></td>
+<td>drift field, 분포를 평균적으로 밀어 주는 방향</td>
+<td>4장, 5장, 9장</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(D_t\)</span></td>
+<td>diffusion coefficient, 확산항의 세기</td>
+<td>4장, 5장, 9장</td>
+</tr>
+<tr>
 <td><span class="arithmatex">\(\nabla_x \log p_t(x)\)</span></td>
 <td>score, 현재 위치에서 density가 증가하는 방향</td>
 <td>5장, 9장</td>
@@ -2049,6 +2174,16 @@
 <div class="highlight"><pre><span></span><code><span class="n">xt</span><span class="p">,</span> <span class="n">ut</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
 </code></pre></div>
 <p>경로 실험을 쉽게 하려면 이 부분을 trainer와 분리하는 것이 좋다.</p>
+<h3 id="continuous-normalizing-flow">Continuous Normalizing Flow<a class="headerlink" href="#continuous-normalizing-flow" title="Permanent link">&para;</a></h3>
+<p>Continuous Normalizing Flow는 normalizing flow의 변환을 연속 시간 ODE로 표현하는 모델 계열이다. 샘플은 velocity field를 따라 이동하고, density 변화는 divergence 항으로 계산한다. Flow Matching은 이 ODE/velocity field 언어를 공유하지만, 학습 목표를 likelihood 중심 simulation에서 velocity regression으로 바꾼다.</p>
+<h3 id="simulation-based-training">Simulation-Based Training<a class="headerlink" href="#simulation-based-training" title="Permanent link">&para;</a></h3>
+<p>CNF처럼 학습 중 모델이 정의한 ODE trajectory를 직접 풀고, 그 결과를 통해 likelihood 또는 loss와 gradient를 계산하는 방식을 말한다. 모델 업데이트마다 solver가 개입하므로 비용, 메모리, 수치 안정성 문제가 커질 수 있다. Flow Matching의 simulation-free training은 이 부담을 줄이려는 문제의식에서 이해할 수 있다.</p>
+<h3 id="flux">Flux<a class="headerlink" href="#flux" title="Permanent link">&para;</a></h3>
+<p>Flux <span class="arithmatex">\(J_t(x)\)</span>는 확률 질량이 공간에서 흘러가는 양과 방향이다. Continuity equation은 <span class="arithmatex">\(\partial_t p_t(x)+\nabla\cdot J_t(x)=0\)</span>처럼 쓸 수 있다. Flow Matching에서는 보통 <span class="arithmatex">\(J_t(x)=p_t(x)u_t(x)\)</span>처럼 velocity field가 확률 질량을 운반한다고 본다.</p>
+<h3 id="liouville-equation">Liouville Equation<a class="headerlink" href="#liouville-equation" title="Permanent link">&para;</a></h3>
+<p>확산항 없이 deterministic velocity field가 density를 이동시키는 경우의 continuity equation을 Liouville equation 관점으로 볼 수 있다. Flow Matching의 ODE 생성 과정을 이해할 때 유용한 배경이다.</p>
+<h3 id="fokker-planck-equation">Fokker-Planck Equation<a class="headerlink" href="#fokker-planck-equation" title="Permanent link">&para;</a></h3>
+<p>SDE가 만드는 확률분포의 시간 변화를 설명하는 PDE다. Drift와 diffusion 항이 함께 등장한다. Diffusion model은 이 관점에서 자연스럽게 설명되고, Flow Matching과 diffusion을 같은 확률 질량 보존 언어에서 비교할 때도 유용하다.</p>
 <h2 id="diffusion">Diffusion 관련 용어<a class="headerlink" href="#diffusion" title="Permanent link">&para;</a></h2>
 <h3 id="forward-noising-process">Forward Noising Process<a class="headerlink" href="#forward-noising-process" title="Permanent link">&para;</a></h3>
 <p>데이터에 점진적으로 noise를 섞어 단순한 noise 분포로 보내는 과정이다. 보통 diffusion에서는 이 과정이 직접 설계된다.</p>

@@ -816,6 +816,17 @@
 </li>
 
         <li class="md-nav__item">
+  <a href="#fokker-planck" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Fokker-Planck 관점에서 보는 공통 뿌리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
 
@@ -1571,6 +1582,17 @@
 </li>
 
         <li class="md-nav__item">
+  <a href="#fokker-planck" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Fokker-Planck 관점에서 보는 공통 뿌리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
 
@@ -1645,7 +1667,7 @@
 <h1 id="9-diffusion-flow-matching">9장. Diffusion과 Flow Matching 비교<a class="headerlink" href="#9-diffusion-flow-matching" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:43 KST</span>
-  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
+  <span>최종 업데이트: 2026-05-23 23:20 KST</span>
 </div>
 
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -1749,6 +1771,64 @@ u_t(x)=a_t\nabla_x\log p_t(x)+b_t x
 <td>학습 직관은 무엇인가?</td>
 <td>노이즈 제거</td>
 <td>분포 이동 속도 맞추기</td>
+</tr>
+</tbody>
+</table>
+<h2 id="fokker-planck">Fokker-Planck 관점에서 보는 공통 뿌리<a class="headerlink" href="#fokker-planck" title="Permanent link">&para;</a></h2>
+<p>Diffusion과 Flow Matching은 겉으로는 매우 다른 학습법처럼 보인다. Diffusion은 noise, score, reverse SDE에서 출발하고, Flow Matching은 path, velocity, ODE에서 출발한다. 하지만 분포의 시간 변화를 쓰는 수학 언어로 내려오면 둘은 같은 뿌리를 공유한다.</p>
+<p>먼저 확률 질량 보존은 flux <span class="arithmatex">\(J_t(x)\)</span>로 다음처럼 쓸 수 있다.</p>
+<div class="arithmatex">\[
+\frac{\partial p_t(x)}{\partial t}+\nabla\cdot J_t(x)=0.
+\]</div>
+<p>Diffusion 계열에서는 이 flux를 drift와 diffusion 항으로 나누어 생각할 수 있다.</p>
+<div class="arithmatex">\[
+J_t(x)=f_t(x)p_t(x)-D_t\nabla p_t(x).
+\]</div>
+<p>여기서 <span class="arithmatex">\(f_t(x)p_t(x)\)</span>는 분포를 특정 방향으로 밀어 주는 drift flux이고, <span class="arithmatex">\(-D_t\nabla p_t(x)\)</span>는 density가 높은 곳에서 낮은 곳으로 퍼지는 diffusion flux다. 이 관점에서 Diffusion은 <span class="arithmatex">\(D_t&gt;0\)</span>인 확산 효과를 적극적으로 사용한다. 개별 샘플 trajectory에는 noise가 들어가지만, 전체 density의 변화는 Fokker-Planck equation으로 결정론적으로 기술된다.</p>
+<p>Flow Matching은 보통 deterministic velocity field를 중심으로 본다. 이때 flux는 다음처럼 읽을 수 있다.</p>
+<div class="arithmatex">\[
+J_t(x)=p_t(x)u_t(x).
+\]</div>
+<p>즉 확산항 없이 velocity field가 확률 질량을 운반하는 Liouville equation 관점에 가깝다. 이 설명은 “확산항 <span class="arithmatex">\(D\)</span>를 켜면 diffusion, 끄면 Flow Matching”이라는 좋은 직관을 준다. 다만 이것은 모든 Flow Matching 변형을 완전히 환원하는 엄밀한 분류라기보다, 두 방법의 공통 기반을 이해하기 위한 지도라고 보는 편이 안전하다.</p>
+<figure class="book-figure">
+  <img src="../assets/figures/fig-09-fpe-switch.svg" alt="그림 9-2. Fokker-Planck 관점에서 본 Diffusion과 Flow Matching">
+  <figcaption>그림 9-2. 연속방정식의 flux를 drift와 diffusion 항으로 나누면, Flow Matching과 Diffusion의 차이를 같은 좌표계에서 비교할 수 있다.</figcaption>
+</figure>
+
+<p>이 관점을 더하면 비교표도 조금 달라진다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>Diffusion</th>
+<th>Flow Matching</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>분포 방정식 직관</td>
+<td>Fokker-Planck, drift + diffusion</td>
+<td>continuity/Liouville, drift 또는 velocity 중심</td>
+</tr>
+<tr>
+<td>개별 trajectory</td>
+<td>stochastic path가 자연스럽다</td>
+<td>deterministic ODE path가 자연스럽다</td>
+</tr>
+<tr>
+<td>학습 대상</td>
+<td>score, noise, velocity parameterization</td>
+<td>velocity field 직접 회귀</td>
+</tr>
+<tr>
+<td>생성 비용 직관</td>
+<td>많은 denoising 또는 solver step</td>
+<td>경로가 곧으면 적은 ODE step 가능</td>
+</tr>
+<tr>
+<td>공통 기반</td>
+<td>확률 질량 보존과 시간별 density 변화</td>
+<td>확률 질량 보존과 시간별 density 변화</td>
 </tr>
 </tbody>
 </table>

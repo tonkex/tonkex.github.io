@@ -1091,10 +1091,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#2-continuous-normalizing-flow" class="md-nav__link">
+  <a href="#2-normalizing-flow-continuous-normalizing-flow" class="md-nav__link">
     <span class="md-ellipsis">
 
-        2단계: Continuous Normalizing Flow
+        2단계: Normalizing Flow에서 Continuous Normalizing Flow로
 
     </span>
   </a>
@@ -1549,10 +1549,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#2-continuous-normalizing-flow" class="md-nav__link">
+  <a href="#2-normalizing-flow-continuous-normalizing-flow" class="md-nav__link">
     <span class="md-ellipsis">
 
-        2단계: Continuous Normalizing Flow
+        2단계: Normalizing Flow에서 Continuous Normalizing Flow로
 
     </span>
   </a>
@@ -1667,7 +1667,7 @@
 <h1 id="15">15장. 논문 로드맵<a class="headerlink" href="#15" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:43 KST</span>
-  <span>최종 업데이트: 2026-05-23 09:35 KST</span>
+  <span>최종 업데이트: 2026-05-23 23:20 KST</span>
 </div>
 
 <h2 id="_1">이 장의 질문<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
@@ -1689,8 +1689,9 @@
 \text{모델이 예측하는 값은 noise인가, score인가, velocity인가?}
 \]</div>
 <p>이 질문은 이후 Flow Matching 논문을 읽을 때 계속 등장한다.</p>
-<h2 id="2-continuous-normalizing-flow">2단계: Continuous Normalizing Flow<a class="headerlink" href="#2-continuous-normalizing-flow" title="Permanent link">&para;</a></h2>
-<p>Flow Matching은 normalizing flow와도 연결된다. Normalizing flow는 단순 분포의 샘플을 invertible transformation으로 데이터 분포로 옮긴다. Continuous normalizing flow는 이 변환을 연속 시간 ODE로 표현한다.</p>
+<h2 id="2-normalizing-flow-continuous-normalizing-flow">2단계: Normalizing Flow에서 Continuous Normalizing Flow로<a class="headerlink" href="#2-normalizing-flow-continuous-normalizing-flow" title="Permanent link">&para;</a></h2>
+<p>Flow Matching은 normalizing flow와도 연결된다. Normalizing flow는 단순 분포의 샘플을 invertible transformation으로 데이터 분포로 옮긴다. NICE, RealNVP, Glow 같은 모델은 이산적인 가역 변환을 쌓아 정확한 likelihood를 계산할 수 있게 했다. 이 계열을 읽을 때 핵심은 “샘플 생성”과 “확률 계산”을 동시에 다루려 했다는 점이다.</p>
+<p>하지만 normalizing flow에는 구조 제약이 따른다. 변환은 가역이어야 하고, Jacobian determinant를 계산할 수 있어야 한다. 표현력을 높이면 Jacobian 비용이 커지고, 계산을 쉽게 만들면 구조가 제한된다. Continuous normalizing flow는 이 딜레마를 Neural ODE 관점으로 바꾼다. 이산적인 layer를 연속 시간 ODE의 흐름으로 일반화하는 것이다.</p>
 <p>핵심 식은 다음이다.</p>
 <div class="arithmatex">\[
 \frac{d x_t}{dt}=v_\theta(x_t,t).
@@ -1700,6 +1701,14 @@
 \frac{d \log p_t(x_t)}{dt}=-\nabla\cdot v_\theta(x_t,t).
 \]</div>
 <p>Flow Matching은 likelihood 계산을 중심에 두기보다, 원하는 확률 경로의 속도장을 직접 맞추는 방식으로 이 계열과 연결된다. 이 배경을 알면 왜 ODE와 velocity field가 중요한지 더 자연스럽게 이해된다.</p>
+<p>이 단계에서 읽을 질문은 다음과 같다.</p>
+<ol>
+<li>모델이 정확한 likelihood를 계산하려면 어떤 제약이 필요한가?</li>
+<li>Jacobian determinant 계산이 왜 normalizing flow의 병목이 되는가?</li>
+<li>Neural ODE는 ResNet의 잔차 업데이트를 어떤 연속 시간 극한으로 해석하는가?</li>
+<li>CNF는 학습 중 왜 ODE simulation 비용을 부담하는가?</li>
+<li>Flow Matching은 이 비용을 어떤 방식으로 우회하는가?</li>
+</ol>
 <h2 id="3-flow-matching">3단계: Flow Matching 핵심 논문<a class="headerlink" href="#3-flow-matching" title="Permanent link">&para;</a></h2>
 <p>이제 Flow Matching 자체를 다루는 논문을 읽는다. 이 묶음에서 확인해야 할 질문은 다음과 같다.</p>
 <ol>
