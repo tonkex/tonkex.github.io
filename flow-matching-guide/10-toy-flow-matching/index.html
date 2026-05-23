@@ -904,10 +904,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#mlpmulti-layer-perceptron" class="md-nav__link">
+  <a href="#mlp" class="md-nav__link">
     <span class="md-ellipsis">
 
-        작은 MLP(Multi-Layer Perceptron, 다층 퍼셉트론) 모델
+        작은 MLP 모델
 
     </span>
   </a>
@@ -1571,10 +1571,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#mlpmulti-layer-perceptron" class="md-nav__link">
+  <a href="#mlp" class="md-nav__link">
     <span class="md-ellipsis">
 
-        작은 MLP(Multi-Layer Perceptron, 다층 퍼셉트론) 모델
+        작은 MLP 모델
 
     </span>
   </a>
@@ -1719,7 +1719,7 @@ u_t=x_1-x_0.
     <span class="k">return</span> <span class="n">xt</span><span class="p">,</span> <span class="n">ut</span>
 </code></pre></div>
 <p>2차원에서는 <span class="arithmatex">\(t_view\)</span>의 shape가 <span class="arithmatex">\(B\times 1\)</span>이면 충분하다. 이미지에서는 <span class="arithmatex">\(B\times 1\times 1\times 1\)</span>이 필요했지만 원리는 같다.</p>
-<h2 id="mlpmulti-layer-perceptron">작은 MLP(Multi-Layer Perceptron, 다층 퍼셉트론) 모델<a class="headerlink" href="#mlpmulti-layer-perceptron" title="Permanent link">&para;</a></h2>
+<h2 id="mlp">작은 MLP 모델<a class="headerlink" href="#mlp" title="Permanent link">&para;</a></h2>
 <p>2차원 실습에서는 큰 U-Net(인코더-디코더형 convolution network)이 필요 없다. 입력은 <span class="arithmatex">\(x_t\in\mathbb{R}^2\)</span>와 시간 <span class="arithmatex">\(t\)</span>이고, 출력은 속도 <span class="arithmatex">\(v_\theta(x_t,t)\in\mathbb{R}^2\)</span>다.</p>
 <p>가장 단순하게는 <span class="arithmatex">\(x_t\)</span>와 <span class="arithmatex">\(t\)</span>를 concatenate해서 MLP(Multi-Layer Perceptron, 다층 퍼셉트론)에 넣을 수 있다.</p>
 <div class="arithmatex">\[

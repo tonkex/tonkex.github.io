@@ -1513,10 +1513,10 @@
 </li>
 
           <li class="md-nav__item">
-  <a href="#vlavision-language-action" class="md-nav__link">
+  <a href="#vla" class="md-nav__link">
     <span class="md-ellipsis">
 
-        VLA(Vision-Language-Action)
+        VLA
 
     </span>
   </a>
@@ -1932,10 +1932,10 @@
 </li>
 
           <li class="md-nav__item">
-  <a href="#vlavision-language-action" class="md-nav__link">
+  <a href="#vla" class="md-nav__link">
     <span class="md-ellipsis">
 
-        VLA(Vision-Language-Action)
+        VLA
 
     </span>
   </a>
@@ -2164,7 +2164,7 @@
 <h3 id="conditional-flow-matching">Conditional Flow Matching<a class="headerlink" href="#conditional-flow-matching" title="Permanent link">&para;</a></h3>
 <p>Conditional Flow Matching은 조건부 경로에서 계산하기 쉬운 target velocity를 샘플링해 학습하는 방식이다.</p>
 <div class="arithmatex">\[
-\mathcal{L}_{\mathrm{CFM(Conditional Flow Matching)}}(\theta)=\mathbb{E}\left[\left\|v_\theta(x_t,t)-u_t(x_t|z)\right\|^2\right].
+\mathcal{L}_{\mathrm{CFM}}(\theta)=\mathbb{E}\left[\left\|v_\theta(x_t,t)-u_t(x_t|z)\right\|^2\right].
 \]</div>
 <p>조건부 target을 학습해도 MSE(Mean Squared Error, 평균제곱오차)의 조건부 평균 성질 때문에 marginal velocity를 배울 수 있다는 점이 핵심이다.</p>
 <h3 id="simulation-free-training">Simulation-Free Training<a class="headerlink" href="#simulation-free-training" title="Permanent link">&para;</a></h3>
@@ -2204,7 +2204,7 @@
 A=(a_1,a_2,\ldots,a_H).
 \]</div>
 <p>로봇 정책에서는 매 순간 단일 action만 예측하기보다 action chunk를 생성하고 일부를 실행한 뒤 다시 계획하는 방식이 많이 쓰인다.</p>
-<h3 id="vlavision-language-action">VLA(Vision-Language-Action)<a class="headerlink" href="#vlavision-language-action" title="Permanent link">&para;</a></h3>
+<h3 id="vla">VLA<a class="headerlink" href="#vla" title="Permanent link">&para;</a></h3>
 <p>Vision-Language-Action 모델의 약자다. 이미지와 언어 지시를 입력으로 받아 로봇 행동을 출력하는 모델 계열을 말한다.</p>
 <h3 id="action-expert">Action Expert<a class="headerlink" href="#action-expert" title="Permanent link">&para;</a></h3>
 <p>VLA(Vision-Language-Action) 구조에서 시각/언어 backbone이 만든 표현을 받아 실제 연속 action을 생성하는 모듈이다. 최근 Flow Matching은 이 action expert로 자주 쓰인다.</p>

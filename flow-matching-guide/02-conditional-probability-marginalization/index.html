@@ -1825,7 +1825,7 @@ v_t(x) = \mathbb{E}_{z \sim p(z \mid x)}[u_t(x \mid z)]
 <p>여기서 <span class="arithmatex">\(x_0\)</span>, <span class="arithmatex">\(x_1\)</span>, <span class="arithmatex">\(t\)</span>를 뽑아 <span class="arithmatex">\(x_t\)</span>와 target velocity를 만드는 부분이 조건부 path에 해당한다. 모델은 여러 batch를 통해 다양한 조건부 path를 보게 된다. 이 과정을 충분히 반복하면 모델은 특정 조건 하나에만 맞는 velocity가 아니라, 전체 분포의 평균적인 velocity field를 학습하게 된다.</p>
 <p>따라서 수식의 주변화는 코드에서 “많은 조건을 무작위로 샘플링하고 평균 loss를 줄이는 학습 과정”으로 나타난다. 이것이 논문 속 expectation과 실제 minibatch 학습이 연결되는 방식이다.</p>
 <figure class="book-figure">
-  <img src="../assets/figures/fig-02-05.svg" alt="그림 2-5. CFM(Conditional Flow Matching) 학습에서 조건부 path가 쓰이는 위치">
+  <img src="../assets/figures/fig-02-05.svg" alt="그림 2-5. CFM 학습에서 조건부 path가 쓰이는 위치">
   <figcaption>그림 2-5. CFM 학습에서 조건부 path가 쓰이는 위치</figcaption>
 </figure>
 

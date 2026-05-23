@@ -949,10 +949,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#u-net-convolution-network" class="md-nav__link">
+  <a href="#u-net" class="md-nav__link">
     <span class="md-ellipsis">
 
-        모델 구조: 작은 U-Net(인코더-디코더형 convolution network)
+        모델 구조: 작은 U-Net
 
     </span>
   </a>
@@ -1549,10 +1549,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#u-net-convolution-network" class="md-nav__link">
+  <a href="#u-net" class="md-nav__link">
     <span class="md-ellipsis">
 
-        모델 구조: 작은 U-Net(인코더-디코더형 convolution network)
+        모델 구조: 작은 U-Net
 
     </span>
   </a>
@@ -1678,7 +1678,7 @@ t_{\mathrm{view}}\in\mathbb{R}^{B\times 1\times 1\times 1}.
 x_1 = 2x_{\mathrm{raw}}-1.
 \]</div>
 <p>이렇게 하면 데이터와 노이즈의 scale이 지나치게 어긋나는 문제를 줄일 수 있다. normalization을 바꾸면 목표 속도 <span class="arithmatex">\(u_t=x_1-x_0\)</span>의 scale도 바뀌므로 loss 크기와 학습 안정성에 영향을 준다.</p>
-<h2 id="u-net-convolution-network">모델 구조: 작은 U-Net(인코더-디코더형 convolution network)<a class="headerlink" href="#u-net-convolution-network" title="Permanent link">&para;</a></h2>
+<h2 id="u-net">모델 구조: 작은 U-Net<a class="headerlink" href="#u-net" title="Permanent link">&para;</a></h2>
 <p>이미지에서는 MLP(Multi-Layer Perceptron, 다층 퍼셉트론)보다 convolution 기반 모델이 적합하다. 가장 흔한 선택은 U-Net(인코더-디코더형 convolution network) 계열이다. U-Net은 downsampling과 upsampling 경로를 통해 local detail과 global context를 함께 다룬다.</p>
 <p>Flow Matching 모델은 다음 함수를 근사한다.</p>
 <div class="arithmatex">\[

@@ -1429,10 +1429,10 @@
 </li>
 
           <li class="md-nav__item">
-  <a href="#cfmconditional-flow-matching-loss" class="md-nav__link">
+  <a href="#cfm-loss" class="md-nav__link">
     <span class="md-ellipsis">
 
-        CFM(Conditional Flow Matching) loss 파이프라인
+        CFM loss 파이프라인
 
     </span>
   </a>
@@ -1642,10 +1642,10 @@
 </li>
 
           <li class="md-nav__item">
-  <a href="#cfmconditional-flow-matching-loss" class="md-nav__link">
+  <a href="#cfm-loss" class="md-nav__link">
     <span class="md-ellipsis">
 
-        CFM(Conditional Flow Matching) loss 파이프라인
+        CFM loss 파이프라인
 
     </span>
   </a>
@@ -1780,7 +1780,7 @@
 <h3 id="_3">생성 모델 역사 지도<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li>사용 장: 0장</li>
-<li>내용: VAE(Variational Autoencoder, 변분 오토인코더), GAN(Generative Adversarial Network, 생성적 적대 신경망), normalizing flow, diffusion, Flow Matching의 흐름</li>
+<li>내용: VAE, GAN, normalizing flow, diffusion, Flow Matching의 흐름</li>
 <li>목적: Flow Matching이 갑자기 등장한 개념이 아니라 생성 모델 문제의식의 연장임을 보여 준다.</li>
 </ul>
 <h3 id="probability-path">Probability path 그림<a class="headerlink" href="#probability-path" title="Permanent link">&para;</a></h3>
@@ -1793,9 +1793,9 @@
 <ul>
 <li>사용 장: 2장, 7장</li>
 <li>내용: 조건부 경로 여러 개가 전체 marginal flow를 만드는 모습</li>
-<li>목적: CFM(Conditional Flow Matching)의 핵심인 조건부 target과 marginal velocity의 관계를 시각화한다.</li>
+<li>목적: CFM의 핵심인 조건부 target과 marginal velocity의 관계를 시각화한다.</li>
 </ul>
-<h3 id="cfmconditional-flow-matching-loss">CFM(Conditional Flow Matching) loss 파이프라인<a class="headerlink" href="#cfmconditional-flow-matching-loss" title="Permanent link">&para;</a></h3>
+<h3 id="cfm-loss">CFM loss 파이프라인<a class="headerlink" href="#cfm-loss" title="Permanent link">&para;</a></h3>
 <ul>
 <li>사용 장: 8장</li>
 <li>내용: <span class="arithmatex">\(x_0\)</span>, <span class="arithmatex">\(x_1\)</span>, <span class="arithmatex">\(t\)</span>에서 <span class="arithmatex">\(x_t\)</span>와 <span class="arithmatex">\(u_t\)</span>를 만들고 모델 출력과 MSE(Mean Squared Error, 평균제곱오차)로 비교하는 흐름</li>
@@ -1804,7 +1804,7 @@
 <h3 id="diffusion-vs-flow-matching">Diffusion vs Flow Matching 비교 그림<a class="headerlink" href="#diffusion-vs-flow-matching" title="Permanent link">&para;</a></h3>
 <ul>
 <li>사용 장: 9장</li>
-<li>내용: diffusion의 reverse denoising과 Flow Matching의 ODE(Ordinary Differential Equation, 상미분방정식) velocity flow 비교</li>
+<li>내용: diffusion의 reverse denoising과 Flow Matching의 ODE velocity flow 비교</li>
 <li>목적: 두 방법의 공통점과 차이를 한 장에서 정리한다.</li>
 </ul>
 <h3 id="2d-velocity-field-trajectory">2D velocity field와 trajectory<a class="headerlink" href="#2d-velocity-field-trajectory" title="Permanent link">&para;</a></h3>
@@ -1817,7 +1817,7 @@
 <ul>
 <li>사용 장: 14장</li>
 <li>내용: Euler step 수에 따른 trajectory 또는 샘플 품질 차이</li>
-<li>목적: NFE(Number of Function Evaluations, 함수 평가 횟수)와 품질 trade-off를 설명한다.</li>
+<li>목적: NFE와 품질 trade-off를 설명한다.</li>
 </ul>
 <h3 id="action-chunk-flow">로보틱스 action chunk flow<a class="headerlink" href="#action-chunk-flow" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1857,7 +1857,7 @@
 </tr>
 <tr>
 <td>4장</td>
-<td>ODE vs SDE(Stochastic Differential Equation, 확률미분방정식) trajectory</td>
+<td>ODE vs SDE trajectory</td>
 <td>동역학 구분</td>
 </tr>
 <tr>
@@ -1907,7 +1907,7 @@
 </tr>
 <tr>
 <td>14장</td>
-<td>solver/NFE(Number of Function Evaluations, 함수 평가 횟수) 비교</td>
+<td>solver/NFE 비교</td>
 <td>sampling trade-off</td>
 </tr>
 <tr>
@@ -1927,7 +1927,7 @@
 </tr>
 <tr>
 <td>18장</td>
-<td>VLA(Vision-Language-Action) action expert 구조</td>
+<td>VLA action expert 구조</td>
 <td>로보틱스 응용</td>
 </tr>
 </tbody>
@@ -1950,7 +1950,7 @@
 <li>CFM loss pipeline</li>
 <li>로보틱스 action chunk flow</li>
 </ol>
-<p>두 번째 업데이트에서는 toy example 실행 결과, ODE solver 비교, guidance scale 비교, VLA(Vision-Language-Action) action expert 구조도를 추가한다.</p>
+<p>두 번째 업데이트에서는 toy example 실행 결과, ODE solver 비교, guidance scale 비교, VLA action expert 구조도를 추가한다.</p>
 <h2 id="5">5. 그림 검수 체크리스트<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
 <ul>
 <li>그림이 본문의 특정 문단과 직접 연결되는가?</li>

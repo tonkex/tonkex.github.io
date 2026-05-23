@@ -80,7 +80,7 @@
     <div data-md-component="skip">
 
 
-        <a href="#14-sampling-odeordinary-differential-equation-solver" class="md-skip">
+        <a href="#14-sampling-ode-solver" class="md-skip">
           콘텐츠로 이동
         </a>
 
@@ -1027,10 +1027,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#nfe-number-of-function-evaluations" class="md-nav__link">
+  <a href="#nfe" class="md-nav__link">
     <span class="md-ellipsis">
 
-        NFE: Number of Function Evaluations
+        NFE
 
     </span>
   </a>
@@ -1582,10 +1582,10 @@
 </li>
 
         <li class="md-nav__item">
-  <a href="#nfe-number-of-function-evaluations" class="md-nav__link">
+  <a href="#nfe" class="md-nav__link">
     <span class="md-ellipsis">
 
-        NFE: Number of Function Evaluations
+        NFE
 
     </span>
   </a>
@@ -1664,7 +1664,7 @@
 
 
 
-<h1 id="14-sampling-odeordinary-differential-equation-solver">14장. Sampling과 ODE(Ordinary Differential Equation, 상미분방정식) Solver<a class="headerlink" href="#14-sampling-odeordinary-differential-equation-solver" title="Permanent link">&para;</a></h1>
+<h1 id="14-sampling-ode-solver">14장. Sampling과 ODE Solver<a class="headerlink" href="#14-sampling-ode-solver" title="Permanent link">&para;</a></h1>
 <div class="page-meta">
   <span>최초 작성: 2026-05-23 01:43 KST</span>
   <span>최종 업데이트: 2026-05-23 23:20 KST</span>
@@ -1715,7 +1715,7 @@ x_{k+1}=x_k+\Delta t\,k_2.
 <p>첫째, 모델 <span class="arithmatex">\(v_\theta\)</span> 자체가 근사 함수다. numerical error를 줄여도 모델 error가 크면 품질 개선이 제한적이다.</p>
 <p>둘째, 고차 solver는 모델 호출이 많다. 같은 시간 예산에서는 낮은 차수 solver로 더 많은 step을 쓰는 편이 나을 수도 있다.</p>
 <p>따라서 solver 비교는 품질과 비용을 함께 봐야 한다.</p>
-<h2 id="nfe-number-of-function-evaluations">NFE: Number of Function Evaluations<a class="headerlink" href="#nfe-number-of-function-evaluations" title="Permanent link">&para;</a></h2>
+<h2 id="nfe">NFE<a class="headerlink" href="#nfe" title="Permanent link">&para;</a></h2>
 <p>생성 모델에서 solver 비용을 말할 때 NFE라는 표현을 자주 쓴다. NFE는 모델 함수를 몇 번 평가했는지를 뜻한다.</p>
 <p>Euler는 step마다 한 번 모델을 호출하므로</p>
 <div class="arithmatex">\[
