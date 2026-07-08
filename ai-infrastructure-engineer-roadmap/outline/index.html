@@ -1,0 +1,1478 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+      
+      
+      
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/outline/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../sample-chapter-plan/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>전체 목차 - AI 인프라 엔지니어 로드맵</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../stylesheets/site-navigation-v1.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href=".." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              전체 목차
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    시작하기
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    책 구조
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    책 구조
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    전체 목차
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    전체 목차
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1부. AI 인프라 엔지니어의 지도
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1부. AI 인프라 엔지니어의 지도">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-ai_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1장. AI 인프라 엔지니어는 무엇을 운영하는가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2장. 토큰, 컨텍스트, 배치가 비용 단위가 되는 이유
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2부. GPU와 메모리 병목
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2부. GPU와 메모리 병목">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3장. GPU는 왜 빠르고 언제 느려지는가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-vram-weights-kv-cache-activations-overhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4장. VRAM 예산: weights, KV cache, activations, overhead
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-kv-cache-llm-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5장. KV cache가 LLM serving의 중심 병목이 되는 순간
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-gpu-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3부. 단일 GPU에서 serving을 측정하기
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3부. 단일 GPU에서 serving을 측정하기">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#6-llm-server-openai-compatible-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6장. 첫 LLM server: OpenAI-compatible endpoint 만들기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-ttft-tpot-throughput-p95" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7장. TTFT, TPOT, throughput, p95를 읽는 법
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8장. Quantization은 언제 성능 최적화이고 언제 위험인가
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-serving-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4부. Serving runtime 선택
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4부. Serving runtime 선택">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#9-vllm-general-purpose-llm-serving-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9장. vLLM: general-purpose LLM serving baseline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-tensorrt-llm-sglang-llamacpp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10장. TensorRT-LLM, SGLang, llama.cpp는 무엇이 다른가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-triton-kserve-ray-serve-runtime-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11장. Triton, KServe, Ray Serve: runtime 위의 platform 계층
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-multi-gpu-kubernetes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5부. Multi-GPU와 Kubernetes로 확장하기
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5부. Multi-GPU와 Kubernetes로 확장하기">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#12-parallelism-nccl-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12장. Parallelism과 NCCL: 한 GPU를 넘을 때 생기는 문제
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-kubernetes-gpu-device-plugin-rollout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13장. Kubernetes GPU 운영: device plugin부터 rollout까지
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-rag-agents-application-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6부. RAG, agents, application layer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6부. RAG, agents, application layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#14-rag-pipeline-serving-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14장. RAG pipeline은 serving 문제가 아니라 release 문제다
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-agent-workload-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15장. Agent workload는 왜 serving을 더 어렵게 만드는가
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-observability-evaluation-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7부. Observability, evaluation, security
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7부. Observability, evaluation, security">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#16-llm-observability-metrics-logs-traces-evals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16장. LLM observability: metrics, logs, traces, evals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#17-evaluation-benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17장. Evaluation과 benchmark: 숫자를 믿기 전에 조건을 기록하라
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#18-security-guardrails-prompt-injection-application-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18장. Security와 guardrails: prompt injection은 application boundary 문제다
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-mlops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8부. MLOps와 운영 로드맵
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8부. MLOps와 운영 로드맵">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#19-model-registry-release-record" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19장. Model registry를 넘어 release record로
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#20-90" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20장. 90일 학습 로드맵과 실습 순서
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        부록
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sample-chapter-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    샘플 챕터 계획
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제작 노트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제작 노트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../source-policy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    소스 정책
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../next-steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    다음 작업
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-ai" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1부. AI 인프라 엔지니어의 지도
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1부. AI 인프라 엔지니어의 지도">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-ai_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1장. AI 인프라 엔지니어는 무엇을 운영하는가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2장. 토큰, 컨텍스트, 배치가 비용 단위가 되는 이유
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2부. GPU와 메모리 병목
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2부. GPU와 메모리 병목">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#3-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3장. GPU는 왜 빠르고 언제 느려지는가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-vram-weights-kv-cache-activations-overhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4장. VRAM 예산: weights, KV cache, activations, overhead
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-kv-cache-llm-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5장. KV cache가 LLM serving의 중심 병목이 되는 순간
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-gpu-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3부. 단일 GPU에서 serving을 측정하기
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3부. 단일 GPU에서 serving을 측정하기">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#6-llm-server-openai-compatible-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6장. 첫 LLM server: OpenAI-compatible endpoint 만들기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-ttft-tpot-throughput-p95" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7장. TTFT, TPOT, throughput, p95를 읽는 법
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8장. Quantization은 언제 성능 최적화이고 언제 위험인가
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-serving-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4부. Serving runtime 선택
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4부. Serving runtime 선택">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#9-vllm-general-purpose-llm-serving-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9장. vLLM: general-purpose LLM serving baseline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#10-tensorrt-llm-sglang-llamacpp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        10장. TensorRT-LLM, SGLang, llama.cpp는 무엇이 다른가
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#11-triton-kserve-ray-serve-runtime-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        11장. Triton, KServe, Ray Serve: runtime 위의 platform 계층
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-multi-gpu-kubernetes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5부. Multi-GPU와 Kubernetes로 확장하기
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5부. Multi-GPU와 Kubernetes로 확장하기">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#12-parallelism-nccl-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        12장. Parallelism과 NCCL: 한 GPU를 넘을 때 생기는 문제
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#13-kubernetes-gpu-device-plugin-rollout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        13장. Kubernetes GPU 운영: device plugin부터 rollout까지
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-rag-agents-application-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6부. RAG, agents, application layer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6부. RAG, agents, application layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#14-rag-pipeline-serving-release" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        14장. RAG pipeline은 serving 문제가 아니라 release 문제다
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#15-agent-workload-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        15장. Agent workload는 왜 serving을 더 어렵게 만드는가
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-observability-evaluation-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7부. Observability, evaluation, security
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7부. Observability, evaluation, security">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#16-llm-observability-metrics-logs-traces-evals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        16장. LLM observability: metrics, logs, traces, evals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#17-evaluation-benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        17장. Evaluation과 benchmark: 숫자를 믿기 전에 조건을 기록하라
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#18-security-guardrails-prompt-injection-application-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        18장. Security와 guardrails: prompt injection은 application boundary 문제다
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-mlops" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8부. MLOps와 운영 로드맵
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8부. MLOps와 운영 로드맵">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#19-model-registry-release-record" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        19장. Model registry를 넘어 release record로
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#20-90" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        20장. 90일 학습 로드맵과 실습 순서
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        부록
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="_1">전체 목차<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>이 목차는 2026-07-08 기준의 구조 설계안이다. 본문 작성과 검증 과정에서 장 제목과 순서는 바뀔 수 있다.</p>
+<h2 id="1-ai">1부. AI 인프라 엔지니어의 지도<a class="headerlink" href="#1-ai" title="Permanent link">&para;</a></h2>
+<h3 id="1-ai_1">1장. AI 인프라 엔지니어는 무엇을 운영하는가<a class="headerlink" href="#1-ai_1" title="Permanent link">&para;</a></h3>
+<p>LLM API 뒤에 있는 model, runtime, GPU, serving API, data, evaluation, security, observability를 하나의 운영 시스템으로 정의한다.</p>
+<h3 id="2">2장. 토큰, 컨텍스트, 배치가 비용 단위가 되는 이유<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
+<p>token, context window, prompt, completion, batch, sequence length를 설명하고, 같은 QPS라도 token shape가 다르면 완전히 다른 workload가 된다는 점을 다룬다.</p>
+<h2 id="2-gpu">2부. GPU와 메모리 병목<a class="headerlink" href="#2-gpu" title="Permanent link">&para;</a></h2>
+<h3 id="3-gpu">3장. GPU는 왜 빠르고 언제 느려지는가<a class="headerlink" href="#3-gpu" title="Permanent link">&para;</a></h3>
+<p>CUDA execution model, HBM/DRAM, compute-bound와 memory-bound 병목을 입문 수준으로 설명한다.</p>
+<h3 id="4-vram-weights-kv-cache-activations-overhead">4장. VRAM 예산: weights, KV cache, activations, overhead<a class="headerlink" href="#4-vram-weights-kv-cache-activations-overhead" title="Permanent link">&para;</a></h3>
+<p>VRAM을 model weights, KV cache, activations, runtime overhead, fragmentation으로 분해해 rough sizing을 할 수 있게 한다.</p>
+<h3 id="5-kv-cache-llm-serving">5장. KV cache가 LLM serving의 중심 병목이 되는 순간<a class="headerlink" href="#5-kv-cache-llm-serving" title="Permanent link">&para;</a></h3>
+<p>KV cache의 목적, 크기 공식, MHA/MQA/GQA/MLA/SWA 차이, PagedAttention, prefix caching, KV quantization을 하나의 mental model로 묶는다.</p>
+<h2 id="3-gpu-serving">3부. 단일 GPU에서 serving을 측정하기<a class="headerlink" href="#3-gpu-serving" title="Permanent link">&para;</a></h2>
+<h3 id="6-llm-server-openai-compatible-endpoint">6장. 첫 LLM server: OpenAI-compatible endpoint 만들기<a class="headerlink" href="#6-llm-server-openai-compatible-endpoint" title="Permanent link">&para;</a></h3>
+<p>model artifact, tokenizer, runtime, HTTP endpoint, client SDK의 관계를 설명하고 vLLM 기준의 첫 serving path를 구성한다.</p>
+<h3 id="7-ttft-tpot-throughput-p95">7장. TTFT, TPOT, throughput, p95를 읽는 법<a class="headerlink" href="#7-ttft-tpot-throughput-p95" title="Permanent link">&para;</a></h3>
+<p>TTFT, TPOT, end-to-end latency, throughput, QPS, p95/p99, cost per token을 정의하고 benchmark 결과를 읽는 법을 다룬다.</p>
+<h3 id="8-quantization">8장. Quantization은 언제 성능 최적화이고 언제 위험인가<a class="headerlink" href="#8-quantization" title="Permanent link">&para;</a></h3>
+<p>weight quantization, activation quantization, KV cache quantization을 분리하고 storage size, kernel support, accuracy, latency, throughput을 별도 축으로 본다.</p>
+<h2 id="4-serving-runtime">4부. Serving runtime 선택<a class="headerlink" href="#4-serving-runtime" title="Permanent link">&para;</a></h2>
+<h3 id="9-vllm-general-purpose-llm-serving-baseline">9장. vLLM: general-purpose LLM serving baseline<a class="headerlink" href="#9-vllm-general-purpose-llm-serving-baseline" title="Permanent link">&para;</a></h3>
+<p>vLLM의 scheduler, PagedAttention, continuous batching, prefix caching, metrics, distributed serving을 설명한다.</p>
+<h3 id="10-tensorrt-llm-sglang-llamacpp">10장. TensorRT-LLM, SGLang, llama.cpp는 무엇이 다른가<a class="headerlink" href="#10-tensorrt-llm-sglang-llamacpp" title="Permanent link">&para;</a></h3>
+<p>TensorRT-LLM, SGLang, llama.cpp를 popularity가 아니라 workload, hardware, latency target, operational complexity 기준으로 비교한다.</p>
+<h3 id="11-triton-kserve-ray-serve-runtime-platform">11장. Triton, KServe, Ray Serve: runtime 위의 platform 계층<a class="headerlink" href="#11-triton-kserve-ray-serve-runtime-platform" title="Permanent link">&para;</a></h3>
+<p>inference server, model serving platform, orchestration framework의 차이를 설명한다. KServe는 Kubernetes-native serving 예시로 다룬다.</p>
+<h2 id="5-multi-gpu-kubernetes">5부. Multi-GPU와 Kubernetes로 확장하기<a class="headerlink" href="#5-multi-gpu-kubernetes" title="Permanent link">&para;</a></h2>
+<h3 id="12-parallelism-nccl-gpu">12장. Parallelism과 NCCL: 한 GPU를 넘을 때 생기는 문제<a class="headerlink" href="#12-parallelism-nccl-gpu" title="Permanent link">&para;</a></h3>
+<p>tensor parallelism, pipeline parallelism, data parallelism, expert parallelism, NCCL collective communication을 설명한다.</p>
+<h3 id="13-kubernetes-gpu-device-plugin-rollout">13장. Kubernetes GPU 운영: device plugin부터 rollout까지<a class="headerlink" href="#13-kubernetes-gpu-device-plugin-rollout" title="Permanent link">&para;</a></h3>
+<p>NVIDIA device plugin, GPU resource request, node labeling, image selection, model cache, readiness, autoscaling, canary rollout을 다룬다.</p>
+<h2 id="6-rag-agents-application-layer">6부. RAG, agents, application layer<a class="headerlink" href="#6-rag-agents-application-layer" title="Permanent link">&para;</a></h2>
+<h3 id="14-rag-pipeline-serving-release">14장. RAG pipeline은 serving 문제가 아니라 release 문제다<a class="headerlink" href="#14-rag-pipeline-serving-release" title="Permanent link">&para;</a></h3>
+<p>ingestion, chunking, embedding, index, retrieval, reranking, prompt assembly, citation, evaluation을 하나의 release artifact로 본다.</p>
+<h3 id="15-agent-workload-serving">15장. Agent workload는 왜 serving을 더 어렵게 만드는가<a class="headerlink" href="#15-agent-workload-serving" title="Permanent link">&para;</a></h3>
+<p>tool call, long context, repeated prefix, retry, sandbox, memory, trace가 serving과 observability에 주는 영향을 설명한다.</p>
+<h2 id="7-observability-evaluation-security">7부. Observability, evaluation, security<a class="headerlink" href="#7-observability-evaluation-security" title="Permanent link">&para;</a></h2>
+<h3 id="16-llm-observability-metrics-logs-traces-evals">16장. LLM observability: metrics, logs, traces, evals<a class="headerlink" href="#16-llm-observability-metrics-logs-traces-evals" title="Permanent link">&para;</a></h3>
+<p>OpenTelemetry, Prometheus, Grafana 같은 system telemetry와 Langfuse, Phoenix 같은 LLM trace/evaluation 계층을 분리해 설명한다.</p>
+<h3 id="17-evaluation-benchmark">17장. Evaluation과 benchmark: 숫자를 믿기 전에 조건을 기록하라<a class="headerlink" href="#17-evaluation-benchmark" title="Permanent link">&para;</a></h3>
+<p>workload shape, model/runtime version, hardware, concurrency, context length, prompt set, measurement method를 함께 기록하는 방법을 다룬다.</p>
+<h3 id="18-security-guardrails-prompt-injection-application-boundary">18장. Security와 guardrails: prompt injection은 application boundary 문제다<a class="headerlink" href="#18-security-guardrails-prompt-injection-application-boundary" title="Permanent link">&para;</a></h3>
+<p>prompt injection, tool permission, RAG authorization, data exfiltration, audit logging, human approval boundary를 다룬다.</p>
+<h2 id="8-mlops">8부. MLOps와 운영 로드맵<a class="headerlink" href="#8-mlops" title="Permanent link">&para;</a></h2>
+<h3 id="19-model-registry-release-record">19장. Model registry를 넘어 release record로<a class="headerlink" href="#19-model-registry-release-record" title="Permanent link">&para;</a></h3>
+<p>model, tokenizer, adapter, prompt, retrieval index, serving runtime, quantization config, evaluator, safety policy를 release record로 묶는다.</p>
+<h3 id="20-90">20장. 90일 학습 로드맵과 실습 순서<a class="headerlink" href="#20-90" title="Permanent link">&para;</a></h3>
+<p>단일 GPU 실험에서 Kubernetes deployment와 observability까지 이어지는 practical roadmap을 제시한다.</p>
+<h2 id="_2">부록<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>부록 A. Glossary</li>
+<li>부록 B. Sizing formulas</li>
+<li>부록 C. Benchmark record template</li>
+<li>부록 D. Tool selection matrix</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+        
+          
+          <a href=".." class="md-footer__link md-footer__link--prev" aria-label="이전: 시작하기">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                시작하기
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../sample-chapter-plan/" class="md-footer__link md-footer__link--next" aria-label="다음: 샘플 챕터 계획">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                샘플 챕터 계획
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../javascripts/header-home-link.js"></script>
+      
+    
+  </body>
+</html>
