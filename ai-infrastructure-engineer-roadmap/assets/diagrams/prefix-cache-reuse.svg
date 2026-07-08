@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="520" viewBox="0 0 980 520" role="img" aria-labelledby="title desc">
+  <title id="title">Prefix cache reuse for repeated prompts</title>
+  <desc id="desc">Repeated system prompts, tool schemas, and shared documents can reuse prefix KV cache so requests only prefill the changing suffix.</desc>
+  <rect width="980" height="520" fill="#ffffff"/>
+  <g font-family="Inter, Pretendard, Arial, sans-serif">
+    <text x="490" y="46" text-anchor="middle" font-size="26" font-weight="800" fill="#0f172a">Prefix caching은 반복되는 앞부분의 prefill을 줄인다</text>
+    <g transform="translate(78 96)">
+      <rect x="0" y="0" width="824" height="104" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="26" y="33" font-size="17" font-weight="800" fill="#0f172a">request 1</text>
+      <rect x="132" y="22" width="160" height="48" rx="8" fill="#dbeafe" stroke="#93c5fd"/>
+      <rect x="306" y="22" width="158" height="48" rx="8" fill="#ede9fe" stroke="#c4b5fd"/>
+      <rect x="478" y="22" width="172" height="48" rx="8" fill="#dcfce7" stroke="#86efac"/>
+      <rect x="664" y="22" width="112" height="48" rx="8" fill="#ffedd5" stroke="#fdba74"/>
+      <text x="212" y="52" text-anchor="middle" font-size="14" font-weight="700" fill="#1e3a8a">system prompt</text>
+      <text x="385" y="52" text-anchor="middle" font-size="14" font-weight="700" fill="#5b21b6">tool schema</text>
+      <text x="564" y="52" text-anchor="middle" font-size="14" font-weight="700" fill="#166534">shared document</text>
+      <text x="720" y="52" text-anchor="middle" font-size="14" font-weight="700" fill="#9a3412">question A</text>
+    </g>
+    <g transform="translate(78 238)">
+      <rect x="0" y="0" width="824" height="104" rx="14" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="26" y="33" font-size="17" font-weight="800" fill="#0f172a">request 2</text>
+      <rect x="132" y="22" width="160" height="48" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="3"/>
+      <rect x="306" y="22" width="158" height="48" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="3"/>
+      <rect x="478" y="22" width="172" height="48" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="3"/>
+      <rect x="664" y="22" width="112" height="48" rx="8" fill="#fee2e2" stroke="#fca5a5"/>
+      <text x="212" y="52" text-anchor="middle" font-size="14" font-weight="700" fill="#1e3a8a">reuse cache</text>
+      <text x="385" y="52" text-anchor="middle" font-size="14" font-weight="700" fill="#5b21b6">reuse cache</text>
+      <text x="564" y="52" text-anchor="middle" font-size="14" font-weight="700" fill="#166534">reuse cache</text>
+      <text x="720" y="52" text-anchor="middle" font-size="14" font-weight="700" fill="#991b1b">question B</text>
+    </g>
+    <path d="M490 205 V230" stroke="#0f766e" stroke-width="4" fill="none"/>
+    <text x="490" y="216" text-anchor="middle" font-size="14" font-weight="800" fill="#0f766e" dy="-8">prefix hit</text>
+    <rect x="150" y="404" width="680" height="56" rx="10" fill="#f0fdfa" stroke="#5eead4"/>
+    <text x="490" y="438" text-anchor="middle" font-size="16" fill="#334155">효과는 주로 TTFT에 나타난다. 긴 답변의 TPOT는 decode 병목이라 그대로일 수 있다.</text>
+  </g>
+</svg>

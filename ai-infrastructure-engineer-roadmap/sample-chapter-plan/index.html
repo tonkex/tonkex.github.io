@@ -825,7 +825,7 @@
 
 <h1 id="_1">샘플 챕터 계획<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
 <p>추천 샘플 챕터는 <strong>5장. KV cache가 LLM serving의 중심 병목이 되는 순간</strong> 이다.</p>
-<p>현재 상태: 초안 v0.1 작성 완료. 공개 원고는 <a href="../chapters/05-kv-cache-serving-bottleneck/">5장. KV cache 병목</a>에 있다.</p>
+<p>현재 상태: 초안 v0.2 보강 완료. 공개 원고는 <a href="../chapters/05-kv-cache-serving-bottleneck/">5장. KV cache 병목</a>에 있다.</p>
 <h2 id="_2">이 장을 먼저 쓰는 이유<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>KV cache는 이 책의 여러 주제를 한 번에 연결한다.</p>
 <ul>
@@ -871,6 +871,8 @@
 <li>KV cache size formula</li>
 <li>Paged KV blocks</li>
 <li>context length와 동시성에 따른 VRAM 사용량 변화</li>
+<li>Q/K/V와 cache read path</li>
+<li>prefix cache reuse</li>
 </ul>
 <h2 id="_7">작성 전 확인할 것<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
 <ul>
@@ -883,6 +885,8 @@
 <li>정량 예시는 대표적인 decoder-only GQA 형태의 rough estimate로 명시했다.</li>
 <li>PagedAttention, prefix caching, FP8 KV cache 관련 factual anchor는 공개 원문과 vLLM stable docs를 기준으로 확인했다.</li>
 <li>공개 원고에는 개인 자료 경로와 내부 메모명을 노출하지 않았다.</li>
+<li>v0.2에서 Q/K/V 흐름, active token 예산, scheduler pressure, fragmentation, prefix caching 실패 원인, 운영 정책, 장애 triage, 실습 표를 추가했다.</li>
+<li>v0.2에서 그림을 2개에서 6개로 늘렸다.</li>
 </ul>
 
 

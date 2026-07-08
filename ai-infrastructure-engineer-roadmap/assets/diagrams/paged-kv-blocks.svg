@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="520" viewBox="0 0 980 520" role="img" aria-labelledby="title desc">
+  <title id="title">Paged KV cache blocks</title>
+  <desc id="desc">Logical request token blocks point to physical KV cache blocks, allowing non-contiguous allocation and reducing fragmentation.</desc>
+  <rect width="980" height="520" fill="#f8fafc"/>
+  <g font-family="Inter, Pretendard, Arial, sans-serif">
+    <text x="490" y="46" text-anchor="middle" font-size="26" font-weight="800" fill="#0f172a">PagedAttention은 KV cache를 연속 배열이 아니라 block table로 관리한다</text>
+    <g transform="translate(64 92)">
+      <rect x="0" y="0" width="390" height="332" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+      <text x="195" y="36" text-anchor="middle" font-size="20" font-weight="800" fill="#0f172a">logical blocks per request</text>
+      <g transform="translate(34 72)" font-size="13" font-weight="700" fill="#1e3a8a">
+        <text x="0" y="22">request A</text>
+        <rect x="96" y="0" width="48" height="34" rx="5" fill="#dbeafe" stroke="#93c5fd"/>
+        <rect x="152" y="0" width="48" height="34" rx="5" fill="#dbeafe" stroke="#93c5fd"/>
+        <rect x="208" y="0" width="48" height="34" rx="5" fill="#dbeafe" stroke="#93c5fd"/>
+        <rect x="264" y="0" width="48" height="34" rx="5" fill="#dbeafe" stroke="#93c5fd"/>
+        <text x="120" y="22" text-anchor="middle">A0</text>
+        <text x="176" y="22" text-anchor="middle">A1</text>
+        <text x="232" y="22" text-anchor="middle">A2</text>
+        <text x="288" y="22" text-anchor="middle">A3</text>
+      </g>
+      <g transform="translate(34 142)" font-size="13" font-weight="700" fill="#166534">
+        <text x="0" y="22">request B</text>
+        <rect x="96" y="0" width="48" height="34" rx="5" fill="#dcfce7" stroke="#86efac"/>
+        <rect x="152" y="0" width="48" height="34" rx="5" fill="#dcfce7" stroke="#86efac"/>
+        <text x="120" y="22" text-anchor="middle">B0</text>
+        <text x="176" y="22" text-anchor="middle">B1</text>
+      </g>
+      <g transform="translate(34 212)" font-size="13" font-weight="700" fill="#9a3412">
+        <text x="0" y="22">request C</text>
+        <rect x="96" y="0" width="48" height="34" rx="5" fill="#ffedd5" stroke="#fdba74"/>
+        <rect x="152" y="0" width="48" height="34" rx="5" fill="#ffedd5" stroke="#fdba74"/>
+        <rect x="208" y="0" width="48" height="34" rx="5" fill="#ffedd5" stroke="#fdba74"/>
+        <text x="120" y="22" text-anchor="middle">C0</text>
+        <text x="176" y="22" text-anchor="middle">C1</text>
+        <text x="232" y="22" text-anchor="middle">C2</text>
+      </g>
+      <text x="195" y="300" text-anchor="middle" font-size="14" fill="#475569">요청은 자기 block sequence만 본다</text>
+    </g>
+    <g transform="translate(526 92)">
+      <rect x="0" y="0" width="390" height="332" rx="14" fill="#ffffff" stroke="#cbd5e1"/>
+      <text x="195" y="36" text-anchor="middle" font-size="20" font-weight="800" fill="#0f172a">physical KV blocks on GPU</text>
+      <g transform="translate(42 76)" font-size="13" font-weight="700">
+        <rect x="0" y="0" width="56" height="42" rx="6" fill="#dbeafe" stroke="#93c5fd"/><text x="28" y="27" text-anchor="middle" fill="#1e3a8a">A0</text>
+        <rect x="72" y="0" width="56" height="42" rx="6" fill="#dcfce7" stroke="#86efac"/><text x="100" y="27" text-anchor="middle" fill="#166534">B0</text>
+        <rect x="144" y="0" width="56" height="42" rx="6" fill="#ffedd5" stroke="#fdba74"/><text x="172" y="27" text-anchor="middle" fill="#9a3412">C0</text>
+        <rect x="216" y="0" width="56" height="42" rx="6" fill="#dbeafe" stroke="#93c5fd"/><text x="244" y="27" text-anchor="middle" fill="#1e3a8a">A1</text>
+        <rect x="288" y="0" width="56" height="42" rx="6" fill="#f1f5f9" stroke="#cbd5e1"/><text x="316" y="27" text-anchor="middle" fill="#64748b">free</text>
+        <rect x="0" y="70" width="56" height="42" rx="6" fill="#ffedd5" stroke="#fdba74"/><text x="28" y="97" text-anchor="middle" fill="#9a3412">C1</text>
+        <rect x="72" y="70" width="56" height="42" rx="6" fill="#dbeafe" stroke="#93c5fd"/><text x="100" y="97" text-anchor="middle" fill="#1e3a8a">A2</text>
+        <rect x="144" y="70" width="56" height="42" rx="6" fill="#dcfce7" stroke="#86efac"/><text x="172" y="97" text-anchor="middle" fill="#166534">B1</text>
+        <rect x="216" y="70" width="56" height="42" rx="6" fill="#ffedd5" stroke="#fdba74"/><text x="244" y="97" text-anchor="middle" fill="#9a3412">C2</text>
+        <rect x="288" y="70" width="56" height="42" rx="6" fill="#dbeafe" stroke="#93c5fd"/><text x="316" y="97" text-anchor="middle" fill="#1e3a8a">A3</text>
+      </g>
+      <text x="195" y="246" text-anchor="middle" font-size="14" fill="#475569">physical memory는 연속일 필요가 없다</text>
+      <text x="195" y="274" text-anchor="middle" font-size="14" fill="#475569">block table이 logical 순서를 보존한다</text>
+    </g>
+    <text x="490" y="476" text-anchor="middle" font-size="16" fill="#334155">핵심은 attention 수식보다 allocator다. request별 동적 길이를 block 단위로 다루면 낭비와 fragmentation을 줄일 수 있다.</text>
+  </g>
+</svg>
