@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="500" viewBox="0 0 980 500" role="img" aria-labelledby="title desc">
+  <title id="title">First server measurement loop</title>
+  <desc id="desc">A first serving experiment records request shape, time to first token, output token count, total latency, and server metrics.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#0f766e"/>
+    </marker>
+  </defs>
+  <rect width="980" height="500" fill="#ffffff"/>
+  <g font-family="Inter, Pretendard, Arial, sans-serif">
+    <text x="490" y="48" text-anchor="middle" font-size="26" font-weight="800" fill="#0f172a">첫 server 실험의 목표는 “된다”가 아니라 “측정된다”이다</text>
+    <g transform="translate(82 116)">
+      <rect x="0" y="0" width="170" height="82" rx="12" fill="#eff6ff" stroke="#93c5fd"/>
+      <text x="85" y="32" text-anchor="middle" font-size="17" font-weight="800" fill="#1e3a8a">1. start server</text>
+      <text x="85" y="56" text-anchor="middle" font-size="12" fill="#475569">model + tokenizer</text>
+    </g>
+    <g transform="translate(312 116)">
+      <rect x="0" y="0" width="170" height="82" rx="12" fill="#fefce8" stroke="#fde047"/>
+      <text x="85" y="32" text-anchor="middle" font-size="17" font-weight="800" fill="#854d0e">2. send prompt</text>
+      <text x="85" y="56" text-anchor="middle" font-size="12" fill="#475569">short / long / repeat</text>
+    </g>
+    <g transform="translate(542 116)">
+      <rect x="0" y="0" width="170" height="82" rx="12" fill="#ecfdf5" stroke="#86efac"/>
+      <text x="85" y="32" text-anchor="middle" font-size="17" font-weight="800" fill="#166534">3. collect latency</text>
+      <text x="85" y="56" text-anchor="middle" font-size="12" fill="#475569">TTFT / total</text>
+    </g>
+    <g transform="translate(772 116)">
+      <rect x="0" y="0" width="146" height="82" rx="12" fill="#fff7ed" stroke="#fdba74"/>
+      <text x="73" y="32" text-anchor="middle" font-size="17" font-weight="800" fill="#9a3412">4. inspect</text>
+      <text x="73" y="56" text-anchor="middle" font-size="12" fill="#475569">metrics / logs</text>
+    </g>
+    <g stroke="#0f766e" stroke-width="3" fill="none" marker-end="url(#arrow)">
+      <path d="M252 157 H304"/>
+      <path d="M482 157 H534"/>
+      <path d="M712 157 H764"/>
+      <path d="M845 205 C780 332 260 332 166 205"/>
+    </g>
+    <g transform="translate(166 298)">
+      <rect x="0" y="0" width="650" height="92" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="325" y="32" text-anchor="middle" font-size="17" font-weight="800" fill="#0f172a">record schema</text>
+      <text x="325" y="60" text-anchor="middle" font-size="14" fill="#334155">model, prompt type, input tokens, output tokens, TTFT, TPOT, total latency, KV/cache metrics</text>
+    </g>
+    <text x="490" y="444" text-anchor="middle" font-size="15" fill="#334155">한 번의 성공 응답보다 같은 workload를 반복해 남긴 측정표가 더 중요하다.</text>
+  </g>
+</svg>

@@ -1,0 +1,1864 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+      
+      
+      
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/06-first-llm-server-openai-endpoint/">
+      
+      
+        <link rel="prev" href="../05-kv-cache-serving-bottleneck/">
+      
+      
+        <link rel="next" href="../../source-policy/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>6장. 첫 LLM server - AI 인프라 엔지니어 로드맵</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/site-navigation-v1.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#6-llm-server-openai-compatible-endpoint" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              6장. 첫 LLM server
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    시작하기
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    책 구조
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    책 구조
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../outline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    전체 목차
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sample-chapter-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    샘플 챕터 계획
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    샘플 원고
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    샘플 원고
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-kv-cache-serving-bottleneck/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5장. KV cache 병목
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6장. 첫 LLM server
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6장. 첫 LLM server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#openai-compatible-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenAI-compatible endpoint가 숨기는 것
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        첫 server의 구성 요소
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="첫 server의 구성 요소">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#model-artifact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model artifact
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runtime
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpu-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU memory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        최소 실행 흐름
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#server_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server가 떴는지 확인하기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python SDK로 호출하기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        첫 실험에서 기록할 표
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ttft-streaming-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TTFT를 간단히 재는 streaming client
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metrics_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /metrics를 같이 봐야 하는 이유
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serving-config-code-capacity-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Serving config는 code가 아니라 capacity contract다
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Serving config는 code가 아니라 capacity contract다">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#max_model_len" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        max_model_len
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpu_memory_utilization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gpu_memory_utilization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dtype-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dtype과 quantization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generation_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generation_config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-key-binding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API key와 binding
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        첫 실험 workload 세트
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        실패하면 어디를 볼 것인가
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llamacpp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        llama.cpp와 비교하면 무엇이 보이는가
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        이 장의 결론
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources-checked-for-this-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources checked for this draft
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제작 노트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제작 노트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../source-policy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    소스 정책
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    다음 작업
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#openai-compatible-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenAI-compatible endpoint가 숨기는 것
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        첫 server의 구성 요소
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="첫 server의 구성 요소">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#model-artifact" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model artifact
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Runtime
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#http-endpoint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HTTP endpoint
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Client
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpu-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU memory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#metrics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        최소 실행 흐름
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#server_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Server가 떴는지 확인하기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-sdk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python SDK로 호출하기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        첫 실험에서 기록할 표
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ttft-streaming-client" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TTFT를 간단히 재는 streaming client
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metrics_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        /metrics를 같이 봐야 하는 이유
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#serving-config-code-capacity-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Serving config는 code가 아니라 capacity contract다
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Serving config는 code가 아니라 capacity contract다">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        model
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#max_model_len" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        max_model_len
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpu_memory_utilization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gpu_memory_utilization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dtype-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dtype과 quantization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#generation_config" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        generation_config
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api-key-binding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API key와 binding
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        첫 실험 workload 세트
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        실패하면 어디를 볼 것인가
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llamacpp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        llama.cpp와 비교하면 무엇이 보이는가
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        이 장의 결론
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources-checked-for-this-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources checked for this draft
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="6-llm-server-openai-compatible-endpoint">6장. 첫 LLM server: OpenAI-compatible endpoint 만들기<a class="headerlink" href="#6-llm-server-openai-compatible-endpoint" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>Draft v0.1</span>
+  <span>Updated: 2026-07-08</span>
+  <span>Part 3 - 단일 GPU에서 serving을 측정하기</span>
+</div>
+
+<p>모델을 API로 띄우는 첫 실습에서 가장 흔한 착각은 "응답이 오면 성공"이라고 보는 것이다. 물론 첫 응답은 중요하다. 하지만 AI 인프라 엔지니어에게 첫 server의 목표는 "된다"가 아니라 "측정된다"이다.</p>
+<p>이 장에서는 vLLM의 OpenAI-compatible server를 기준으로 최소 serving stack을 만든다. 핵심은 명령어 하나를 외우는 것이 아니다. model artifact, tokenizer, runtime, scheduler, GPU memory, HTTP endpoint, client SDK가 어떤 관계인지 이해하는 것이다. 같은 <code>/v1/chat/completions</code> endpoint를 열어도 내부 runtime 설정이 다르면 capacity와 latency는 완전히 달라진다.</p>
+<p>이 장의 독자 질문은 다음과 같다.</p>
+<blockquote>
+<p>모델을 로컬 또는 서버 GPU에서 API로 띄우려면 최소 구성은 무엇이고, 첫 실험에서 무엇을 기록해야 하는가?</p>
+</blockquote>
+<h2 id="openai-compatible-endpoint">OpenAI-compatible endpoint가 숨기는 것<a class="headerlink" href="#openai-compatible-endpoint" title="Permanent link">&para;</a></h2>
+<p>OpenAI-compatible endpoint는 application 개발자에게 편하다. 기존 OpenAI SDK를 거의 그대로 쓰고, <code>base_url</code>만 바꾸면 local server나 private GPU server를 호출할 수 있다. vLLM quickstart도 OpenAI API protocol을 구현하는 server로 배포할 수 있고, 기본적으로 <code>http://localhost:8000</code>에서 시작하며 <code>--host</code>, <code>--port</code>로 주소를 지정할 수 있다고 설명한다.</p>
+<p>하지만 이 편리함은 동시에 위험하다. API 모양이 같다고 내부 system이 같은 것은 아니다.</p>
+<table>
+<thead>
+<tr>
+<th>겉으로 보이는 것</th>
+<th>실제로 결정해야 하는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>/v1/chat/completions</code></td>
+<td>tokenizer, chat template, model config</td>
+</tr>
+<tr>
+<td><code>model</code> 문자열</td>
+<td>weight 위치, precision, trust policy</td>
+</tr>
+<tr>
+<td><code>messages</code> 배열</td>
+<td>prompt serialization, input token count</td>
+</tr>
+<tr>
+<td><code>max_tokens</code></td>
+<td>decode 길이, KV cache 수명</td>
+</tr>
+<tr>
+<td><code>temperature</code></td>
+<td>sampling policy, 재현성</td>
+</tr>
+<tr>
+<td>HTTP 응답</td>
+<td>scheduler, GPU memory, queueing, metrics</td>
+</tr>
+</tbody>
+</table>
+<p>Application 개발자는 endpoint contract를 본다. AI 인프라 엔지니어는 endpoint 아래의 capacity contract를 봐야 한다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/minimal-llm-serving-stack.svg" alt="Minimal LLM serving stack from client to runtime, GPU memory, and metrics">
+  <figcaption><strong>최소 LLM serving stack.</strong> OpenAI-compatible API는 얇은 입구이고, 실제 운영 특성은 tokenizer, scheduler, runtime, GPU memory 정책에서 결정된다.</figcaption>
+</figure>
+
+<h2 id="server">첫 server의 구성 요소<a class="headerlink" href="#server" title="Permanent link">&para;</a></h2>
+<p>첫 LLM server를 띄울 때 필요한 구성 요소는 여섯 가지다.</p>
+<h3 id="model-artifact">Model artifact<a class="headerlink" href="#model-artifact" title="Permanent link">&para;</a></h3>
+<p>Model artifact는 단순히 weight 파일 하나가 아니다. 보통 다음을 포함한다.</p>
+<ul>
+<li>model weights</li>
+<li>model config</li>
+<li>tokenizer</li>
+<li>tokenizer config</li>
+<li>chat template</li>
+<li>generation config</li>
+<li>special token 정의</li>
+</ul>
+<p>Serving runtime은 이 묶음을 읽어 model을 초기화한다. tokenizer와 chat template이 맞지 않으면 같은 <code>messages</code>를 보내도 완전히 다른 prompt token sequence가 만들어질 수 있다. 따라서 model artifact는 "모델 파일"이 아니라 "입력을 어떤 token sequence로 바꿀지까지 포함한 실행 단위"로 봐야 한다.</p>
+<h3 id="runtime">Runtime<a class="headerlink" href="#runtime" title="Permanent link">&para;</a></h3>
+<p>Runtime은 model을 GPU에서 실행하는 엔진이다. 이 장에서는 vLLM을 기준으로 설명한다. vLLM은 OpenAI-compatible server를 제공하고, PagedAttention, scheduler, batching, KV cache 관리, metrics 같은 serving 기능을 포함한다.</p>
+<p>Runtime을 선택하면 다음 질문도 따라온다.</p>
+<ul>
+<li>어떤 attention backend를 쓸 것인가?</li>
+<li>GPU memory utilization을 어느 정도까지 허용할 것인가?</li>
+<li>max model length를 어떻게 제한할 것인가?</li>
+<li>prefix caching, quantization, speculative decoding 같은 기능을 켤 것인가?</li>
+<li>metrics를 어디로 노출하고 어떻게 수집할 것인가?</li>
+</ul>
+<p>첫 실습에서는 기능을 많이 켜지 않는다. baseline을 먼저 만든다.</p>
+<h3 id="http-endpoint">HTTP endpoint<a class="headerlink" href="#http-endpoint" title="Permanent link">&para;</a></h3>
+<p>HTTP endpoint는 application과 runtime 사이의 계약이다. vLLM quickstart 기준으로 server는 OpenAI API 형식으로 model list, chat completion, completion endpoint를 제공한다. 따라서 OpenAI SDK를 쓰는 application은 <code>base_url</code>을 local server로 바꿔 호출할 수 있다.</p>
+<p>하지만 endpoint를 열었다고 production server가 된 것은 아니다. 인증, rate limit, timeout, logging, tracing, load balancing, model rollout은 아직 없다. 첫 server는 "실험 가능한 단일 runtime"이다.</p>
+<h3 id="client">Client<a class="headerlink" href="#client" title="Permanent link">&para;</a></h3>
+<p>Client는 <code>curl</code>일 수도 있고 Python OpenAI SDK일 수도 있다. 첫 실험에서는 둘 다 써 보는 것이 좋다.</p>
+<ul>
+<li><code>curl</code>은 HTTP payload와 응답을 직접 확인하기 좋다.</li>
+<li>SDK는 실제 application integration과 가까운 형태를 확인하기 좋다.</li>
+</ul>
+<p>Client에서 반드시 기록해야 하는 것은 응답 text가 아니다. request payload, latency, token count, error 여부다.</p>
+<h3 id="gpu-memory">GPU memory<a class="headerlink" href="#gpu-memory" title="Permanent link">&para;</a></h3>
+<p>5장에서 본 것처럼 GPU memory에는 weight만 올라가지 않는다. KV cache, runtime overhead, temporary buffer, allocator 여유분이 함께 들어간다. 첫 server에서 <code>nvidia-smi</code>만 보는 것은 부족하지만, 그래도 시작점으로는 유용하다.</p>
+<p>첫 실험에서는 다음을 기록한다.</p>
+<ul>
+<li>server 시작 직후 GPU memory</li>
+<li>첫 요청 후 GPU memory</li>
+<li>긴 prompt 요청 후 GPU memory</li>
+<li>동시 요청 또는 반복 요청 후 GPU memory</li>
+</ul>
+<p>정확한 원인 분석은 runtime metrics와 함께 해야 하지만, GPU memory 변화 감각은 초반에 꼭 잡아야 한다.</p>
+<h3 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permanent link">&para;</a></h3>
+<p>vLLM production metrics 문서는 OpenAI-compatible API server의 <code>/metrics</code> endpoint를 통해 system health를 모니터링할 수 있다고 설명한다. 이 metrics에는 request success, KV cache usage, running/waiting requests, e2e latency, inter-token latency, prefill/decode time, TTFT 등이 포함된다.</p>
+<p>첫 server 실험에서 metrics를 보는 이유는 간단하다. "느리다"를 "queue에서 기다렸다", "prefill이 길었다", "decode가 느렸다", "KV cache가 찼다"로 나누기 위해서다.</p>
+<h2 id="_1">최소 실행 흐름<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>vLLM quickstart의 online serving 예시는 다음 형태로 server를 시작한다.</p>
+<div class="highlight"><pre><span></span><code>vllm<span class="w"> </span>serve<span class="w"> </span>Qwen/Qwen2.5-1.5B-Instruct
+</code></pre></div>
+<p>이 명령은 Hugging Face model id를 받아 server를 시작한다. 공식 quickstart는 이 예시에서 <code>Qwen/Qwen2.5-1.5B-Instruct</code>를 사용한다. 실제 실습에서는 GPU VRAM, network access, license, 조직 정책에 맞는 작은 instruct model을 선택해야 한다.</p>
+<p>첫 실행에서는 다음처럼 옵션을 명시하는 편이 좋다.</p>
+<div class="highlight"><pre><span></span><code>vllm<span class="w"> </span>serve<span class="w"> </span>Qwen/Qwen2.5-1.5B-Instruct<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--port<span class="w"> </span><span class="m">8000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--generation-config<span class="w"> </span>vllm
+</code></pre></div>
+<p><code>--generation-config vllm</code>을 넣는 이유는 baseline을 분명하게 만들기 위해서다. vLLM quickstart는 Hugging Face repository에 <code>generation_config.json</code>이 있으면 기본 sampling parameter가 model creator 권장값으로 override될 수 있고, 이를 비활성화하려면 <code>--generation-config vllm</code>을 넘기라고 설명한다. 첫 측정에서는 숨은 기본값을 줄이는 편이 좋다.</p>
+<p>이 명령은 production 권장 설정이 아니다. 첫 baseline을 만들기 위한 최소 시작점이다.</p>
+<h2 id="server_1">Server가 떴는지 확인하기<a class="headerlink" href="#server_1" title="Permanent link">&para;</a></h2>
+<p>서버가 뜨면 먼저 model list endpoint를 확인한다.</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>http://localhost:8000/v1/models
+</code></pre></div>
+<p>이 요청은 model이 실제로 API server에 등록됐는지 확인한다. 여기서 실패하면 chat completion을 볼 필요가 없다. 먼저 server log, model download, GPU memory, port binding, Python environment를 확인해야 한다.</p>
+<p>다음으로 chat completion을 보낸다.</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>http://localhost:8000/v1/chat/completions<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{</span>
+<span class="s1">    &quot;model&quot;: &quot;Qwen/Qwen2.5-1.5B-Instruct&quot;,</span>
+<span class="s1">    &quot;messages&quot;: [</span>
+<span class="s1">      {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: &quot;You are a concise assistant.&quot;},</span>
+<span class="s1">      {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;KV cache를 한 문장으로 설명해 줘.&quot;}</span>
+<span class="s1">    ],</span>
+<span class="s1">    &quot;max_tokens&quot;: 128,</span>
+<span class="s1">    &quot;temperature&quot;: 0</span>
+<span class="s1">  }&#39;</span>
+</code></pre></div>
+<p>첫 응답에서 확인할 것은 세 가지다.</p>
+<ol>
+<li>HTTP status가 정상인가?</li>
+<li>응답 schema가 application이 기대하는 형태인가?</li>
+<li>usage 또는 token count를 기록할 수 있는가?</li>
+</ol>
+<p>내용 품질 평가는 나중 문제다. 지금은 server contract와 측정 가능성이 먼저다.</p>
+<h2 id="python-sdk">Python SDK로 호출하기<a class="headerlink" href="#python-sdk" title="Permanent link">&para;</a></h2>
+<p>Application과 가까운 형태는 Python OpenAI SDK다. vLLM quickstart도 <code>base_url</code>을 local vLLM server로 바꾸는 예시를 제공한다.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span>
+    <span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;EMPTY&quot;</span><span class="p">,</span>
+    <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;http://localhost:8000/v1&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;Qwen/Qwen2.5-1.5B-Instruct&quot;</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;You are a concise assistant.&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;KV cache를 한 문장으로 설명해 줘.&quot;</span><span class="p">},</span>
+    <span class="p">],</span>
+    <span class="n">max_tokens</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">usage</span><span class="p">)</span>
+</code></pre></div>
+<p>여기서 <code>api_key="EMPTY"</code>는 local test에서 흔히 쓰는 placeholder다. 실제 shared server에서는 key 없이 열어 두면 안 된다. vLLM quickstart는 <code>--api-key</code> 또는 <code>VLLM_API_KEY</code>로 API key 검사를 켤 수 있다고 설명한다. 혼자 쓰는 localhost와 팀이 쓰는 server는 security contract가 다르다.</p>
+<h2 id="_2">첫 실험에서 기록할 표<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>첫 server 실험에서 가장 중요한 산출물은 실행 명령이 아니라 기록표다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/first-server-measurement-loop.svg" alt="First server experiment records request shape, latency, token counts, and server metrics">
+  <figcaption><strong>첫 server measurement loop.</strong> 한 번 응답을 받는 것보다 같은 workload를 반복해 request shape, latency, token count, runtime metrics를 기록하는 것이 중요하다.</figcaption>
+</figure>
+
+<p>다음 표를 만든다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>기록 예시</th>
+<th>왜 필요한가</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>model id</td>
+<td><code>Qwen/Qwen2.5-1.5B-Instruct</code></td>
+<td>model config와 tokenizer 추적</td>
+</tr>
+<tr>
+<td>server command</td>
+<td><code>vllm serve ...</code></td>
+<td>재현성</td>
+</tr>
+<tr>
+<td>GPU</td>
+<td><code>A10</code>, <code>L4</code>, <code>A100</code> 등</td>
+<td>hardware 비교</td>
+</tr>
+<tr>
+<td>dtype/quantization</td>
+<td>BF16, FP16, AWQ 등</td>
+<td>memory와 kernel 영향</td>
+</tr>
+<tr>
+<td>max model length</td>
+<td>runtime 설정값</td>
+<td>KV cache budget</td>
+</tr>
+<tr>
+<td>prompt type</td>
+<td>short chat, long RAG 등</td>
+<td>workload 분리</td>
+</tr>
+<tr>
+<td>input tokens</td>
+<td>prompt token count</td>
+<td>prefill/KV cache</td>
+</tr>
+<tr>
+<td>output tokens</td>
+<td>generated token count</td>
+<td>decode 시간</td>
+</tr>
+<tr>
+<td>TTFT</td>
+<td>첫 token까지 시간</td>
+<td>사용자 체감 시작점</td>
+</tr>
+<tr>
+<td>TPOT</td>
+<td>output token당 시간</td>
+<td>decode 병목</td>
+</tr>
+<tr>
+<td>total latency</td>
+<td>전체 응답 시간</td>
+<td>product SLA</td>
+</tr>
+<tr>
+<td>server metrics snapshot</td>
+<td><code>/metrics</code> 일부</td>
+<td>queue, cache, request state</td>
+</tr>
+</tbody>
+</table>
+<p>이 표가 있어야 7장에서 benchmark를 의미 있게 읽을 수 있다.</p>
+<h2 id="ttft-streaming-client">TTFT를 간단히 재는 streaming client<a class="headerlink" href="#ttft-streaming-client" title="Permanent link">&para;</a></h2>
+<p><code>curl</code>만으로도 대략적인 전체 latency는 볼 수 있다. 하지만 TTFT를 보려면 streaming 응답의 첫 chunk 시간을 기록하는 편이 좋다. 아래 코드는 실습용 skeleton이다.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openai</span><span class="w"> </span><span class="kn">import</span> <span class="n">OpenAI</span>
+
+<span class="n">client</span> <span class="o">=</span> <span class="n">OpenAI</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;EMPTY&quot;</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="s2">&quot;http://localhost:8000/v1&quot;</span><span class="p">)</span>
+
+<span class="n">started</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+<span class="n">first_token_at</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">output_chars</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">stream</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">completions</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;Qwen/Qwen2.5-1.5B-Instruct&quot;</span><span class="p">,</span>
+    <span class="n">messages</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;You are a concise assistant.&quot;</span><span class="p">},</span>
+        <span class="p">{</span><span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;KV cache와 prefill/decode의 관계를 설명해 줘.&quot;</span><span class="p">},</span>
+    <span class="p">],</span>
+    <span class="n">max_tokens</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">stream</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">stream</span><span class="p">:</span>
+    <span class="n">delta</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">choices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span><span class="o">.</span><span class="n">content</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">delta</span> <span class="ow">and</span> <span class="n">first_token_at</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">first_token_at</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+    <span class="n">output_chars</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">delta</span><span class="p">)</span>
+
+<span class="n">ended</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">({</span>
+    <span class="s2">&quot;ttft_seconds&quot;</span><span class="p">:</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">first_token_at</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">first_token_at</span> <span class="o">-</span> <span class="n">started</span><span class="p">,</span>
+    <span class="s2">&quot;total_latency_seconds&quot;</span><span class="p">:</span> <span class="n">ended</span> <span class="o">-</span> <span class="n">started</span><span class="p">,</span>
+    <span class="s2">&quot;output_chars&quot;</span><span class="p">:</span> <span class="n">output_chars</span><span class="p">,</span>
+<span class="p">})</span>
+</code></pre></div>
+<p>이 코드는 완전한 benchmark가 아니다. token count 대신 character count를 임시로 기록하고, network overhead와 client overhead도 섞여 있다. 하지만 첫 실험에서는 충분히 좋은 출발점이다. 다음 장에서 더 엄밀한 benchmark 설계로 넘어간다.</p>
+<h2 id="metrics_1"><code>/metrics</code>를 같이 봐야 하는 이유<a class="headerlink" href="#metrics_1" title="Permanent link">&para;</a></h2>
+<p>Client에서 보이는 latency만으로는 병목을 알 수 없다. vLLM metrics endpoint를 같이 확인한다.</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>http://localhost:8000/metrics
+</code></pre></div>
+<p>첫 실험에서 특히 볼 만한 항목은 다음과 같다.</p>
+<table>
+<thead>
+<tr>
+<th>metric</th>
+<th>해석</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vllm:time_to_first_token_seconds</code></td>
+<td>TTFT histogram</td>
+</tr>
+<tr>
+<td><code>vllm:request_time_per_output_token_seconds</code></td>
+<td>request별 TPOT</td>
+</tr>
+<tr>
+<td><code>vllm:e2e_request_latency_seconds</code></td>
+<td>end-to-end latency</td>
+</tr>
+<tr>
+<td><code>vllm:request_prefill_time_seconds</code></td>
+<td>prefill 단계 시간</td>
+</tr>
+<tr>
+<td><code>vllm:request_decode_time_seconds</code></td>
+<td>decode 단계 시간</td>
+</tr>
+<tr>
+<td><code>vllm:kv_cache_usage_perc</code></td>
+<td>KV cache 사용률</td>
+</tr>
+<tr>
+<td><code>vllm:num_requests_running</code></td>
+<td>실행 batch 안의 request 수</td>
+</tr>
+<tr>
+<td><code>vllm:num_requests_waiting</code></td>
+<td>대기 중인 request 수</td>
+</tr>
+<tr>
+<td><code>vllm:request_prompt_tokens</code></td>
+<td>prompt token 분포</td>
+</tr>
+<tr>
+<td><code>vllm:request_generation_tokens</code></td>
+<td>generation token 분포</td>
+</tr>
+</tbody>
+</table>
+<p>이 metrics는 5장에서 만든 mental model을 실제 server에 붙여 준다. TTFT가 나쁜지, TPOT가 나쁜지, queue가 쌓이는지, KV cache가 찼는지 분리할 수 있다.</p>
+<h2 id="serving-config-code-capacity-contract">Serving config는 code가 아니라 capacity contract다<a class="headerlink" href="#serving-config-code-capacity-contract" title="Permanent link">&para;</a></h2>
+<p>첫 server에서 설정값을 무심코 넘기면 나중에 재현이 어렵다. 다음 설정은 반드시 기록해야 한다.</p>
+<h3 id="model"><code>model</code><a class="headerlink" href="#model" title="Permanent link">&para;</a></h3>
+<p>Model id는 단순 이름이 아니다. weight, config, tokenizer, chat template, generation config를 함께 가리킨다. 같은 model family라도 instruct/base, quantized/non-quantized, revision에 따라 serving 결과가 달라진다.</p>
+<h3 id="max_model_len"><code>max_model_len</code><a class="headerlink" href="#max_model_len" title="Permanent link">&para;</a></h3>
+<p>최대 context length는 product 기능처럼 보이지만 사실은 KV cache budget이다. 너무 크게 잡으면 긴 request를 받을 수는 있지만 동시성이 줄고 tail latency가 악화될 수 있다.</p>
+<h3 id="gpu_memory_utilization"><code>gpu_memory_utilization</code><a class="headerlink" href="#gpu_memory_utilization" title="Permanent link">&para;</a></h3>
+<p>GPU memory를 얼마나 공격적으로 쓸지 정한다. 높게 잡으면 capacity는 늘 수 있지만 OOM, fragmentation, 다른 process와의 충돌 위험도 커진다.</p>
+<h3 id="dtype-quantization"><code>dtype</code>과 quantization<a class="headerlink" href="#dtype-quantization" title="Permanent link">&para;</a></h3>
+<p>Weight dtype과 quantization은 memory footprint와 kernel path를 바꾼다. 5장에서 봤듯 KV cache dtype도 별도 축이다. "작아진다"와 "빨라진다"는 같은 말이 아니다.</p>
+<h3 id="generation_config"><code>generation_config</code><a class="headerlink" href="#generation_config" title="Permanent link">&para;</a></h3>
+<p>Sampling 기본값이 model repository의 <code>generation_config.json</code>에서 올 수 있다. baseline 측정에서는 이 차이를 명확히 해야 한다. 실험 결과를 비교할 때 temperature, top_p, max_tokens가 달라지면 latency와 output length도 달라진다.</p>
+<h3 id="api-key-binding">API key와 binding<a class="headerlink" href="#api-key-binding" title="Permanent link">&para;</a></h3>
+<p><code>localhost</code>에만 띄우는 실험과 <code>0.0.0.0</code>으로 팀 네트워크에 여는 server는 보안 의미가 다르다. shared server라면 API key, firewall, reverse proxy, TLS, access log를 별도 과제로 잡아야 한다.</p>
+<h2 id="workload">첫 실험 workload 세트<a class="headerlink" href="#workload" title="Permanent link">&para;</a></h2>
+<p>첫 server를 띄웠다면 하나의 prompt만 보내지 않는다. 최소 세 workload를 보낸다.</p>
+<table>
+<thead>
+<tr>
+<th>workload</th>
+<th>목적</th>
+<th>예시</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>short chat</td>
+<td>기본 endpoint latency 확인</td>
+<td>200-500 input tokens, 100 output tokens</td>
+</tr>
+<tr>
+<td>long prompt</td>
+<td>prefill과 KV cache pressure 확인</td>
+<td>4k-16k input tokens, 짧은 답변</td>
+</tr>
+<tr>
+<td>repeated prefix</td>
+<td>prefix caching 후보 확인</td>
+<td>같은 system/document prefix, 다른 질문</td>
+</tr>
+</tbody>
+</table>
+<p>아직 load test를 하지 않아도 된다. 각 workload를 5-10회 반복해 기록하면 충분하다. 이 작은 표만 있어도 다음 장에서 benchmark 곡선을 읽을 준비가 된다.</p>
+<h2 id="_3">실패하면 어디를 볼 것인가<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>첫 server 실습은 자주 실패한다. 실패 자체는 문제가 아니다. 문제는 실패가 어느 계층에서 났는지 모르는 것이다.</p>
+<table>
+<thead>
+<tr>
+<th>증상</th>
+<th>먼저 볼 곳</th>
+<th>흔한 원인</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>server가 시작하지 않음</td>
+<td>install, CUDA, model download</td>
+<td>Python/CUDA mismatch, network, disk</td>
+</tr>
+<tr>
+<td>model load 중 OOM</td>
+<td>GPU memory, dtype, model size</td>
+<td>weight가 GPU에 올라가지 않음</td>
+</tr>
+<tr>
+<td><code>/v1/models</code> 실패</td>
+<td>server log, port binding</td>
+<td>server 미기동, port 충돌</td>
+</tr>
+<tr>
+<td>chat template error</td>
+<td>tokenizer, model type</td>
+<td>template 누락 또는 메시지 형식 불일치</td>
+</tr>
+<tr>
+<td>첫 token이 너무 느림</td>
+<td>input token, queue, prefill</td>
+<td>긴 prompt, cold start</td>
+</tr>
+<tr>
+<td>token 생성이 느림</td>
+<td>TPOT, GPU utilization, backend</td>
+<td>decode 병목, attention backend</td>
+</tr>
+<tr>
+<td>같은 prompt 결과가 다름</td>
+<td>sampling config</td>
+<td>temperature/top_p/default generation config</td>
+</tr>
+</tbody>
+</table>
+<p>이 표는 troubleshooting을 빠르게 만든다. "vLLM이 안 된다"보다 "model load OOM이다", "chat template 문제다", "decode backend 문제다"라고 말할 수 있어야 한다.</p>
+<h2 id="llamacpp">llama.cpp와 비교하면 무엇이 보이는가<a class="headerlink" href="#llamacpp" title="Permanent link">&para;</a></h2>
+<p>이 장의 baseline은 vLLM이다. 하지만 local inference에서 llama.cpp 같은 runtime을 만나는 경우도 많다. 두 도구를 단순히 "어느 쪽이 빠른가"로 비교하면 안 된다.</p>
+<p>vLLM은 GPU server와 online serving baseline으로 이해하는 것이 좋다. OpenAI-compatible API, batching, scheduler, KV cache 관리, metrics, multi-GPU 확장 같은 production serving 요소를 다룬다.</p>
+<p>llama.cpp는 local/edge inference와 GGUF ecosystem에서 강하다. CPU, Apple Silicon, partial offload, local quantized model 실행 같은 맥락에서 자주 쓰인다.</p>
+<p>비교 질문은 다음처럼 잡아야 한다.</p>
+<ul>
+<li>내 목표는 developer laptop local inference인가, shared GPU API server인가?</li>
+<li>동시 요청을 batch로 처리해야 하는가?</li>
+<li>OpenAI-compatible API만 필요한가, production metrics와 scheduler도 필요한가?</li>
+<li>model format과 quantization workflow는 무엇인가?</li>
+<li>운영 대상이 단일 사용자 desktop인가, 여러 tenant가 쓰는 server인가?</li>
+</ul>
+<p>이 책에서는 vLLM을 먼저 baseline으로 둔다. 이유는 production LLM serving의 병목을 scheduler, KV cache, metrics와 함께 설명하기 좋기 때문이다.</p>
+<h2 id="_4">이 장의 결론<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>첫 LLM server는 모델을 "띄우는" 단계가 아니라 serving system을 "측정 가능한 상태로 만드는" 단계다.</p>
+<ul>
+<li>OpenAI-compatible endpoint는 application integration을 쉽게 하지만 runtime 차이를 숨긴다.</li>
+<li>Model artifact는 weight뿐 아니라 config, tokenizer, chat template, generation config를 포함한다.</li>
+<li>첫 baseline에서는 server command, model id, GPU, dtype, max context, prompt shape, latency, token count를 기록해야 한다.</li>
+<li>TTFT와 TPOT를 분리하려면 streaming client와 <code>/metrics</code>를 함께 보는 것이 좋다.</li>
+<li>Serving config는 code snippet이 아니라 capacity contract다.</li>
+<li>첫 workload는 short chat, long prompt, repeated prefix로 나누어야 한다.</li>
+</ul>
+<p>다음 장에서는 이 측정값을 더 체계적으로 다룬다. TTFT, TPOT, throughput, p95/p99 latency를 분리하고, benchmark 결과를 어떻게 읽어야 하는지 정리한다.</p>
+<h2 id="sources-checked-for-this-draft">Sources checked for this draft<a class="headerlink" href="#sources-checked-for-this-draft" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://docs.vllm.ai/en/stable/getting_started/quickstart/">vLLM Quickstart</a></li>
+<li><a href="https://docs.vllm.ai/en/stable/usage/metrics/">vLLM Production Metrics</a></li>
+<li><a href="https://docs.vllm.ai/en/stable/getting_started/installation/gpu/">vLLM GPU installation guide</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+        
+          
+          <a href="../05-kv-cache-serving-bottleneck/" class="md-footer__link md-footer__link--prev" aria-label="이전: 5장. KV cache 병목">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                5장. KV cache 병목
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../source-policy/" class="md-footer__link md-footer__link--next" aria-label="다음: 소스 정책">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                소스 정책
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/header-home-link.js"></script>
+      
+    
+  </body>
+</html>
