@@ -1,0 +1,1402 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+      
+      
+      
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/05-kv-cache-serving-bottleneck/">
+      
+      
+        <link rel="prev" href="../../sample-chapter-plan/">
+      
+      
+        <link rel="next" href="../../source-policy/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>5장. KV cache 병목 - AI 인프라 엔지니어 로드맵</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/site-navigation-v1.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#5-kv-cache-llm-serving" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              5장. KV cache 병목
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    시작하기
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    책 구조
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    책 구조
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../outline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    전체 목차
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sample-chapter-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    샘플 챕터 계획
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    샘플 원고
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    샘플 원고
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5장. KV cache 병목
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5장. KV cache 병목
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        사용자는 왜 첫 토큰을 기다리는가
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kv-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KV cache는 무엇을 저장하는가
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        크기 공식부터 잡기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mha-mqa-gqa-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MHA, MQA, GQA가 왜 capacity 문제인가
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kv-cache-model-weights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KV cache가 model weights보다 더 급하게 문제가 되는 순간
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pagedattention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PagedAttention이 해결한 문제
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefix-caching-cache-compression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefix caching은 cache compression이 아니다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kv-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KV quantization은 메모리만 보는 기능이 아니다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#offload-tiering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offload와 tiering은 마지막에 보는 것이 아니다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        운영자가 봐야 할 대시보드
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#triage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        실무 triage 순서
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        이 장의 결론
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources-checked-for-this-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources checked for this draft
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제작 노트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제작 노트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../source-policy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    소스 정책
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    다음 작업
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        사용자는 왜 첫 토큰을 기다리는가
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kv-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KV cache는 무엇을 저장하는가
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        크기 공식부터 잡기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mha-mqa-gqa-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MHA, MQA, GQA가 왜 capacity 문제인가
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kv-cache-model-weights" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KV cache가 model weights보다 더 급하게 문제가 되는 순간
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pagedattention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PagedAttention이 해결한 문제
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefix-caching-cache-compression" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefix caching은 cache compression이 아니다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kv-quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KV quantization은 메모리만 보는 기능이 아니다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#offload-tiering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Offload와 tiering은 마지막에 보는 것이 아니다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        운영자가 봐야 할 대시보드
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#triage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        실무 triage 순서
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        이 장의 결론
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources-checked-for-this-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources checked for this draft
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="5-kv-cache-llm-serving">5장. KV cache가 LLM serving의 중심 병목이 되는 순간<a class="headerlink" href="#5-kv-cache-llm-serving" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>Sample chapter</span>
+  <span>Draft v0.1</span>
+  <span>Updated: 2026-07-08</span>
+</div>
+
+<p>LLM API가 느릴 때 가장 먼저 떠올리는 원인은 보통 "모델이 크다"이다. 하지만 production serving에서는 모델 weight가 이미 GPU에 올라간 뒤의 문제가 더 자주 터진다. 같은 모델, 같은 GPU, 같은 endpoint인데도 어떤 날은 빠르고 어떤 날은 느리다. 짧은 질문은 잘 처리되는데, 긴 문서 기반 질문이나 agent loop가 섞이면 첫 토큰이 늦게 나오고 tail latency가 흔들린다.</p>
+<p>이때 운영자가 먼저 봐야 하는 것이 KV cache다.</p>
+<p>KV cache는 모델이 이미 읽은 token의 attention state를 저장해 decode 단계에서 같은 계산을 반복하지 않게 해 준다. 기능만 보면 단순한 최적화처럼 보이지만, 실제 serving에서는 VRAM capacity, 동시성, context length, batching, prefix reuse, quantization, offload 전략을 모두 연결하는 핵심 상태가 된다. 이 장의 목표는 KV cache를 "Transformer 내부 구현"이 아니라 "운영자가 예산을 잡아야 하는 runtime memory"로 이해하는 것이다.</p>
+<h2 id="_1">사용자는 왜 첫 토큰을 기다리는가<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>LLM serving latency는 크게 prefill과 decode로 나눌 수 있다.</p>
+<p>Prefill은 입력 prompt 전체를 한 번 읽는 단계다. 사용자가 8,000 token짜리 문서를 붙여 넣으면, 모델은 답변을 시작하기 전에 그 8,000 token을 먼저 처리해야 한다. 이 단계가 길어지면 사용자는 첫 토큰을 오래 기다린다. 그래서 prefill은 TTFT, 즉 time to first token에 직접 영향을 준다.</p>
+<p>Decode는 새 token을 하나씩 생성하는 반복 단계다. 모델은 지금까지의 context를 바탕으로 다음 token을 만들고, 그 token을 다시 context에 붙인 뒤 다음 token을 만든다. 답변이 길어질수록 decode 반복 횟수가 늘어난다. 이 단계는 TPOT, 즉 time per output token에 직접 영향을 준다.</p>
+<p>문제는 decode가 매번 전체 과거 context를 처음부터 다시 계산하면 비용이 너무 크다는 점이다. 그래서 Transformer serving runtime은 각 layer의 key와 value state를 KV cache에 저장한다. 다음 token을 만들 때는 과거 token의 K/V를 다시 계산하지 않고 cache에서 읽는다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../assets/diagrams/kv-cache-lifecycle.svg" alt="Prefill writes KV cache blocks and decode repeatedly reads and appends them">
+  <figcaption><strong>Prefill/decode와 KV cache lifecycle.</strong> Prefill은 prompt의 K/V state를 만들고, decode는 이전 cache를 읽으면서 새 token의 K/V를 추가한다.</figcaption>
+</figure>
+
+<p>이 구조는 계산을 줄인다. 대신 메모리 상태를 만든다. AI 인프라 엔지니어가 봐야 하는 trade-off는 여기서 시작한다.</p>
+<h2 id="kv-cache">KV cache는 무엇을 저장하는가<a class="headerlink" href="#kv-cache" title="Permanent link">&para;</a></h2>
+<p>Self-attention에서 각 token은 query, key, value 벡터로 변환된다. 새 token을 생성할 때 현재 token의 query는 과거 token들의 key와 비교되고, 그 결과로 과거 value들의 가중합을 만든다. 이때 과거 token의 key와 value는 이미 계산된 값이다.</p>
+<p>KV cache는 이 과거 key/value tensor를 layer별로 저장한다.</p>
+<p>한 token이 들어오면 각 Transformer layer는 그 token에 대한 K와 V를 만든다. 그 값은 decode가 끝날 때까지 살아 있어야 한다. 왜냐하면 뒤에 생성되는 모든 token이 앞선 token들의 K/V를 참조할 수 있기 때문이다. 즉 KV cache의 수명은 "request가 살아 있는 동안"이다.</p>
+<p>운영 관점에서는 세 가지 사실이 중요하다.</p>
+<ol>
+<li>KV cache는 model weight와 다르게 요청 수와 context length에 따라 계속 변한다.</li>
+<li>완료된 요청의 cache는 반환되지만, 진행 중인 요청의 cache는 decode 동안 계속 유지된다.</li>
+<li>같은 GPU에 여러 request가 동시에 있으면, 각 request의 살아 있는 token 수가 합쳐져 capacity를 결정한다.</li>
+</ol>
+<p>이 때문에 단순히 "70B 모델이 GPU에 올라가는가"만으로는 serving 가능 여부를 판단할 수 없다. 모델이 올라간 뒤에도 답변을 생성하는 동안 KV cache가 커진다.</p>
+<h2 id="_2">크기 공식부터 잡기<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>KV cache memory의 rough estimate는 다음 형태로 잡을 수 있다.</p>
+<div class="arithmatex">\[
+\text{KV cache bytes}
+\approx
+T_\text{active}
+\times 2
+\times L
+\times H_\text{kv}
+\times D_\text{head}
+\times B_\text{dtype}
+\]</div>
+<p>각 항은 다음 뜻이다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>의미</th>
+<th>운영상 영향</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(T_\text{active}\)</span></td>
+<td>현재 GPU 안에서 살아 있는 token 총량</td>
+<td>동시 요청 수와 각 요청의 context length가 곱해진다</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(2\)</span></td>
+<td>key와 value 두 종류의 cache</td>
+<td>K만 저장하는 것이 아니라 V도 저장한다</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(L\)</span></td>
+<td>Transformer layer 수</td>
+<td>깊은 모델일수록 token당 cache가 커진다</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(H_\text{kv}\)</span></td>
+<td>KV head 수</td>
+<td>MHA, MQA, GQA 구조에 따라 크게 달라진다</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(D_\text{head}\)</span></td>
+<td>head dimension</td>
+<td>보통 hidden size와 head 수에서 정해진다</td>
+</tr>
+<tr>
+<td><span class="arithmatex">\(B_\text{dtype}\)</span></td>
+<td>element당 byte 수</td>
+<td>FP16/BF16은 보통 2 byte, FP8은 1 byte로 추정한다</td>
+</tr>
+</tbody>
+</table>
+<figure class="book-figure book-figure-wide">
+  <img src="../assets/diagrams/kv-cache-memory-formula.svg" alt="KV cache memory grows with active tokens, layers, KV heads, head dimension, and bytes per element">
+  <figcaption><strong>KV cache 크기 공식.</strong> 모델 weight는 고정 비용에 가깝지만, KV cache는 동시에 살아 있는 token 총량에 비례해 움직인다.</figcaption>
+</figure>
+
+<p>예를 들어 다음과 같은 대표적인 decoder-only GQA 형태를 가정해 보자. 이 값은 특정 모델의 보증값이 아니라 capacity 감각을 만들기 위한 rough estimate다.</p>
+<table>
+<thead>
+<tr>
+<th>변수</th>
+<th style="text-align: right;">값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>layer 수 <span class="arithmatex">\(L\)</span></td>
+<td style="text-align: right;">32</td>
+</tr>
+<tr>
+<td>query head 수</td>
+<td style="text-align: right;">32</td>
+</tr>
+<tr>
+<td>KV head 수 <span class="arithmatex">\(H_\text{kv}\)</span></td>
+<td style="text-align: right;">8</td>
+</tr>
+<tr>
+<td>head dimension <span class="arithmatex">\(D_\text{head}\)</span></td>
+<td style="text-align: right;">128</td>
+</tr>
+<tr>
+<td>KV dtype</td>
+<td style="text-align: right;">BF16, 2 byte</td>
+</tr>
+</tbody>
+</table>
+<p>이때 token 하나의 KV cache는 대략 다음과 같다.</p>
+<div class="arithmatex">\[
+2 \times 32 \times 8 \times 128 \times 2
+= 131{,}072 \text{ bytes}
+\approx 128 \text{ KiB}
+\]</div>
+<p>8,192 token짜리 요청 하나가 살아 있으면 KV cache는 약 1 GiB가 된다. 같은 형태의 요청 16개가 동시에 살아 있으면 약 16 GiB가 된다. 64개면 약 64 GiB다. 여기에 model weights, CUDA graph나 runtime overhead, fragmentation, allocator 여유분, activation peak가 더해진다.</p>
+<p>이 숫자가 말하는 바는 단순하다. 긴 context serving에서는 "모델 weight가 몇 GB인가"보다 "지금 GPU 안에 살아 있는 token이 몇 개인가"가 더 직접적인 capacity 질문이 된다.</p>
+<h2 id="mha-mqa-gqa-capacity">MHA, MQA, GQA가 왜 capacity 문제인가<a class="headerlink" href="#mha-mqa-gqa-capacity" title="Permanent link">&para;</a></h2>
+<p>Attention 구조를 설명할 때 query head 수만 보는 경우가 많다. 하지만 KV cache size에는 query head 수보다 KV head 수가 직접 들어간다.</p>
+<p>Multi-Head Attention, 즉 MHA에서는 query head와 key/value head 수가 같다. Query head가 32개면 KV head도 32개다. 이 구조는 cache가 크다.</p>
+<p>Multi-Query Attention, 즉 MQA에서는 여러 query head가 하나의 K/V head를 공유한다. KV head 수가 1에 가까워지므로 cache가 크게 줄어든다. 대신 모델 품질, 구현, kernel, hardware 특성에 따라 trade-off가 생길 수 있다.</p>
+<p>Grouped-Query Attention, 즉 GQA는 그 중간이다. 예를 들어 query head는 32개지만 KV head는 8개로 줄인다. 그러면 MHA 대비 KV cache는 대략 4분의 1이 된다.</p>
+<p>운영자가 모델 카드를 볼 때 <code>num_attention_heads</code>만 보고 멈추면 안 된다. <code>num_key_value_heads</code> 또는 유사한 config를 함께 확인해야 한다. 같은 parameter count와 context length라도 KV head 수가 다르면 동시성 capacity가 달라진다.</p>
+<h2 id="kv-cache-model-weights">KV cache가 model weights보다 더 급하게 문제가 되는 순간<a class="headerlink" href="#kv-cache-model-weights" title="Permanent link">&para;</a></h2>
+<p>모델 weight는 시작할 때 한 번 올라간다. 같은 model replica가 같은 GPU에서 같은 precision으로 돈다면 weight memory는 거의 고정 비용이다. 반면 KV cache는 traffic shape에 따라 계속 달라진다.</p>
+<p>다음 상황에서는 KV cache가 model weights보다 더 급한 운영 문제가 된다.</p>
+<table>
+<thead>
+<tr>
+<th>상황</th>
+<th>왜 문제가 되는가</th>
+<th>먼저 볼 지표</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>긴 RAG 문서 질의</td>
+<td>prefill이 길고 request당 active token이 많다</td>
+<td>TTFT, input token length, cache usage</td>
+</tr>
+<tr>
+<td>multi-turn chat</td>
+<td>history가 계속 붙어 context가 커진다</td>
+<td>context length 분포, session별 token 누적</td>
+</tr>
+<tr>
+<td>agent loop</td>
+<td>같은 system/tool prompt가 반복되고 호출 수가 많다</td>
+<td>prefix hit, request fan-out, p95 TTFT</td>
+</tr>
+<tr>
+<td>높은 동시성</td>
+<td>각 요청의 cache가 합쳐져 VRAM을 압박한다</td>
+<td>active sequences, waiting queue, GPU memory</td>
+</tr>
+<tr>
+<td>긴 답변 생성</td>
+<td>decode가 길어지며 cache 수명이 길어진다</td>
+<td>output token length, TPOT, request duration</td>
+</tr>
+</tbody>
+</table>
+<p>여기서 중요한 것은 평균 prompt length가 아니다. tail이다. 평균 prompt가 1,000 token이어도 p95가 16,000 token이면, capacity planning은 p95와 concurrency를 기준으로 해야 한다. production 장애는 대개 긴 요청과 높은 동시성이 겹칠 때 발생한다.</p>
+<h2 id="pagedattention">PagedAttention이 해결한 문제<a class="headerlink" href="#pagedattention" title="Permanent link">&para;</a></h2>
+<p>KV cache는 요청마다 길이가 다르고, 생성 중에도 계속 늘어난다. 기존 방식처럼 요청마다 큰 연속 메모리 영역을 미리 잡으면 낭비가 생긴다. 어떤 요청은 짧게 끝나고, 어떤 요청은 길게 이어지고, 어떤 요청은 취소된다. GPU memory 안에 빈 조각이 늘어나면 실제로는 여유가 있어도 새 요청을 넣기 어려워진다.</p>
+<p>PagedAttention은 이 문제를 운영체제의 paging과 비슷한 방식으로 푼다. 요청의 KV cache를 고정 크기 block으로 나누고, logical block이 GPU memory의 physical block을 가리키도록 관리한다. 논문은 KV cache가 request마다 크고 동적으로 늘고 줄며, 비효율적으로 관리되면 fragmentation과 중복 때문에 batch size가 제한된다는 문제의식에서 출발한다. vLLM은 이 아이디어를 기반으로 KV cache memory waste를 줄이고 cache sharing을 가능하게 하는 serving system으로 제안되었다.</p>
+<p>이 관점에서 PagedAttention은 "attention이 더 똑똑해졌다"라기보다 "KV cache allocator가 serving workload에 맞게 바뀌었다"에 가깝다. 그래서 AI 인프라 엔지니어에게 중요하다. 모델 수식보다 운영 문제가 먼저다.</p>
+<p>PagedAttention 이후에도 질문은 남는다.</p>
+<ul>
+<li>block size가 workload에 맞는가?</li>
+<li>긴 prompt와 짧은 prompt가 섞일 때 scheduler가 어떻게 batch를 구성하는가?</li>
+<li>prefix가 공유되는 요청에서 cache sharing이 실제로 일어나는가?</li>
+<li>cache block이 부족할 때 waiting, preemption, offload 중 무엇이 발생하는가?</li>
+</ul>
+<p>이 질문들은 vLLM, TensorRT-LLM, SGLang, KServe 같은 도구를 비교할 때 모두 다시 등장한다.</p>
+<h2 id="prefix-caching-cache-compression">Prefix caching은 cache compression이 아니다<a class="headerlink" href="#prefix-caching-cache-compression" title="Permanent link">&para;</a></h2>
+<p>Agent나 RAG workload에서는 같은 prefix가 반복된다. system prompt, tool schema, 긴 문서, 대화 history의 앞부분이 여러 요청에서 공유될 수 있다. Automatic Prefix Caching은 이런 공통 prefix의 KV cache를 재사용해 prefill 계산을 줄이는 전략이다.</p>
+<p>이 최적화가 잘 맞는 workload는 명확하다.</p>
+<ul>
+<li>같은 긴 문서를 두고 여러 질문을 하는 document QA</li>
+<li>같은 system prompt와 tool schema를 반복하는 agent</li>
+<li>multi-round conversation에서 이전 대화 history를 계속 포함하는 chat</li>
+<li>best-of, parallel sampling, retry처럼 prefix가 같은 여러 branch</li>
+</ul>
+<p>하지만 prefix caching은 decode를 없애지 않는다. vLLM 문서도 APC가 prefill 단계의 query processing 시간을 줄이는 최적화이며, 긴 답변 생성처럼 decode가 대부분인 경우에는 이득이 제한된다고 설명한다. 따라서 prefix caching hit가 높아져도 TPOT가 그대로라면 정상이다. 이 경우는 cache reuse 문제가 아니라 decode throughput 문제다.</p>
+<p>운영자는 prefix caching을 켤 때 다음을 함께 봐야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>확인 항목</th>
+<th>해석</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>prefix hit rate</td>
+<td>반복 prefix가 실제로 reuse되는가</td>
+</tr>
+<tr>
+<td>TTFT 변화</td>
+<td>prefill 절감이 사용자가 느끼는 첫 토큰 지연을 줄였는가</td>
+</tr>
+<tr>
+<td>TPOT 변화</td>
+<td>decode 병목은 그대로인지 확인한다</td>
+</tr>
+<tr>
+<td>cache residency</td>
+<td>재사용될 cache가 eviction되지 않고 남아 있는가</td>
+</tr>
+<tr>
+<td>workload grouping</td>
+<td>같은 prefix 요청이 같은 replica로 라우팅되는가</td>
+</tr>
+</tbody>
+</table>
+<p>마지막 항목이 중요하다. prefix cache는 runtime 내부 기능이지만, 실제 hit rate는 gateway routing과도 연결된다. 같은 tenant나 같은 document session의 요청이 매번 다른 replica로 흩어지면 cache reuse 가능성이 떨어진다.</p>
+<h2 id="kv-quantization">KV quantization은 메모리만 보는 기능이 아니다<a class="headerlink" href="#kv-quantization" title="Permanent link">&para;</a></h2>
+<p>KV cache quantization은 cache element를 더 낮은 precision으로 저장해 memory footprint를 줄인다. vLLM의 stable 문서는 FP8 KV cache가 memory footprint를 줄여 더 많은 token을 memory에 저장하고, throughput과 긴 context 지원에 도움을 줄 수 있다고 설명한다. 문서 기준으로 FP8 KV cache에는 per-tensor와 per-attention-head quantization 전략, scale calibration 방식이 존재한다.</p>
+<p>여기서 운영자가 조심해야 할 점은 "메모리가 줄면 항상 빨라진다"가 아니라는 것이다.</p>
+<p>Quantization은 세 가지 비용을 함께 가져온다.</p>
+<ol>
+<li>quantize/dequantize 또는 quantized-domain 연산 비용</li>
+<li>calibration 품질에 따른 accuracy risk</li>
+<li>attention backend, GPU architecture, model 구조에 따른 성능 차이</li>
+</ol>
+<p>따라서 KV quantization은 capacity가 막혔을 때 검토할 수 있는 카드지만, 기본값처럼 켜는 기능으로 취급하면 안 된다. 특히 production에서는 다음 순서가 더 안전하다.</p>
+<ol>
+<li>동일 workload에서 baseline latency, throughput, quality를 기록한다.</li>
+<li>KV cache memory pressure가 실제 병목인지 확인한다.</li>
+<li>quantization 후 TTFT, TPOT, p95/p99, output quality를 같은 prompt set으로 비교한다.</li>
+<li>calibration dataset과 model/runtime version을 함께 versioning한다.</li>
+<li>fallback 가능한 serving profile을 남긴다.</li>
+</ol>
+<p>메모리 절약은 목표가 아니라 trade-off의 한 축이다.</p>
+<h2 id="offload-tiering">Offload와 tiering은 마지막에 보는 것이 아니다<a class="headerlink" href="#offload-tiering" title="Permanent link">&para;</a></h2>
+<p>GPU HBM은 빠르지만 작고 비싸다. CPU DRAM, local SSD, remote cache는 더 크거나 저렴할 수 있지만 latency와 bandwidth가 다르다. 긴 context, 많은 session, agent memory를 다루는 workload에서는 KV cache를 GPU 밖으로 옮기거나 계층화하는 전략이 등장한다.</p>
+<p>그러나 offload는 무료가 아니다. cache를 GPU 밖으로 내보내면 다시 읽을 때 data movement가 생긴다. decode 단계가 매 token마다 과거 cache를 참조한다는 점을 생각하면, 잘못된 offload는 memory capacity를 늘리는 대신 TPOT를 망칠 수 있다.</p>
+<p>운영 판단은 다음 질문으로 시작하면 된다.</p>
+<ul>
+<li>지금 병목은 capacity인가, bandwidth인가, scheduler인가?</li>
+<li>offload 대상은 곧 다시 읽힐 hot cache인가, 당분간 쓰지 않을 cold cache인가?</li>
+<li>offload가 TTFT를 개선하는가, TPOT를 악화시키는가?</li>
+<li>request cancellation과 eviction policy가 명확한가?</li>
+<li>장애 시 cache miss가 품질 문제가 아니라 latency 문제로만 끝나는가?</li>
+</ul>
+<p>KV cache offload는 "큰 context를 억지로 가능하게 하는 기능"이 아니라 "cache locality와 latency budget을 설계하는 문제"다.</p>
+<h2 id="_3">운영자가 봐야 할 대시보드<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>KV cache를 운영 지표로 바꾸면 다음 dashboard가 필요하다.</p>
+<table>
+<thead>
+<tr>
+<th>범주</th>
+<th>지표</th>
+<th>질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>traffic shape</td>
+<td>input tokens, output tokens, context length distribution</td>
+<td>어떤 요청이 cache를 키우는가</td>
+</tr>
+<tr>
+<td>concurrency</td>
+<td>active sequences, waiting requests, running requests</td>
+<td>살아 있는 cache가 얼마나 쌓이는가</td>
+</tr>
+<tr>
+<td>memory</td>
+<td>GPU memory used, KV cache allocated blocks, free blocks</td>
+<td>capacity가 어디서 막히는가</td>
+</tr>
+<tr>
+<td>latency</td>
+<td>TTFT, TPOT, p95/p99 latency</td>
+<td>prefill 문제인가 decode 문제인가</td>
+</tr>
+<tr>
+<td>reuse</td>
+<td>prefix cache hit/miss, reused tokens</td>
+<td>반복 prefix가 실제로 이득을 주는가</td>
+</tr>
+<tr>
+<td>quality</td>
+<td>eval score, regression prompts, refusal/error rate</td>
+<td>memory 최적화가 답변 품질을 해치지 않는가</td>
+</tr>
+</tbody>
+</table>
+<p>이 표를 보면 KV cache는 단일 metric이 아니다. traffic, memory, scheduler, latency, quality를 연결하는 상태다. 좋은 운영자는 "GPU memory가 높다"에서 멈추지 않고 "어떤 request shape가 어떤 cache pressure를 만들고, 그것이 TTFT와 TPOT 중 어디로 나타났는가"까지 추적한다.</p>
+<h2 id="triage">실무 triage 순서<a class="headerlink" href="#triage" title="Permanent link">&para;</a></h2>
+<p>LLM endpoint가 느려졌고 KV cache가 의심된다면 다음 순서로 본다.</p>
+<ol>
+<li>요청 shape를 나눈다.
+   짧은 chat, 긴 RAG, multi-turn chat, agent loop를 같은 평균 latency로 섞어 보지 않는다.</li>
+<li>TTFT와 TPOT를 분리한다.
+   TTFT가 나빠지면 prefill, queueing, prefix reuse를 본다. TPOT가 나빠지면 decode batch, memory bandwidth, cache read path를 본다.</li>
+<li>active token 총량을 계산한다.
+   <code>running sequences x current context length</code>의 분포를 본다. 평균보다 p95와 p99가 중요하다.</li>
+<li>KV cache 예산을 rough estimate로 계산한다.
+   공식으로 token당 cache 크기를 잡고, 동시 active token을 곱해 GPU당 cache pressure를 추정한다.</li>
+<li>최적화를 축별로 분리한다.
+   PagedAttention은 allocation/fragmentation 문제, prefix caching은 reuse 문제, quantization은 footprint 문제, offload는 memory tiering 문제다.</li>
+<li>변경 전후를 같은 prompt set으로 비교한다.
+   latency만 보지 말고 output quality와 error rate를 함께 본다.</li>
+</ol>
+<p>이 순서를 지키면 도구 이름에 끌려가지 않는다. "vLLM을 쓰면 된다" 또는 "FP8을 켜면 된다"가 아니라, 지금 workload의 병목이 어떤 cache 문제인지 먼저 구분하게 된다.</p>
+<h2 id="_4">이 장의 결론<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>KV cache를 이해하면 LLM serving의 많은 문제가 한 줄로 연결된다.</p>
+<ul>
+<li>Prefill은 prompt를 읽고 KV cache를 만든다. Decode는 cache를 읽으며 새 token의 K/V를 추가한다.</li>
+<li>KV cache 크기는 active token 수, layer 수, KV head 수, head dimension, dtype에 비례한다.</li>
+<li>GQA/MQA는 KV head 수를 줄여 cache capacity에 직접 영향을 준다.</li>
+<li>PagedAttention은 KV cache allocation과 fragmentation 문제를 serving workload에 맞게 다루는 baseline mental model이다.</li>
+<li>Prefix caching, KV quantization, offload는 서로 다른 문제를 푸는 전략이므로 같은 최적화로 묶으면 안 된다.</li>
+</ul>
+<p>다음 장부터는 이 mental model을 단일 GPU serving 실험으로 옮긴다. 모델을 API endpoint로 띄우고, TTFT와 TPOT를 분리해 측정하고, cache pressure가 실제로 latency와 throughput에 어떻게 나타나는지 확인할 것이다.</p>
+<h2 id="sources-checked-for-this-draft">Sources checked for this draft<a class="headerlink" href="#sources-checked-for-this-draft" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://arxiv.org/abs/2309.06180">Efficient Memory Management for Large Language Model Serving with PagedAttention</a></li>
+<li><a href="https://docs.vllm.ai/en/stable/design/paged_attention/">vLLM stable docs: Paged Attention</a></li>
+<li><a href="https://docs.vllm.ai/en/stable/features/automatic_prefix_caching/">vLLM stable docs: Automatic Prefix Caching</a></li>
+<li><a href="https://docs.vllm.ai/en/stable/features/quantization/quantized_kvcache/">vLLM stable docs: Quantized KV Cache</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+        
+          
+          <a href="../../sample-chapter-plan/" class="md-footer__link md-footer__link--prev" aria-label="이전: 샘플 챕터 계획">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                샘플 챕터 계획
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../source-policy/" class="md-footer__link md-footer__link--next" aria-label="다음: 소스 정책">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                소스 정책
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/header-home-link.js"></script>
+      
+    
+  </body>
+</html>

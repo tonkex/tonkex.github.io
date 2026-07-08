@@ -58,6 +58,33 @@ html .md-header .md-header__title {
   background: rgba(63, 81, 181, 0.06);
 }
 
+.md-typeset .book-figure {
+  margin: 1.6rem auto;
+  text-align: center;
+}
+
+.md-typeset .book-figure img {
+  display: block;
+  width: min(100%, 44rem);
+  height: auto;
+  margin: 0 auto;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 0.45rem;
+  background: #fff;
+}
+
+.md-typeset .book-figure-wide img {
+  width: min(100%, 54rem);
+}
+
+.md-typeset .book-figure figcaption {
+  max-width: 48rem;
+  margin: 0.55rem auto 0;
+  color: var(--md-default-fg-color--light);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
 .md-sidebar--primary .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link {
   margin: 0.25rem 0 0.15rem;
   padding: 0.38rem 0.5rem;

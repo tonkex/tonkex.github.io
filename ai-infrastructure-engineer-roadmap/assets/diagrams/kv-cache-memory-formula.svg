@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="460" viewBox="0 0 980 460" role="img" aria-labelledby="title desc">
+  <title id="title">KV cache memory formula variables</title>
+  <desc id="desc">KV cache memory grows with active tokens, transformer layers, KV heads, head dimension, and bytes per element.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#0f766e"/>
+    </marker>
+  </defs>
+  <rect width="980" height="460" fill="#ffffff"/>
+  <g font-family="Inter, Pretendard, Arial, sans-serif">
+    <rect x="56" y="52" width="868" height="96" rx="14" fill="#f0fdfa" stroke="#5eead4"/>
+    <text x="490" y="95" text-anchor="middle" font-size="28" font-weight="800" fill="#0f172a">KV cache bytes</text>
+    <text x="490" y="128" text-anchor="middle" font-size="24" fill="#0f766e">active tokens x 2 x layers x KV heads x head dim x bytes</text>
+
+    <g transform="translate(72 208)">
+      <rect x="0" y="0" width="130" height="98" rx="12" fill="#eff6ff" stroke="#93c5fd"/>
+      <text x="65" y="36" text-anchor="middle" font-size="18" font-weight="800" fill="#1e3a8a">active</text>
+      <text x="65" y="59" text-anchor="middle" font-size="18" font-weight="800" fill="#1e3a8a">tokens</text>
+      <text x="65" y="83" text-anchor="middle" font-size="12" fill="#475569">sequences x length</text>
+    </g>
+    <g transform="translate(240 208)">
+      <rect x="0" y="0" width="110" height="98" rx="12" fill="#fefce8" stroke="#fde047"/>
+      <text x="55" y="50" text-anchor="middle" font-size="28" font-weight="900" fill="#854d0e">2</text>
+      <text x="55" y="78" text-anchor="middle" font-size="12" fill="#475569">key + value</text>
+    </g>
+    <g transform="translate(388 208)">
+      <rect x="0" y="0" width="120" height="98" rx="12" fill="#f5f3ff" stroke="#c4b5fd"/>
+      <text x="60" y="48" text-anchor="middle" font-size="18" font-weight="800" fill="#5b21b6">layers</text>
+      <text x="60" y="76" text-anchor="middle" font-size="12" fill="#475569">decoder blocks</text>
+    </g>
+    <g transform="translate(546 208)">
+      <rect x="0" y="0" width="126" height="98" rx="12" fill="#ecfdf5" stroke="#86efac"/>
+      <text x="63" y="42" text-anchor="middle" font-size="18" font-weight="800" fill="#166534">KV heads</text>
+      <text x="63" y="68" text-anchor="middle" font-size="12" fill="#475569">MHA/MQA/GQA</text>
+    </g>
+    <g transform="translate(710 208)">
+      <rect x="0" y="0" width="120" height="98" rx="12" fill="#fff7ed" stroke="#fdba74"/>
+      <text x="60" y="42" text-anchor="middle" font-size="18" font-weight="800" fill="#9a3412">head dim</text>
+      <text x="60" y="68" text-anchor="middle" font-size="12" fill="#475569">per-head width</text>
+    </g>
+    <g transform="translate(858 208)">
+      <rect x="0" y="0" width="72" height="98" rx="12" fill="#f8fafc" stroke="#cbd5e1"/>
+      <text x="36" y="42" text-anchor="middle" font-size="18" font-weight="800" fill="#334155">bytes</text>
+      <text x="36" y="68" text-anchor="middle" font-size="12" fill="#64748b">dtype</text>
+    </g>
+    <g stroke="#0f766e" stroke-width="2.5" fill="none" marker-end="url(#arrow)">
+      <path d="M202 257 H232"/>
+      <path d="M350 257 H380"/>
+      <path d="M508 257 H538"/>
+      <path d="M672 257 H702"/>
+      <path d="M830 257 H850"/>
+    </g>
+    <rect x="86" y="360" width="808" height="52" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="490" y="392" text-anchor="middle" font-size="16" fill="#334155">운영자는 모델 weight 크기만 보지 말고, 동시에 살아 있는 token 총량을 먼저 추정해야 한다.</text>
+  </g>
+</svg>

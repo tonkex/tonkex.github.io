@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="420" viewBox="0 0 980 420" role="img" aria-labelledby="title desc">
+  <title id="title">Prefill and decode KV cache lifecycle</title>
+  <desc id="desc">A request enters tokenization, prefill writes KV cache blocks, decode repeatedly reads prior cache and appends a new block, and completion releases cache memory.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/>
+    </marker>
+    <filter id="soft-shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <rect width="980" height="420" fill="#f8fafc"/>
+  <g font-family="Inter, Pretendard, Arial, sans-serif">
+    <g filter="url(#soft-shadow)">
+      <rect x="50" y="78" width="150" height="84" rx="10" fill="#ffffff" stroke="#bfdbfe"/>
+      <rect x="245" y="78" width="170" height="84" rx="10" fill="#eff6ff" stroke="#60a5fa"/>
+      <rect x="465" y="78" width="190" height="84" rx="10" fill="#ecfdf5" stroke="#34d399"/>
+      <rect x="705" y="78" width="170" height="84" rx="10" fill="#fff7ed" stroke="#fb923c"/>
+    </g>
+    <g font-size="18" font-weight="700" fill="#0f172a">
+      <text x="125" y="112" text-anchor="middle">Tokenize</text>
+      <text x="330" y="112" text-anchor="middle">Prefill</text>
+      <text x="560" y="112" text-anchor="middle">Decode loop</text>
+      <text x="790" y="112" text-anchor="middle">Release</text>
+    </g>
+    <g font-size="13" fill="#475569">
+      <text x="125" y="138" text-anchor="middle">prompt를 token으로 변환</text>
+      <text x="330" y="138" text-anchor="middle">전체 prompt를 한 번 읽고</text>
+      <text x="330" y="154" text-anchor="middle">K/V state를 기록</text>
+      <text x="560" y="138" text-anchor="middle">이전 cache를 읽고</text>
+      <text x="560" y="154" text-anchor="middle">새 token의 K/V를 추가</text>
+      <text x="790" y="138" text-anchor="middle">완료/취소 시</text>
+      <text x="790" y="154" text-anchor="middle">cache block 반환</text>
+    </g>
+    <g stroke="#2563eb" stroke-width="3" fill="none" marker-end="url(#arrow)">
+      <path d="M205 120 H237"/>
+      <path d="M420 120 H457"/>
+      <path d="M660 120 H697"/>
+    </g>
+    <g transform="translate(82 232)">
+      <rect x="0" y="0" width="120" height="42" rx="7" fill="#e2e8f0" stroke="#94a3b8"/>
+      <text x="60" y="27" text-anchor="middle" font-size="14" font-weight="700" fill="#334155">input tokens</text>
+    </g>
+    <g transform="translate(272 214)">
+      <rect x="0" y="0" width="36" height="36" rx="5" fill="#bfdbfe"/>
+      <rect x="42" y="0" width="36" height="36" rx="5" fill="#bfdbfe"/>
+      <rect x="84" y="0" width="36" height="36" rx="5" fill="#bfdbfe"/>
+      <rect x="126" y="0" width="36" height="36" rx="5" fill="#bfdbfe"/>
+      <text x="81" y="61" text-anchor="middle" font-size="13" fill="#1e3a8a">prompt KV blocks</text>
+    </g>
+    <g transform="translate(500 206)">
+      <rect x="0" y="0" width="34" height="34" rx="5" fill="#bbf7d0"/>
+      <rect x="40" y="0" width="34" height="34" rx="5" fill="#bbf7d0"/>
+      <rect x="80" y="0" width="34" height="34" rx="5" fill="#bbf7d0"/>
+      <rect x="120" y="0" width="34" height="34" rx="5" fill="#86efac"/>
+      <path d="M176 17 C210 17 210 74 176 74" fill="none" stroke="#16a34a" stroke-width="3" marker-end="url(#arrow)"/>
+      <text x="77" y="58" text-anchor="middle" font-size="13" fill="#14532d">read old blocks</text>
+      <text x="222" y="58" text-anchor="middle" font-size="13" fill="#14532d">append</text>
+    </g>
+    <g transform="translate(728 226)">
+      <rect x="0" y="0" width="116" height="44" rx="7" fill="#fed7aa" stroke="#fb923c"/>
+      <text x="58" y="28" text-anchor="middle" font-size="14" font-weight="700" fill="#7c2d12">free blocks</text>
+    </g>
+    <g font-size="14" fill="#334155">
+      <text x="490" y="340" text-anchor="middle">Prefill은 cache를 크게 한 번 만든다. Decode는 cache를 계속 읽고 조금씩 키운다.</text>
+      <text x="490" y="366" text-anchor="middle">동시 요청이 많거나 context가 길면, 이 반복 상태가 VRAM capacity의 중심 문제가 된다.</text>
+    </g>
+  </g>
+</svg>
