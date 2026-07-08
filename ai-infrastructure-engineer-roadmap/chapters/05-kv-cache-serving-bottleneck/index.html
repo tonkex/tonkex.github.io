@@ -1400,7 +1400,7 @@
 <p>Decode는 새 token을 하나씩 생성하는 반복 단계다. 모델은 지금까지의 context를 바탕으로 다음 token을 만들고, 그 token을 다시 context에 붙인 뒤 다음 token을 만든다. 답변이 길어질수록 decode 반복 횟수가 늘어난다. 이 단계는 TPOT, 즉 time per output token에 직접 영향을 준다.</p>
 <p>문제는 decode가 매번 전체 과거 context를 처음부터 다시 계산하면 비용이 너무 크다는 점이다. 그래서 Transformer serving runtime은 각 layer의 key와 value state를 KV cache에 저장한다. 다음 token을 만들 때는 과거 token의 K/V를 다시 계산하지 않고 cache에서 읽는다.</p>
 <figure class="book-figure book-figure-wide">
-  <img src="../assets/diagrams/kv-cache-lifecycle.svg" alt="Prefill writes KV cache blocks and decode repeatedly reads and appends them">
+  <img src="../../assets/diagrams/kv-cache-lifecycle.svg" alt="Prefill writes KV cache blocks and decode repeatedly reads and appends them">
   <figcaption><strong>Prefill/decode와 KV cache lifecycle.</strong> Prefill은 prompt의 K/V state를 만들고, decode는 이전 cache를 읽으면서 새 token의 K/V를 추가한다.</figcaption>
 </figure>
 
@@ -1409,7 +1409,7 @@
 <p>Self-attention에서 각 token은 query, key, value 벡터로 변환된다. 새 token을 생성할 때 현재 token의 query는 과거 token들의 key와 비교되고, 그 결과로 과거 value들의 가중합을 만든다. 이때 과거 token의 key와 value는 이미 계산된 값이다.</p>
 <p>KV cache는 이 과거 key/value tensor를 layer별로 저장한다.</p>
 <figure class="book-figure book-figure-wide">
-  <img src="../assets/diagrams/kv-cache-qkv-attention.svg" alt="Current token creates query while past tokens provide cached keys and values">
+  <img src="../../assets/diagrams/kv-cache-qkv-attention.svg" alt="Current token creates query while past tokens provide cached keys and values">
   <figcaption><strong>Q/K/V와 KV cache.</strong> Decode에서 현재 token은 query를 만들고, 과거 token의 key/value는 cache에서 읽는다.</figcaption>
 </figure>
 
@@ -1496,7 +1496,7 @@ T_\text{active}
 </tbody>
 </table>
 <figure class="book-figure book-figure-wide">
-  <img src="../assets/diagrams/kv-cache-memory-formula.svg" alt="KV cache memory grows with active tokens, layers, KV heads, head dimension, and bytes per element">
+  <img src="../../assets/diagrams/kv-cache-memory-formula.svg" alt="KV cache memory grows with active tokens, layers, KV heads, head dimension, and bytes per element">
   <figcaption><strong>KV cache 크기 공식.</strong> 모델 weight는 고정 비용에 가깝지만, KV cache는 동시에 살아 있는 token 총량에 비례해 움직인다.</figcaption>
 </figure>
 
@@ -1588,7 +1588,7 @@ T_\text{active}
 </table>
 <p>같은 GPU에서 32개의 짧은 chat은 버틸 수 있어도, 16개의 긴 RAG 요청이 들어오면 갑자기 cache가 같은 수준으로 커진다. 8개의 긴 context 분석과 64개의 agent fan-out이 같은 active token 총량을 만들 수도 있다. 그래서 "동시 request 64개를 버틴다"는 말은 workload shape 없이 의미가 없다.</p>
 <figure class="book-figure book-figure-wide">
-  <img src="../assets/diagrams/kv-cache-active-token-growth.svg" alt="Different workload shapes create different KV cache memory pressure as concurrency rises">
+  <img src="../../assets/diagrams/kv-cache-active-token-growth.svg" alt="Different workload shapes create different KV cache memory pressure as concurrency rises">
   <figcaption><strong>Active token 총량과 KV cache pressure.</strong> 같은 동시성이라도 context length와 출력 길이가 다르면 memory pressure가 완전히 달라진다.</figcaption>
 </figure>
 
@@ -1755,7 +1755,7 @@ T_\text{active}
 <p>KV cache는 요청마다 길이가 다르고, 생성 중에도 계속 늘어난다. 기존 방식처럼 요청마다 큰 연속 메모리 영역을 미리 잡으면 낭비가 생긴다. 어떤 요청은 짧게 끝나고, 어떤 요청은 길게 이어지고, 어떤 요청은 취소된다. GPU memory 안에 빈 조각이 늘어나면 실제로는 여유가 있어도 새 요청을 넣기 어려워진다.</p>
 <p>PagedAttention은 이 문제를 운영체제의 paging과 비슷한 방식으로 푼다. 요청의 KV cache를 고정 크기 block으로 나누고, logical block이 GPU memory의 physical block을 가리키도록 관리한다. 논문은 KV cache가 request마다 크고 동적으로 늘고 줄며, 비효율적으로 관리되면 fragmentation과 중복 때문에 batch size가 제한된다는 문제의식에서 출발한다. vLLM은 이 아이디어를 기반으로 KV cache memory waste를 줄이고 cache sharing을 가능하게 하는 serving system으로 제안되었다.</p>
 <figure class="book-figure book-figure-wide">
-  <img src="../assets/diagrams/paged-kv-blocks.svg" alt="Logical request KV blocks point to physical GPU KV cache blocks">
+  <img src="../../assets/diagrams/paged-kv-blocks.svg" alt="Logical request KV blocks point to physical GPU KV cache blocks">
   <figcaption><strong>Paged KV blocks.</strong> 요청은 logical block 순서를 유지하지만, GPU의 physical block은 연속일 필요가 없다.</figcaption>
 </figure>
 
@@ -1784,7 +1784,7 @@ T_\text{active}
 <h2 id="prefix-caching-cache-compression">Prefix caching은 cache compression이 아니다<a class="headerlink" href="#prefix-caching-cache-compression" title="Permanent link">&para;</a></h2>
 <p>Agent나 RAG workload에서는 같은 prefix가 반복된다. system prompt, tool schema, 긴 문서, 대화 history의 앞부분이 여러 요청에서 공유될 수 있다. Automatic Prefix Caching은 이런 공통 prefix의 KV cache를 재사용해 prefill 계산을 줄이는 전략이다.</p>
 <figure class="book-figure book-figure-wide">
-  <img src="../assets/diagrams/prefix-cache-reuse.svg" alt="Repeated system prompt, tool schema, and shared document reuse prefix cache">
+  <img src="../../assets/diagrams/prefix-cache-reuse.svg" alt="Repeated system prompt, tool schema, and shared document reuse prefix cache">
   <figcaption><strong>Prefix cache reuse.</strong> 반복되는 system prompt, tool schema, 공유 문서의 K/V를 재사용하면 바뀌는 suffix만 새로 prefill하면 된다.</figcaption>
 </figure>
 
