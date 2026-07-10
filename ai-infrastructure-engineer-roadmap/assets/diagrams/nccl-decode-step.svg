@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 420" role="img" aria-labelledby="title desc">
+  <title id="title">NCCL communication in one decode step</title>
+  <desc id="desc">A decode step timeline showing compute, collective communication, and sampling.</desc>
+  <style>
+    .bg { fill: #f8fafc; }
+    .lane { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 10; }
+    .compute { fill: #dbeafe; stroke: #2563eb; stroke-width: 2; rx: 8; }
+    .kv { fill: #ede9fe; stroke: #7c3aed; stroke-width: 2; rx: 8; }
+    .comm { fill: #fee2e2; stroke: #dc2626; stroke-width: 2; rx: 8; }
+    .sample { fill: #dcfce7; stroke: #16a34a; stroke-width: 2; rx: 8; }
+    .text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; font-size: 17px; }
+    .small { font-size: 14px; fill: #334155; }
+    .title { font-size: 22px; font-weight: 700; }
+    .axis { stroke: #64748b; stroke-width: 2; marker-end: url(#arrow); }
+    .sync { stroke: #dc2626; stroke-width: 2.4; stroke-dasharray: 7 5; fill: none; marker-end: url(#arrow-red); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="980" height="420"/>
+  <text class="text title" x="55" y="52">One decode token on tensor-parallel GPUs</text>
+  <line class="axis" x1="120" y1="86" x2="900" y2="86"/>
+  <text class="small" x="905" y="91">time</text>
+
+  <rect class="lane" x="55" y="115" width="870" height="95"/>
+  <text class="text" x="78" y="151">GPU rank 0</text>
+  <rect class="compute" x="185" y="132" width="170" height="42"/>
+  <text class="small" x="229" y="159">matmul shard</text>
+  <rect class="comm" x="380" y="132" width="145" height="42"/>
+  <text class="small" x="418" y="159">all-reduce</text>
+  <rect class="kv" x="550" y="132" width="140" height="42"/>
+  <text class="small" x="579" y="159">KV update</text>
+  <rect class="sample" x="715" y="132" width="145" height="42"/>
+  <text class="small" x="754" y="159">logits/token</text>
+
+  <rect class="lane" x="55" y="235" width="870" height="95"/>
+  <text class="text" x="78" y="271">GPU rank 1</text>
+  <rect class="compute" x="185" y="252" width="170" height="42"/>
+  <text class="small" x="229" y="279">matmul shard</text>
+  <rect class="comm" x="380" y="252" width="145" height="42"/>
+  <text class="small" x="418" y="279">all-reduce</text>
+  <rect class="kv" x="550" y="252" width="140" height="42"/>
+  <text class="small" x="579" y="279">KV update</text>
+  <rect class="sample" x="715" y="252" width="145" height="42"/>
+  <text class="small" x="754" y="279">logits/token</text>
+
+  <path class="sync" d="M455 130 C455 185, 455 198, 455 250"/>
+  <text class="small" x="535" y="214">collective latency repeats for every generated token</text>
+  <text class="small" x="70" y="370">Decode TPOT includes GPU compute, KV cache access, synchronization, and sampling. More GPUs reduce memory pressure but can add communication.</text>
+</svg>

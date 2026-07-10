@@ -1,0 +1,1819 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/12-parallelism-nccl-multi-gpu/">
+
+
+        <link rel="prev" href="../11-platform-layer-triton-kserve-rayserve/">
+
+
+        <link rel="next" href="../../source-policy/">
+
+
+
+
+
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>12장. Parallelism과 NCCL - AI 인프라 엔지니어 로드맵</title>
+
+
+
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+      <link rel="stylesheet" href="../../stylesheets/site-navigation-v2.css">
+
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#12-parallelism-nccl-gpu" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              12장. Parallelism과 NCCL
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    시작하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    책 구조
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    책 구조
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../outline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    전체 목차
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../sample-chapter-plan/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 챕터 계획
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 원고
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    샘플 원고
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-kv-cache-serving-bottleneck/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. KV cache 병목
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-first-llm-server-openai-endpoint/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. 첫 LLM server
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07-serving-metrics-ttft-tpot-throughput/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Serving metrics
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08-quantization-optimization-risk/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Quantization
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../09-vllm-serving-baseline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. vLLM baseline
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../10-runtime-selection-tensorrt-sglang-llamacpp/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. Runtime 선택
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../11-platform-layer-triton-kserve-rayserve/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. Platform 계층
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    12장. Parallelism과 NCCL
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    12장. Parallelism과 NCCL
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        먼저 왜 한 GPU를 넘는지 구분한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#parallelism" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        세 가지 parallelism을 같은 말로 부르지 않는다
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="세 가지 parallelism을 같은 말로 부르지 않는다">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#data-parallelism-replica" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Data parallelism은 replica를 늘린다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#tensor-parallelism-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Tensor parallelism은 layer 내부 계산을 나눈다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#pipeline-parallelism-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Pipeline parallelism은 layer 구간을 나눈다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#nccl-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        NCCL은 GPU들이 함께 움직이게 하는 통신 계층이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#decode" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Decode에서 통신 비용은 왜 더 아프게 느껴지는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#kv-cache-rank" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        KV cache는 rank마다 어떻게 보아야 하는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#topology" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Topology는 성능 특성이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#single-node-multi-node" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Single-node와 multi-node는 다른 문제다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#parallelism-workload-shape" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Parallelism 선택은 workload shape에서 시작한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#nvidia-smi-topo-m-tp-group" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: nvidia-smi topo -m으로 TP group 후보 고르기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#gpu_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU 수만 보고 성능을 예상한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#data-parallelism-tensor-parallelism" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Data parallelism과 tensor parallelism을 섞어 말한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#vram-long-context-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        총 VRAM만 보고 long context capacity를 판단한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#nccl-error-application-error" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        NCCL error를 application error처럼 처리한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#multi-node-single-node" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Multi-node를 single-node의 연장으로 본다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    제작 노트
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    제작 노트
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../source-policy/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    소스 정책
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    다음 작업
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        먼저 왜 한 GPU를 넘는지 구분한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#parallelism" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        세 가지 parallelism을 같은 말로 부르지 않는다
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="세 가지 parallelism을 같은 말로 부르지 않는다">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#data-parallelism-replica" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Data parallelism은 replica를 늘린다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#tensor-parallelism-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Tensor parallelism은 layer 내부 계산을 나눈다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#pipeline-parallelism-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Pipeline parallelism은 layer 구간을 나눈다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#nccl-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        NCCL은 GPU들이 함께 움직이게 하는 통신 계층이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#decode" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Decode에서 통신 비용은 왜 더 아프게 느껴지는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#kv-cache-rank" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        KV cache는 rank마다 어떻게 보아야 하는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#topology" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Topology는 성능 특성이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#single-node-multi-node" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Single-node와 multi-node는 다른 문제다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#parallelism-workload-shape" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Parallelism 선택은 workload shape에서 시작한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#nvidia-smi-topo-m-tp-group" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: nvidia-smi topo -m으로 TP group 후보 고르기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#gpu_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU 수만 보고 성능을 예상한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#data-parallelism-tensor-parallelism" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Data parallelism과 tensor parallelism을 섞어 말한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#vram-long-context-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        총 VRAM만 보고 long context capacity를 판단한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#nccl-error-application-error" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        NCCL error를 application error처럼 처리한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#multi-node-single-node" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Multi-node를 single-node의 연장으로 본다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="12-parallelism-nccl-gpu">12장. Parallelism과 NCCL: 한 GPU를 넘을 때 생기는 문제<a class="headerlink" href="#12-parallelism-nccl-gpu" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>Draft v0.1</span>
+  <span>Updated: 2026-07-10</span>
+  <span>Part 5 - Multi-GPU와 cluster inference</span>
+</div>
+
+<p>11장까지는 runtime과 platform을 고르는 문제를 다뤘다. 이제 더 근본적인 제약이 나온다.</p>
+<blockquote>
+<p>모델이 한 GPU에 들어가지 않거나, 한 GPU로는 필요한 throughput을 만들 수 없으면 무엇이 바뀌는가?</p>
+</blockquote>
+<p>GPU를 여러 개 붙이면 capacity가 자동으로 늘어날 것처럼 보인다. 실제로는 model weight, KV cache, activation, scheduler, network topology, collective communication이 모두 같은 요청의 latency 안으로 들어온다. 단일 GPU에서는 "GPU가 빠른가"를 주로 물었다면, multi-GPU에서는 "GPU들이 서로 얼마나 자주, 얼마나 멀리, 얼마나 큰 데이터를 주고받는가"를 물어야 한다.</p>
+<p>이 장의 독자 질문은 다음과 같다.</p>
+<blockquote>
+<p>Tensor parallelism, pipeline parallelism, data parallelism은 각각 어떤 문제를 풀고, NCCL 통신은 decode latency에 어디서 들어오는가?</p>
+</blockquote>
+<p>핵심은 하나다. Multi-GPU serving은 GPU 수를 늘리는 작업이 아니라, memory pressure와 communication cost를 교환하는 작업이다.</p>
+<h2 id="gpu">먼저 왜 한 GPU를 넘는지 구분한다<a class="headerlink" href="#gpu" title="Permanent link">&para;</a></h2>
+<p>Multi-GPU가 필요한 이유는 크게 세 가지다.</p>
+<table>
+<thead>
+<tr>
+<th>이유</th>
+<th>증상</th>
+<th>먼저 의심할 제약</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>모델이 크다</td>
+<td>weight가 한 GPU VRAM에 들어가지 않는다</td>
+<td>model weight memory</td>
+</tr>
+<tr>
+<td>context가 길다</td>
+<td>모델은 올라가지만 동시 요청을 못 받는다</td>
+<td>KV cache memory</td>
+</tr>
+<tr>
+<td>traffic이 많다</td>
+<td>latency SLO를 유지하면서 QPS를 못 받는다</td>
+<td>replica 수, scheduler, routing</td>
+</tr>
+</tbody>
+</table>
+<p>이 세 이유를 섞으면 설계가 흔들린다. 예를 들어 weight가 한 GPU에 들어가지 않는 문제는 tensor parallelism이나 pipeline parallelism으로 풀어야 한다. 반면 모델은 한 GPU에 들어가는데 traffic이 많은 문제는 data parallel replica를 늘리는 쪽이 더 단순할 수 있다. Context가 긴 문제는 GPU를 늘려도 KV cache 배치 방식, max model length, batch token limit을 같이 보지 않으면 해결되지 않는다.</p>
+<p>따라서 multi-GPU 설계의 첫 문장은 다음처럼 써야 한다.</p>
+<blockquote>
+<p>우리는 weight 때문에 GPU를 나누는가, KV cache 때문에 capacity를 늘리는가, 아니면 traffic 때문에 replica를 늘리는가?</p>
+</blockquote>
+<h2 id="parallelism">세 가지 parallelism을 같은 말로 부르지 않는다<a class="headerlink" href="#parallelism" title="Permanent link">&para;</a></h2>
+<p>LLM serving에서 자주 만나는 parallelism은 data parallelism, tensor parallelism, pipeline parallelism이다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/parallelism-serving-shapes.svg" alt="Data parallel, tensor parallel, and pipeline parallel serving layouts">
+  <figcaption><strong>Serving parallelism shapes.</strong> Data parallelism은 replica를 늘리고, tensor parallelism은 layer 내부 계산을 나누며, pipeline parallelism은 layer 구간을 stage로 나눈다.</figcaption>
+</figure>
+
+<h3 id="data-parallelism-replica">Data parallelism은 replica를 늘린다<a class="headerlink" href="#data-parallelism-replica" title="Permanent link">&para;</a></h3>
+<p>Data parallel serving은 같은 모델 replica를 여러 개 띄우고 request router가 요청을 나누는 방식이다. 각 replica는 전체 model weight와 자기 replica의 KV cache를 가진다.</p>
+<p>장점은 단순하다. Replica 간에 매 token마다 동기화할 필요가 없다. 한 replica가 느리거나 죽어도 routing과 retry로 격리하기 쉽다. 단일 GPU에서 모델이 잘 올라가고 traffic만 문제라면 가장 먼저 생각할 수 있는 방식이다.</p>
+<p>하지만 data parallelism은 model memory 문제를 풀지 못한다. 70B 모델이 한 GPU에 안 들어간다면 replica를 늘릴 수 없다. 또 long context 요청이 특정 replica에 몰리면 그 replica의 KV cache만 압박을 받는다. Router가 token shape을 모르고 단순 round-robin만 하면 GPU 사용률은 높아 보이는데 p95 latency가 무너질 수 있다.</p>
+<h3 id="tensor-parallelism-layer">Tensor parallelism은 layer 내부 계산을 나눈다<a class="headerlink" href="#tensor-parallelism-layer" title="Permanent link">&para;</a></h3>
+<p>Tensor parallelism은 하나의 layer 안에서 큰 matrix multiplication을 여러 GPU rank로 나눈다. 각 GPU는 weight shard를 들고 자기 shard의 계산을 수행한다. 그 다음 partial result를 합치기 위해 collective communication이 필요하다.</p>
+<p>이 방식은 model weight가 한 GPU에 들어가지 않을 때 강력하다. 4 GPU tensor parallel group을 쓰면 각 GPU가 전체 weight의 일부만 들 수 있다. 또한 attention head나 MLP projection처럼 큰 tensor 연산을 병렬화할 수 있다.</p>
+<p>대가도 분명하다. 매 layer 또는 여러 layer 지점에서 rank 간 동기화가 필요하다. Prefill처럼 큰 matrix 연산이 많은 구간에서는 계산 병렬화 이득이 클 수 있지만, decode처럼 token 하나씩 반복되는 구간에서는 작은 collective latency가 TPOT에 계속 누적된다.</p>
+<h3 id="pipeline-parallelism-layer">Pipeline parallelism은 layer 구간을 나눈다<a class="headerlink" href="#pipeline-parallelism-layer" title="Permanent link">&para;</a></h3>
+<p>Pipeline parallelism은 layer 0-11은 GPU 0, layer 12-23은 GPU 1처럼 model depth를 stage로 나눈다. 각 request의 activation은 stage를 따라 이동한다.</p>
+<p>이 방식은 GPU 사이 통신 빈도를 줄일 수 있다. Tensor parallelism처럼 layer 내부마다 자주 합치는 대신, stage 경계에서 activation을 넘긴다. vLLM 문서는 모델이 한 node에 들어가지만 GPU 수가 모델 크기를 고르게 나누지 못하거나 NVLink가 없는 GPU 환경에서는 pipeline parallelism이 더 나을 수 있다고 설명한다.</p>
+<p>하지만 pipeline에는 bubble이 있다. Stage가 모두 항상 바쁘려면 충분한 microbatch 또는 request concurrency가 필요하다. Decode serving에서는 token 단위 반복과 scheduler 정책 때문에 pipeline 효율이 기대보다 낮아질 수 있다.</p>
+<h2 id="nccl-gpu">NCCL은 GPU들이 함께 움직이게 하는 통신 계층이다<a class="headerlink" href="#nccl-gpu" title="Permanent link">&para;</a></h2>
+<p>NCCL은 NVIDIA GPU 사이의 collective communication과 point-to-point communication을 제공하는 library다. AI 인프라 엔지니어가 자주 만나는 collective는 다음과 같다.</p>
+<table>
+<thead>
+<tr>
+<th>Collective</th>
+<th>직관</th>
+<th>Serving에서 보이는 위치</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>all-reduce</td>
+<td>각 rank의 partial result를 합쳐 모두에게 돌려준다</td>
+<td>tensor parallel layer output 합치기</td>
+</tr>
+<tr>
+<td>all-gather</td>
+<td>rank별 shard를 모아 모두가 전체를 보게 한다</td>
+<td>sharded tensor 재구성</td>
+</tr>
+<tr>
+<td>reduce-scatter</td>
+<td>합친 결과를 다시 rank별 shard로 나눈다</td>
+<td>distributed tensor 연산 최적화</td>
+</tr>
+<tr>
+<td>broadcast</td>
+<td>한 rank의 값을 다른 rank로 보낸다</td>
+<td>parameter, metadata, sampling result 공유</td>
+</tr>
+<tr>
+<td>all-to-all</td>
+<td>rank마다 서로 다른 데이터를 교환한다</td>
+<td>expert parallel, MoE routing</td>
+</tr>
+</tbody>
+</table>
+<p>중요한 점은 NCCL이 "느린 것"이 아니라는 사실이다. NCCL은 GPU 통신을 빠르게 하기 위한 계층이다. 문제는 serving workload가 통신을 반복적으로 요구한다는 데 있다. Decode는 한 token을 만들 때마다 비슷한 경로를 다시 돈다. 따라서 collective 하나가 조금만 느려도 전체 TPOT에 반복해서 들어간다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/nccl-decode-step.svg" alt="Decode step timeline showing compute, NCCL all-reduce, KV update, and token sampling">
+  <figcaption><strong>NCCL in decode path.</strong> Tensor parallel decode에서는 shard별 계산 뒤 collective communication이 반복된다. 이 시간이 TPOT에 직접 들어간다.</figcaption>
+</figure>
+
+<h2 id="decode">Decode에서 통신 비용은 왜 더 아프게 느껴지는가<a class="headerlink" href="#decode" title="Permanent link">&para;</a></h2>
+<p>Prefill과 decode는 multi-GPU에서 다르게 보인다.</p>
+<p>Prefill은 입력 prompt 전체를 처리한다. Token 수가 많고 matrix 연산이 크기 때문에 GPU compute가 상대적으로 두껍다. Tensor parallelism으로 큰 연산을 나누면 communication이 있어도 계산 이득이 커질 수 있다.</p>
+<p>Decode는 output token을 하나씩 만든다. 각 step은 작고 반복적이다. Compute가 짧아질수록 collective latency, kernel launch overhead, scheduler overhead가 더 잘 보인다. 즉 GPU를 늘렸는데 TPOT이 예상만큼 줄지 않거나 오히려 늘 수 있다.</p>
+<p>간단히 쓰면 다음과 같다.</p>
+<div class="arithmatex">\[
+TPOT \approx compute_{decode} + kv\_access + comm_{collective} + scheduler\_overhead
+\]</div>
+<p>이 식은 정확한 성능 모델이 아니라 사고 도구다. 단일 GPU에서는 <code>comm_collective</code>가 거의 보이지 않는다. Tensor parallel group을 만들면 이 항이 생긴다. GPU 수를 늘릴 때마다 memory pressure는 줄어들 수 있지만 communication path가 길어질 수 있다.</p>
+<h2 id="kv-cache-rank">KV cache는 rank마다 어떻게 보아야 하는가<a class="headerlink" href="#kv-cache-rank" title="Permanent link">&para;</a></h2>
+<p>KV cache는 multi-GPU에서 더 조심해야 한다. 5장에서 본 것처럼 KV cache는 layer, token, KV head, head dimension, dtype에 비례한다. Tensor parallelism이나 attention head sharding을 쓰면 각 rank가 전체 KV cache의 일부를 갖는 구조가 될 수 있다. 하지만 "GPU가 4개니까 KV cache capacity가 정확히 4배"라고 말하면 안 된다.</p>
+<p>실제 capacity는 다음에 영향을 받는다.</p>
+<ul>
+<li>model weight shard가 각 GPU에서 얼마나 VRAM을 차지하는가</li>
+<li>runtime이 KV cache block을 어떤 단위로 예약하고 회수하는가</li>
+<li><code>max_model_len</code>, batch token limit, active sequence 수가 어떻게 설정되어 있는가</li>
+<li>tensor parallel group과 data parallel replica가 어떤 조합인지</li>
+<li>prefix cache, speculative decoding, LoRA, guided decoding 같은 기능이 추가 memory를 요구하는가</li>
+</ul>
+<p>vLLM은 실행 로그에서 GPU KV cache size와 최대 동시성 추정치를 보여 준다. 이 값은 "이 parallelism 설정에서 실제로 몇 token을 담을 수 있는가"를 읽는 첫 단서다. Multi-GPU에서는 총 VRAM만 보지 말고 rank별 free memory와 runtime이 보고하는 KV cache capacity를 함께 봐야 한다.</p>
+<h2 id="topology">Topology는 성능 특성이다<a class="headerlink" href="#topology" title="Permanent link">&para;</a></h2>
+<p>같은 4 GPU라도 topology가 다르면 tensor parallelism의 성능이 달라진다. GPU들이 NVLink로 직접 연결된 node와 PCIe switch를 거치는 node는 collective latency와 bandwidth가 다르다. Multi-node로 넘어가면 GPU 간 통신은 NIC, InfiniBand 또는 RoCE, GPUDirect RDMA 설정까지 영향을 받는다.</p>
+<p>실무에서 가장 먼저 볼 수 있는 명령은 다음이다.</p>
+<div class="highlight"><pre><span></span><code>nvidia-smi<span class="w"> </span>topo<span class="w"> </span>-m
+</code></pre></div>
+<p>출력에는 GPU 사이 연결 관계가 matrix로 나온다. NVIDIA 문서의 legend에 따르면 <code>NV#</code>는 여러 NVLink로 묶인 연결을, <code>PIX</code>는 하나의 PCIe bridge를, <code>PXB</code>는 여러 PCIe bridge를, <code>PHB</code>는 PCIe host bridge를, <code>NODE</code>와 <code>SYS</code>는 NUMA 또는 CPU interconnect를 지나는 더 먼 경로를 뜻한다.</p>
+<p>읽는 기준은 단순하다.</p>
+<table>
+<thead>
+<tr>
+<th>표시</th>
+<th>대략적 의미</th>
+<th>Serving 해석</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NV#</code></td>
+<td>NVLink 연결</td>
+<td>tensor parallel group 후보</td>
+</tr>
+<tr>
+<td><code>PIX</code> / <code>PXB</code></td>
+<td>PCIe switch 경유</td>
+<td>가능하지만 communication cost 주의</td>
+</tr>
+<tr>
+<td><code>PHB</code></td>
+<td>CPU host bridge 경유</td>
+<td>latency-sensitive TP에는 불리할 수 있음</td>
+</tr>
+<tr>
+<td><code>NODE</code> / <code>SYS</code></td>
+<td>NUMA 또는 CPU interconnect 경유</td>
+<td>같은 TP group으로 묶기 전에 재검토</td>
+</tr>
+</tbody>
+</table>
+<p>Topology는 "하드웨어 정보"가 아니라 runtime 선택 기준이다. Tensor parallelism은 rank 간 자주 동기화하므로 가까운 GPU를 선호한다. Pipeline parallelism은 stage 경계 통신이 상대적으로 드물 수 있으므로 NVLink가 약한 환경에서 더 나은 선택지가 될 수 있다. Data parallelism은 replica 간 token-level 동기화가 적어 topology에 덜 민감하지만, router와 model loading, KV cache locality가 중요해진다.</p>
+<h2 id="single-node-multi-node">Single-node와 multi-node는 다른 문제다<a class="headerlink" href="#single-node-multi-node" title="Permanent link">&para;</a></h2>
+<p>Single-node multi-GPU에서는 주로 GPU-GPU path를 본다. NVLink, PCIe switch, NUMA affinity가 핵심이다. Multi-node로 넘어가면 NIC와 network fabric이 serving path에 들어온다.</p>
+<p>Multi-node serving에서 확인해야 할 질문은 다음과 같다.</p>
+<ul>
+<li>모든 node의 driver, CUDA, NCCL, runtime version이 맞는가?</li>
+<li>Container image와 model path가 모든 node에서 동일한가?</li>
+<li>NCCL이 올바른 network interface를 선택하는가?</li>
+<li>GPU Direct RDMA가 필요한 workload인가, 그리고 실제로 켜져 있는가?</li>
+<li>Ray나 MPI 같은 distributed executor가 장애, restart, placement를 어떻게 처리하는가?</li>
+<li>Control traffic과 data traffic이 같은 network를 공유하는가?</li>
+</ul>
+<p>vLLM의 multi-node 문서는 동일한 실행 환경과 container image 사용을 강조하고, Ray cluster 위에서 multi-node deployment를 구성하는 흐름을 제시한다. 여기서 중요한 것은 Ray 자체보다 "distributed serving은 runtime 실행 환경을 모든 node에서 재현해야 한다"는 점이다.</p>
+<h2 id="parallelism-workload-shape">Parallelism 선택은 workload shape에서 시작한다<a class="headerlink" href="#parallelism-workload-shape" title="Permanent link">&para;</a></h2>
+<p>다음 표는 첫 선택을 돕기 위한 rough guide다.</p>
+<table>
+<thead>
+<tr>
+<th>상황</th>
+<th>우선 고려</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>모델이 한 GPU에 잘 들어가고 QPS만 부족하다</td>
+<td>data parallel replica</td>
+<td>단순하고 token-level sync가 적다</td>
+</tr>
+<tr>
+<td>모델 weight가 한 GPU에 안 들어간다</td>
+<td>tensor parallelism</td>
+<td>layer 내부 weight shard로 memory 문제를 푼다</td>
+</tr>
+<tr>
+<td>GPU 사이 NVLink가 약하거나 uneven split이 필요하다</td>
+<td>pipeline parallelism</td>
+<td>layer 단위 분할로 통신 패턴을 바꾼다</td>
+</tr>
+<tr>
+<td>모델이 한 node에도 안 들어간다</td>
+<td>tensor + pipeline parallelism</td>
+<td>node 내부 TP, node 간 PP 조합을 검토한다</td>
+</tr>
+<tr>
+<td>MoE 모델이다</td>
+<td>expert parallelism 포함 검토</td>
+<td>expert routing과 all-to-all 비용이 중요하다</td>
+</tr>
+<tr>
+<td>long context 요청이 많다</td>
+<td>KV cache capacity 중심 검토</td>
+<td>weight보다 active token memory가 먼저 터질 수 있다</td>
+</tr>
+</tbody>
+</table>
+<p>이 표는 정답표가 아니다. 실제 결정은 benchmark로 닫아야 한다. 동일 모델, 동일 input/output token shape, 동일 concurrency에서 single GPU, DP, TP, PP 조합을 비교해야 한다.</p>
+<h2 id="nvidia-smi-topo-m-tp-group">실습: <code>nvidia-smi topo -m</code>으로 TP group 후보 고르기<a class="headerlink" href="#nvidia-smi-topo-m-tp-group" title="Permanent link">&para;</a></h2>
+<p>실습 목표는 특정 runtime을 tuning하기 전에 하드웨어 제약을 읽는 것이다.</p>
+<ol>
+<li>GPU topology를 확인한다.</li>
+</ol>
+<div class="highlight"><pre><span></span><code>nvidia-smi<span class="w"> </span>topo<span class="w"> </span>-m
+</code></pre></div>
+<ol>
+<li>
+<p>GPU 사이 matrix에서 <code>NV#</code>, <code>PIX</code>, <code>PXB</code>, <code>PHB</code>, <code>NODE</code>, <code>SYS</code>를 표시한다.</p>
+</li>
+<li>
+<p>Tensor parallel group 후보를 세운다.</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>후보 group</th>
+<th>연결 상태</th>
+<th>판단</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPU 0,1</td>
+<td><code>NV#</code></td>
+<td>우선 후보</td>
+</tr>
+<tr>
+<td>GPU 0,2</td>
+<td><code>PIX</code></td>
+<td>benchmark 필요</td>
+</tr>
+<tr>
+<td>GPU 0,3</td>
+<td><code>PHB</code></td>
+<td>latency-sensitive TP에서는 피하고 싶음</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>같은 모델을 단일 GPU와 TP=2 또는 TP=4로 띄워 다음을 비교한다.</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>측정 항목</th>
+<th>단일 GPU</th>
+<th>TP=2</th>
+<th>TP=4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>model load 성공 여부</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>GPU KV cache size</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>TTFT</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>TPOT</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>throughput tokens/sec</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>p95 latency</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>GPU memory headroom</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>NCCL warning/error</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li>결론을 한 문장으로 쓴다.</li>
+</ol>
+<blockquote>
+<p>이 node에서는 TP=4가 model load에는 필요하지만, decode TPOT은 TP=2보다 나쁘다. 이유는 GPU 2-3 경로가 PCIe/PHB를 지나고 collective latency가 늘기 때문이다.</p>
+</blockquote>
+<p>이런 문장이 나와야 multi-GPU 실험이 지식으로 남는다.</p>
+<h2 id="_1">실패 패턴<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h3 id="gpu_1">GPU 수만 보고 성능을 예상한다<a class="headerlink" href="#gpu_1" title="Permanent link">&para;</a></h3>
+<p>4 GPU가 1 GPU보다 항상 4배 빠르지 않다. Model memory는 나뉘지만 collective communication이 생긴다. Decode workload에서는 이 비용이 반복된다.</p>
+<h3 id="data-parallelism-tensor-parallelism">Data parallelism과 tensor parallelism을 섞어 말한다<a class="headerlink" href="#data-parallelism-tensor-parallelism" title="Permanent link">&para;</a></h3>
+<p>DP는 replica를 늘리는 것이고 TP는 하나의 replica 내부를 나누는 것이다. DP=4와 TP=4는 완전히 다른 memory, routing, failure domain을 만든다.</p>
+<h3 id="vram-long-context-capacity">총 VRAM만 보고 long context capacity를 판단한다<a class="headerlink" href="#vram-long-context-capacity" title="Permanent link">&para;</a></h3>
+<p>KV cache capacity는 runtime block manager, rank별 memory, max sequence length, active token 수에 의해 결정된다. 총 VRAM이 충분해도 특정 rank에서 OOM이 날 수 있다.</p>
+<h3 id="nccl-error-application-error">NCCL error를 application error처럼 처리한다<a class="headerlink" href="#nccl-error-application-error" title="Permanent link">&para;</a></h3>
+<p>NCCL hang, timeout, interface mismatch, topology detection 문제는 application retry만으로 해결되지 않는다. Driver, fabric, container, environment variable, process placement를 같이 봐야 한다.</p>
+<h3 id="multi-node-single-node">Multi-node를 single-node의 연장으로 본다<a class="headerlink" href="#multi-node-single-node" title="Permanent link">&para;</a></h3>
+<p>Multi-node는 network interface, RDMA, security, clock, image consistency, placement, failure handling이 들어온다. 같은 <code>--tensor-parallel-size</code>라도 운영 복잡도는 다르다.</p>
+<h2 id="_2">정리<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Multi-GPU serving은 memory pressure와 communication cost의 trade-off다.</li>
+<li>Data parallelism은 full model replica를 늘려 traffic을 나누지만 model memory 문제를 풀지 못한다.</li>
+<li>Tensor parallelism은 layer 내부 계산과 weight를 나누지만 collective communication이 TPOT에 반복해서 들어간다.</li>
+<li>Pipeline parallelism은 layer 구간을 stage로 나누며, topology가 약하거나 uneven split이 있을 때 선택지가 될 수 있다.</li>
+<li>NCCL은 all-reduce, all-gather, reduce-scatter, broadcast, all-to-all 같은 GPU collective communication을 제공한다.</li>
+<li><code>nvidia-smi topo -m</code>은 tensor parallel group 후보와 communication risk를 읽는 첫 도구다.</li>
+<li>Multi-node로 넘어가면 GPU topology뿐 아니라 NIC, RDMA, 동일한 runtime/container 환경, distributed executor까지 함께 검증해야 한다.</li>
+</ul>
+<h2 id="source-anchors">Source anchors<a class="headerlink" href="#source-anchors" title="Permanent link">&para;</a></h2>
+<ul>
+<li>NVIDIA NCCL overview: <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/overview.html">https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/overview.html</a></li>
+<li>NVIDIA NCCL collective operations: <a href="https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html">https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/usage/collectives.html</a></li>
+<li>NVIDIA System Management Interface documentation: <a href="https://docs.nvidia.com/deploy/nvidia-smi/index.html">https://docs.nvidia.com/deploy/nvidia-smi/index.html</a></li>
+<li>vLLM Parallelism and Scaling: <a href="https://docs.vllm.ai/en/stable/serving/parallelism_scaling/">https://docs.vllm.ai/en/stable/serving/parallelism_scaling/</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../11-platform-layer-triton-kserve-rayserve/" class="md-footer__link md-footer__link--prev" aria-label="이전: 11장. Platform 계층">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                11장. Platform 계층
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../../source-policy/" class="md-footer__link md-footer__link--next" aria-label="다음: 소스 정책">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                소스 정책
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+        <script src="../../javascripts/header-home-link.js"></script>
+
+
+  </body>
+</html>

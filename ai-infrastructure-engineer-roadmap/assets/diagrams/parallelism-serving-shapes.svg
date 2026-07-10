@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 430" role="img" aria-labelledby="title desc">
+  <title id="title">LLM serving parallelism shapes</title>
+  <desc id="desc">Comparison of data parallel, tensor parallel, and pipeline parallel serving shapes.</desc>
+  <style>
+    .bg { fill: #f8fafc; }
+    .panel { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 10; }
+    .gpu { fill: #e0f2fe; stroke: #0284c7; stroke-width: 2; rx: 8; }
+    .gpu2 { fill: #ecfdf5; stroke: #059669; stroke-width: 2; rx: 8; }
+    .gpu3 { fill: #fff7ed; stroke: #ea580c; stroke-width: 2; rx: 8; }
+    .router { fill: #f1f5f9; stroke: #64748b; stroke-width: 2; rx: 8; }
+    .text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; font-size: 18px; }
+    .small { font-size: 14px; fill: #334155; }
+    .label { font-size: 15px; fill: #475569; font-weight: 600; }
+    .title { font-size: 21px; font-weight: 700; }
+    .arrow { stroke: #475569; stroke-width: 2.4; fill: none; marker-end: url(#arrow); }
+    .sync { stroke: #dc2626; stroke-width: 2.4; stroke-dasharray: 7 5; fill: none; marker-end: url(#arrow-red); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#475569"/>
+    </marker>
+    <marker id="arrow-red" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#dc2626"/>
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="980" height="430"/>
+
+  <rect class="panel" x="30" y="40" width="285" height="330"/>
+  <text class="text title" x="55" y="78">Data parallel</text>
+  <rect class="router" x="75" y="110" width="190" height="48"/>
+  <text class="text small" x="118" y="141">request router</text>
+  <path class="arrow" d="M120 170 C95 195, 85 215, 85 242"/>
+  <path class="arrow" d="M170 172 L170 238"/>
+  <path class="arrow" d="M220 170 C245 195, 255 215, 255 242"/>
+  <rect class="gpu" x="52" y="245" width="70" height="60"/>
+  <rect class="gpu" x="135" y="245" width="70" height="60"/>
+  <rect class="gpu" x="218" y="245" width="70" height="60"/>
+  <text class="text small" x="68" y="281">full</text>
+  <text class="text small" x="151" y="281">full</text>
+  <text class="text small" x="234" y="281">full</text>
+  <text class="text small" x="55" y="337">Each replica holds the full model.</text>
+
+  <rect class="panel" x="350" y="40" width="285" height="330"/>
+  <text class="text title" x="375" y="78">Tensor parallel</text>
+  <rect class="router" x="395" y="110" width="190" height="48"/>
+  <text class="text small" x="434" y="141">one replica group</text>
+  <path class="arrow" d="M490 170 L490 222"/>
+  <rect class="gpu2" x="380" y="225" width="68" height="60"/>
+  <rect class="gpu2" x="456" y="225" width="68" height="60"/>
+  <rect class="gpu2" x="532" y="225" width="68" height="60"/>
+  <text class="text small" x="393" y="261">shard</text>
+  <text class="text small" x="469" y="261">shard</text>
+  <text class="text small" x="545" y="261">shard</text>
+  <path class="sync" d="M410 304 C450 335, 530 335, 570 304"/>
+  <text class="text small" x="372" y="337">Layer math is split. Ranks sync often.</text>
+
+  <rect class="panel" x="665" y="40" width="285" height="330"/>
+  <text class="text title" x="690" y="78">Pipeline parallel</text>
+  <rect class="gpu3" x="695" y="115" width="210" height="50"/>
+  <rect class="gpu3" x="695" y="200" width="210" height="50"/>
+  <rect class="gpu3" x="695" y="285" width="210" height="50"/>
+  <text class="text small" x="760" y="146">layers 0-11</text>
+  <text class="text small" x="760" y="231">layers 12-23</text>
+  <text class="text small" x="760" y="316">layers 24-35</text>
+  <path class="arrow" d="M800 170 L800 195"/>
+  <path class="arrow" d="M800 255 L800 280"/>
+  <text class="text small" x="687" y="365">Layers move in stages. Bubbles matter.</text>
+
+  <text class="label" x="380" y="404">Serving scale is a choice about memory, synchronization, and request routing.</text>
+</svg>

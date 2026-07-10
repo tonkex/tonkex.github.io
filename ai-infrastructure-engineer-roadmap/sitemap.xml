@@ -48,4 +48,8 @@
          <loc>https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/11-platform-layer-triton-kserve-rayserve/</loc>
          <lastmod>2026-07-10</lastmod>
     </url>
+    <url>
+         <loc>https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/12-parallelism-nccl-multi-gpu/</loc>
+         <lastmod>2026-07-10</lastmod>
+    </url>
 </urlset>
