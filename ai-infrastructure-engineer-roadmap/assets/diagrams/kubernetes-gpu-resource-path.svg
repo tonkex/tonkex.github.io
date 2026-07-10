@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 430" role="img" aria-labelledby="title desc">
+  <title id="title">Kubernetes GPU resource path</title>
+  <desc id="desc">How a GPU node exposes nvidia.com/gpu through drivers, container runtime, device plugin, kubelet, scheduler, and pod resource limits.</desc>
+  <style>
+    .bg { fill: #f8fafc; }
+    .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 10; }
+    .node { fill: #eef2ff; stroke: #4f46e5; stroke-width: 2; rx: 10; }
+    .plugin { fill: #ecfdf5; stroke: #059669; stroke-width: 2; rx: 10; }
+    .sched { fill: #fff7ed; stroke: #ea580c; stroke-width: 2; rx: 10; }
+    .pod { fill: #fef2f2; stroke: #dc2626; stroke-width: 2; rx: 10; }
+    .text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; fill: #0f172a; font-size: 17px; }
+    .small { font-size: 14px; fill: #334155; }
+    .title { font-size: 21px; font-weight: 700; }
+    .arrow { stroke: #475569; stroke-width: 2.5; fill: none; marker-end: url(#arrow); }
+  </style>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <rect class="bg" width="980" height="430"/>
+  <text class="text title" x="55" y="55">From physical GPU to schedulable Kubernetes resource</text>
+
+  <rect class="node" x="55" y="95" width="245" height="245"/>
+  <text class="text title" x="83" y="133">GPU node</text>
+  <rect class="box" x="85" y="155" width="185" height="42"/>
+  <text class="small" x="122" y="181">NVIDIA driver</text>
+  <rect class="box" x="85" y="215" width="185" height="42"/>
+  <text class="small" x="103" y="241">container runtime</text>
+  <rect class="plugin" x="85" y="275" width="185" height="42"/>
+  <text class="small" x="109" y="301">device plugin DS</text>
+
+  <rect class="plugin" x="370" y="115" width="220" height="74"/>
+  <text class="text" x="414" y="147">kubelet</text>
+  <text class="small" x="398" y="173">advertises capacity</text>
+
+  <rect class="sched" x="370" y="245" width="220" height="74"/>
+  <text class="text" x="410" y="277">scheduler</text>
+  <text class="small" x="396" y="303">matches resource + policy</text>
+
+  <rect class="pod" x="680" y="150" width="230" height="130"/>
+  <text class="text title" x="730" y="188">LLM Pod</text>
+  <text class="small" x="712" y="221">resources.limits:</text>
+  <text class="small" x="712" y="246">  nvidia.com/gpu: 1</text>
+
+  <path class="arrow" d="M300 295 C335 295, 335 152, 365 152"/>
+  <path class="arrow" d="M480 190 L480 240"/>
+  <path class="arrow" d="M592 282 C640 282, 640 215, 675 215"/>
+  <text class="small" x="70" y="380">Device plugin makes GPUs visible. Scheduling policy decides which GPU node receives the serving workload.</text>
+</svg>

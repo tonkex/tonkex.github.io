@@ -1,0 +1,1850 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/13-kubernetes-gpu-operations/">
+
+
+        <link rel="prev" href="../12-parallelism-nccl-multi-gpu/">
+
+
+        <link rel="next" href="../../source-policy/">
+
+
+
+
+
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>13장. Kubernetes GPU 운영 - AI 인프라 엔지니어 로드맵</title>
+
+
+
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+      <link rel="stylesheet" href="../../stylesheets/site-navigation-v2.css">
+
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#13-kubernetes-gpu-device-plugin-node-pool-scheduling" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              13장. Kubernetes GPU 운영
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    시작하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    책 구조
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    책 구조
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../outline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    전체 목차
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../sample-chapter-plan/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 챕터 계획
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 원고
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    샘플 원고
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-kv-cache-serving-bottleneck/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. KV cache 병목
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-first-llm-server-openai-endpoint/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. 첫 LLM server
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07-serving-metrics-ttft-tpot-throughput/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Serving metrics
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08-quantization-optimization-risk/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Quantization
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../09-vllm-serving-baseline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. vLLM baseline
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../10-runtime-selection-tensorrt-sglang-llamacpp/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. Runtime 선택
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../11-platform-layer-triton-kserve-rayserve/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. Platform 계층
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../12-parallelism-nccl-multi-gpu/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    12장. Parallelism과 NCCL
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    13장. Kubernetes GPU 운영
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    13장. Kubernetes GPU 운영
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#kubernetes-gpu-cpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Kubernetes는 GPU를 기본 CPU처럼 알지 못한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#device-plugin-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Device plugin은 GPU를 보이게 할 뿐이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#node-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Node pool을 먼저 나눈다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#label-taint" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Label은 선택 기준이고 taint는 보호 장치다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#gpu-pod-spec-resource-placement" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU Pod spec은 resource와 placement를 함께 읽어야 한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#pending-pod-scheduler" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Pending Pod는 scheduler의 설명을 읽는다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#topology-aware-placement" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Topology-aware placement가 필요해지는 순간
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#mig-time-slicing-capacity-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        MIG와 time-slicing은 capacity가 아니라 isolation 정책이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#autoscaling-gpu-warm-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Autoscaling은 GPU 개수보다 warm capacity가 어렵다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#gpu-scheduling-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: GPU scheduling checklist 만들기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#gpu-limit-node-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU limit만 넣고 node pool을 지정하지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#gpu-node-taint" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU node에 taint를 걸지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#toleration-scheduling-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Toleration을 만능 scheduling rule로 착각한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#pod-running-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Pod가 Running이면 GPU 사용 가능하다고 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#autoscaling-warm-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Autoscaling만 믿고 warm capacity를 두지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    제작 노트
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    제작 노트
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../source-policy/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    소스 정책
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    다음 작업
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#kubernetes-gpu-cpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Kubernetes는 GPU를 기본 CPU처럼 알지 못한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#device-plugin-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Device plugin은 GPU를 보이게 할 뿐이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#node-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Node pool을 먼저 나눈다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#label-taint" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Label은 선택 기준이고 taint는 보호 장치다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#gpu-pod-spec-resource-placement" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU Pod spec은 resource와 placement를 함께 읽어야 한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#pending-pod-scheduler" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Pending Pod는 scheduler의 설명을 읽는다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#topology-aware-placement" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Topology-aware placement가 필요해지는 순간
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#mig-time-slicing-capacity-isolation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        MIG와 time-slicing은 capacity가 아니라 isolation 정책이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#autoscaling-gpu-warm-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Autoscaling은 GPU 개수보다 warm capacity가 어렵다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#gpu-scheduling-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: GPU scheduling checklist 만들기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#gpu-limit-node-pool" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU limit만 넣고 node pool을 지정하지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#gpu-node-taint" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU node에 taint를 걸지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#toleration-scheduling-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Toleration을 만능 scheduling rule로 착각한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#pod-running-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Pod가 Running이면 GPU 사용 가능하다고 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#autoscaling-warm-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Autoscaling만 믿고 warm capacity를 두지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="13-kubernetes-gpu-device-plugin-node-pool-scheduling">13장. Kubernetes GPU 운영: device plugin, node pool, scheduling<a class="headerlink" href="#13-kubernetes-gpu-device-plugin-node-pool-scheduling" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>Draft v0.1</span>
+  <span>Updated: 2026-07-10</span>
+  <span>Part 5 - Multi-GPU와 cluster inference</span>
+</div>
+
+<p>12장에서 우리는 한 GPU를 넘을 때 parallelism과 NCCL 통신이 latency 안으로 들어온다는 점을 봤다. 이제 질문이 cluster 운영으로 바뀐다.</p>
+<blockquote>
+<p>Kubernetes에 GPU node를 붙이면 LLM serving pod는 자동으로 올바른 GPU에 배치되는가?</p>
+</blockquote>
+<p>답은 아니다. Kubernetes가 GPU를 인식하게 만드는 것과, inference workload를 올바른 GPU node에 배치하고, 다른 workload와 격리하고, 장애와 capacity를 운영하는 것은 다른 문제다.</p>
+<p>이 장의 독자 질문은 다음과 같다.</p>
+<blockquote>
+<p>Kubernetes에서 GPU는 어떻게 resource로 노출되고, AI 인프라 엔지니어는 node pool, label, taint, toleration, affinity를 어떻게 설계해야 하는가?</p>
+</blockquote>
+<p>핵심은 하나다. GPU scheduling은 <code>nvidia.com/gpu: 1</code> 한 줄이 아니라, hardware inventory와 placement policy를 함께 설계하는 일이다.</p>
+<h2 id="kubernetes-gpu-cpu">Kubernetes는 GPU를 기본 CPU처럼 알지 못한다<a class="headerlink" href="#kubernetes-gpu-cpu" title="Permanent link">&para;</a></h2>
+<p>Kubernetes는 CPU와 memory를 기본 resource로 다룬다. GPU 같은 specialized hardware는 device plugin을 통해 node의 allocatable resource로 노출된다. Kubernetes 공식 문서는 GPU 관리를 stable 기능으로 설명하면서, AMD/NVIDIA GPU를 device plugin을 통해 cluster node에서 사용할 수 있다고 설명한다.</p>
+<p>NVIDIA 환경에서 일반적인 흐름은 다음과 같다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/kubernetes-gpu-resource-path.svg" alt="Kubernetes GPU resource path from NVIDIA driver and container runtime to device plugin, kubelet, scheduler, and pod limits">
+  <figcaption><strong>GPU resource path.</strong> Driver와 container runtime이 준비된 node에서 NVIDIA device plugin이 GPU를 노출하고, kubelet과 scheduler가 `nvidia.com/gpu` resource 요청을 기준으로 Pod를 배치한다.</figcaption>
+</figure>
+
+<table>
+<thead>
+<tr>
+<th>계층</th>
+<th>역할</th>
+<th>확인할 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPU driver</td>
+<td>host가 GPU를 사용할 수 있게 한다</td>
+<td><code>nvidia-smi</code>가 node에서 동작하는가</td>
+</tr>
+<tr>
+<td>container runtime</td>
+<td>container 안에서 GPU device와 library를 사용할 수 있게 한다</td>
+<td>NVIDIA Container Toolkit, runtime config</td>
+</tr>
+<tr>
+<td>device plugin</td>
+<td>GPU를 Kubernetes extended resource로 노출한다</td>
+<td>DaemonSet health, node allocatable</td>
+</tr>
+<tr>
+<td>kubelet</td>
+<td>node capacity와 allocatable resource를 API server에 보고한다</td>
+<td><code>kubectl describe node</code></td>
+</tr>
+<tr>
+<td>scheduler</td>
+<td>Pod의 GPU limit과 scheduling policy를 보고 node를 선택한다</td>
+<td>pending reason, events</td>
+</tr>
+<tr>
+<td>workload Pod</td>
+<td><code>resources.limits.nvidia.com/gpu</code>를 요청한다</td>
+<td>limits, tolerations, affinity</td>
+</tr>
+</tbody>
+</table>
+<p>이 흐름 중 하나라도 빠지면 문제는 다르게 보인다. Driver가 없으면 node 자체가 GPU를 못 쓴다. Runtime 설정이 잘못되면 Pod는 뜨지만 container 안에서 GPU를 못 본다. Device plugin이 없으면 Kubernetes scheduler가 GPU capacity를 모른다. Scheduling policy가 없으면 GPU는 보이지만 원하지 않는 node에 배치될 수 있다.</p>
+<h2 id="device-plugin-gpu">Device plugin은 GPU를 보이게 할 뿐이다<a class="headerlink" href="#device-plugin-gpu" title="Permanent link">&para;</a></h2>
+<p>NVIDIA k8s-device-plugin은 DaemonSet으로 배포되어 각 GPU node에서 GPU 개수와 health를 Kubernetes에 노출한다. 공식 README는 이 plugin이 cluster node의 GPU 수를 노출하고, GPU health를 추적하며, GPU enabled container를 실행할 수 있게 한다고 설명한다.</p>
+<p>기본 Pod spec은 다음 형태다.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Pod</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llm-serving</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">containers</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="w">      </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.example.com/llm-server:v1</span>
+<span class="w">      </span><span class="nt">resources</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">limits</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">nvidia.com/gpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</code></pre></div>
+<p>Kubernetes GPU resource에는 중요한 제약이 있다. 공식 문서 기준으로 GPU는 <code>limits</code>에 지정해야 하며, <code>requests</code>와 <code>limits</code>를 둘 다 지정한다면 값이 같아야 한다. <code>requests</code>만 지정하는 방식은 사용할 수 없다.</p>
+<p>이 제약은 운영적으로 중요하다. CPU처럼 "request는 낮게, limit은 높게" 잡는 사고방식을 GPU에 그대로 적용할 수 없다. GPU 1개를 요청하면 scheduler는 그 Pod가 GPU 1개를 점유한다고 본다.</p>
+<h2 id="node-pool">Node pool을 먼저 나눈다<a class="headerlink" href="#node-pool" title="Permanent link">&para;</a></h2>
+<p>GPU cluster 운영에서 첫 번째 설계 단위는 node pool이다. 모든 GPU node를 하나의 pool처럼 보면 placement가 불명확해진다. LLM serving은 GPU model, VRAM, NVLink topology, local SSD, network fabric, node image, driver version에 민감하다.</p>
+<p>예를 들어 다음 node pool은 서로 다른 운영 단위다.</p>
+<table>
+<thead>
+<tr>
+<th>Node pool</th>
+<th>예</th>
+<th>주된 용도</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gpu-a100-80g</code></td>
+<td>A100 80GB, NVLink</td>
+<td>large model serving, tensor parallel</td>
+</tr>
+<tr>
+<td><code>gpu-h100</code></td>
+<td>H100, high bandwidth fabric</td>
+<td>latency-sensitive production serving</td>
+</tr>
+<tr>
+<td><code>gpu-l40s</code></td>
+<td>L40S, PCIe</td>
+<td>cost-sensitive serving, embedding, batch</td>
+</tr>
+<tr>
+<td><code>gpu-mig</code></td>
+<td>MIG partitioned GPU</td>
+<td>small model, notebook, isolated low-SLO workloads</td>
+</tr>
+<tr>
+<td><code>cpu-system</code></td>
+<td>CPU-only</td>
+<td>gateway, controller, observability</td>
+</tr>
+</tbody>
+</table>
+<p>Node pool을 나누는 이유는 scheduler가 "GPU 1개"만 보고는 GPU의 품질과 topology를 이해하지 못하기 때문이다. <code>nvidia.com/gpu: 1</code>은 A100 80GB 1개와 L40S 1개를 구분하지 않는다. 구분은 labels, node affinity, taints/tolerations, admission policy, platform convention으로 해야 한다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/gpu-node-pool-scheduling.svg" alt="GPU node pool scheduling controls with labels, taints, tolerations, node affinity, and GPU resource limits">
+  <figcaption><strong>GPU node pool scheduling.</strong> GPU request는 필요 조건이고, node label, taint/toleration, affinity, topology spread가 실제 placement policy를 만든다.</figcaption>
+</figure>
+
+<h2 id="label-taint">Label은 선택 기준이고 taint는 보호 장치다<a class="headerlink" href="#label-taint" title="Permanent link">&para;</a></h2>
+<p>GPU node에는 workload가 선택할 수 있는 label이 필요하다.</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>label<span class="w"> </span>node<span class="w"> </span>gpu-node-1<span class="w"> </span><span class="nv">accelerator</span><span class="o">=</span>nvidia-a100-80g
+kubectl<span class="w"> </span>label<span class="w"> </span>node<span class="w"> </span>gpu-node-1<span class="w"> </span>serving.ai/node-pool<span class="o">=</span>gpu-a100-80g
+kubectl<span class="w"> </span>label<span class="w"> </span>node<span class="w"> </span>gpu-node-1<span class="w"> </span>topology.ai/nvlink<span class="o">=</span><span class="nb">true</span>
+</code></pre></div>
+<p>가장 단순한 Pod 배치는 <code>nodeSelector</code>로 시작할 수 있다.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">nodeSelector</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">serving.ai/node-pool</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gpu-a100-80g</span>
+</code></pre></div>
+<p>더 복잡한 조건은 node affinity로 표현한다. Kubernetes 문서는 <code>nodeSelector</code>를 가장 단순한 node selection 방식으로 설명하고, node affinity는 더 표현력이 높고 hard rule과 soft preference를 구분할 수 있다고 설명한다.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">affinity</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">nodeAffinity</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">requiredDuringSchedulingIgnoredDuringExecution</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">nodeSelectorTerms</span><span class="p">:</span>
+<span class="w">          </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">matchExpressions</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">serving.ai/node-pool</span>
+<span class="w">                </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">In</span>
+<span class="w">                </span><span class="nt">values</span><span class="p">:</span>
+<span class="w">                  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gpu-a100-80g</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">topology.ai/nvlink</span>
+<span class="w">                </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">In</span>
+<span class="w">                </span><span class="nt">values</span><span class="p">:</span>
+<span class="w">                  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;true&quot;</span>
+</code></pre></div>
+<p>Label이 "이 node를 선택하라"는 신호라면, taint는 "아무 Pod나 들어오지 못하게 하라"는 보호 장치다.</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>taint<span class="w"> </span>nodes<span class="w"> </span>gpu-node-1<span class="w"> </span>nvidia.com/gpu<span class="o">=</span>true:NoSchedule
+</code></pre></div>
+<p>GPU workload Pod에는 matching toleration을 넣는다.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">tolerations</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nvidia.com/gpu</span>
+<span class="w">      </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Exists</span>
+<span class="w">      </span><span class="nt">effect</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NoSchedule</span>
+</code></pre></div>
+<p>Kubernetes 문서는 taint가 node가 Pod를 밀어내는 방식이고, toleration은 Pod가 해당 taint를 견딜 수 있게 한다고 설명한다. 단, toleration은 scheduling을 허용할 뿐 보장하지 않는다. Scheduler는 여전히 resource, affinity, spread, priority 같은 다른 조건을 함께 평가한다.</p>
+<h2 id="gpu-pod-spec-resource-placement">GPU Pod spec은 resource와 placement를 함께 읽어야 한다<a class="headerlink" href="#gpu-pod-spec-resource-placement" title="Permanent link">&para;</a></h2>
+<p>LLM serving Pod에서 다음 네 가지는 같이 봐야 한다.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llm-server</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llm-server</span>
+<span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">labels</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">llm-server</span>
+<span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">tolerations</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nvidia.com/gpu</span>
+<span class="w">          </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Exists</span>
+<span class="w">          </span><span class="nt">effect</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NoSchedule</span>
+<span class="w">      </span><span class="nt">affinity</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">nodeAffinity</span><span class="p">:</span>
+<span class="w">          </span><span class="nt">requiredDuringSchedulingIgnoredDuringExecution</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">nodeSelectorTerms</span><span class="p">:</span>
+<span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">matchExpressions</span><span class="p">:</span>
+<span class="w">                  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">serving.ai/node-pool</span>
+<span class="w">                    </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">In</span>
+<span class="w">                    </span><span class="nt">values</span><span class="p">:</span>
+<span class="w">                      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gpu-a100-80g</span>
+<span class="w">      </span><span class="nt">containers</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">server</span>
+<span class="w">          </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">registry.example.com/llm-server:v1</span>
+<span class="w">          </span><span class="nt">resources</span><span class="p">:</span>
+<span class="w">            </span><span class="nt">limits</span><span class="p">:</span>
+<span class="w">              </span><span class="nt">nvidia.com/gpu</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>resources.limits.nvidia.com/gpu</code></td>
+<td>GPU 몇 개를 점유할지</td>
+</tr>
+<tr>
+<td><code>nodeAffinity</code> 또는 <code>nodeSelector</code></td>
+<td>어떤 GPU node pool에 갈지</td>
+</tr>
+<tr>
+<td><code>tolerations</code></td>
+<td>GPU 전용 node taint를 통과할 수 있는지</td>
+</tr>
+<tr>
+<td><code>replicas</code></td>
+<td>data parallel serving replica 수</td>
+</tr>
+</tbody>
+</table>
+<p>이 네 가지 중 하나라도 빠지면 운영 의도가 흐려진다. GPU limit만 있으면 아무 GPU node나 갈 수 있다. Affinity만 있고 GPU limit이 없으면 GPU node에 올라가도 GPU를 점유하지 않을 수 있다. Toleration이 없으면 GPU node가 taint되어 있을 때 Pending 상태가 된다.</p>
+<h2 id="pending-pod-scheduler">Pending Pod는 scheduler의 설명을 읽는다<a class="headerlink" href="#pending-pod-scheduler" title="Permanent link">&para;</a></h2>
+<p>GPU workload가 Pending이면 먼저 event를 본다.</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>describe<span class="w"> </span>pod<span class="w"> </span>llm-server-xxxxx
+</code></pre></div>
+<p>자주 보는 원인은 다음과 같다.</p>
+<table>
+<thead>
+<tr>
+<th>Event / 증상</th>
+<th>의미</th>
+<th>확인</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Insufficient nvidia.com/gpu</code></td>
+<td>allocatable GPU가 부족하다</td>
+<td><code>kubectl describe node</code></td>
+</tr>
+<tr>
+<td>node affinity mismatch</td>
+<td>label 조건을 만족하는 node가 없다</td>
+<td>node labels</td>
+</tr>
+<tr>
+<td>untolerated taint</td>
+<td>Pod가 GPU node taint를 tolerate하지 못한다</td>
+<td>taints/tolerations</td>
+</tr>
+<tr>
+<td>image pull delay</td>
+<td>GPU scheduling은 됐지만 image를 못 받는다</td>
+<td>registry, image size</td>
+</tr>
+<tr>
+<td>runtime error after scheduled</td>
+<td>Pod는 떴지만 container가 GPU를 못 본다</td>
+<td>container runtime, driver mount</td>
+</tr>
+</tbody>
+</table>
+<p>AI 인프라 엔지니어는 Pending을 "Kubernetes 문제"라고 뭉뚱그리면 안 된다. Scheduler가 못 올린 것인지, kubelet이 container를 못 실행한 것인지, runtime 안에서 CUDA가 실패한 것인지 분리해야 한다.</p>
+<h2 id="topology-aware-placement">Topology-aware placement가 필요해지는 순간<a class="headerlink" href="#topology-aware-placement" title="Permanent link">&para;</a></h2>
+<p>12장에서 본 tensor parallelism은 GPU 사이 topology에 민감하다. Kubernetes scheduler의 기본 resource model은 <code>nvidia.com/gpu: 4</code>가 같은 node의 어떤 네 GPU인지, 그 GPU들이 NVLink로 묶였는지까지 세밀하게 알지 못한다.</p>
+<p>따라서 production LLM serving에서는 다음 중 하나가 필요해질 수 있다.</p>
+<ul>
+<li>한 Pod가 한 node의 모든 GPU를 점유하도록 설계한다.</li>
+<li>Node pool 자체를 동일 topology 장비로만 구성한다.</li>
+<li>GPU feature labels로 NVLink, memory, MIG profile, GPU product를 노출한다.</li>
+<li>Runtime이 visible device ordering을 어떻게 받는지 검증한다.</li>
+<li>Multi-node TP/PP는 Kubernetes 기본 scheduler만 믿지 말고 Ray, MPI operator, custom scheduler, gang scheduling, placement group 같은 계층을 검토한다.</li>
+</ul>
+<p>이 장에서는 custom scheduler까지 깊게 들어가지 않는다. 그러나 기억해야 할 원칙은 분명하다. Kubernetes의 기본 GPU resource는 "개수"를 잘 다루지만, LLM serving에서 중요한 "GPU 사이 관계"는 별도 정책으로 보강해야 한다.</p>
+<h2 id="mig-time-slicing-capacity-isolation">MIG와 time-slicing은 capacity가 아니라 isolation 정책이다<a class="headerlink" href="#mig-time-slicing-capacity-isolation" title="Permanent link">&para;</a></h2>
+<p>NVIDIA GPU 운영에서는 MIG나 time-slicing을 만나게 된다. 둘 다 GPU 공유와 관련 있지만 의미가 다르다.</p>
+<p>MIG는 지원 GPU를 하드웨어 partition으로 나누어 더 작은 GPU instance처럼 사용하는 방식이다. 작은 model serving, notebook, batch inference처럼 isolation이 중요한 workload에 유용할 수 있다. 하지만 한 large model replica가 GPU 전체 VRAM과 bandwidth를 필요로 한다면 MIG는 오히려 제약이 된다.</p>
+<p>Time-slicing은 여러 workload가 GPU를 시간적으로 나눠 쓰게 하는 방식이다. GPU utilization이 낮은 작은 workload에는 유용할 수 있지만, latency-sensitive LLM serving에서는 tail latency가 흔들릴 수 있다.</p>
+<p>따라서 질문은 "GPU를 더 잘게 나눌 수 있나"가 아니다.</p>
+<table>
+<thead>
+<tr>
+<th>방식</th>
+<th>먼저 물어볼 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>full GPU</td>
+<td>이 workload가 latency SLO와 KV cache를 위해 GPU 전체가 필요한가?</td>
+</tr>
+<tr>
+<td>MIG</td>
+<td>작은 workload를 강하게 격리하는 것이 목표인가?</td>
+</tr>
+<tr>
+<td>time-slicing</td>
+<td>latency보다 평균 utilization이 더 중요한가?</td>
+</tr>
+</tbody>
+</table>
+<p>Production serving node pool과 notebook/shared experimentation node pool을 섞지 않는 이유도 여기에 있다.</p>
+<h2 id="autoscaling-gpu-warm-capacity">Autoscaling은 GPU 개수보다 warm capacity가 어렵다<a class="headerlink" href="#autoscaling-gpu-warm-capacity" title="Permanent link">&para;</a></h2>
+<p>CPU service는 replica를 늘리면 비교적 빠르게 capacity가 늘 수 있다. LLM serving은 다르다. 새 Pod가 GPU node에 배치되어도 model download, weight load, engine build, CUDA graph capture, tokenizer 준비, health check까지 시간이 걸린다.</p>
+<p>따라서 GPU autoscaling은 다음 질문을 포함해야 한다.</p>
+<ul>
+<li>새 GPU node가 준비되는 데 몇 분 걸리는가?</li>
+<li>Model artifact는 local cache나 shared cache에 있는가?</li>
+<li>Pod가 Ready가 되기 전에 traffic이 들어가지 않도록 readiness가 정확한가?</li>
+<li>Scale down 때 active request와 KV cache를 어떻게 drain하는가?</li>
+<li>HPA 기준이 QPS인가, queue time인가, active sequence인가, GPU KV cache usage인가?</li>
+</ul>
+<p>GPU node autoscaling은 비용을 줄일 수 있지만, cold start가 길면 incident 중에는 도움이 늦게 온다. Production serving에는 최소 warm replica와 warm node capacity가 필요할 수 있다.</p>
+<h2 id="gpu-scheduling-checklist">실습: GPU scheduling checklist 만들기<a class="headerlink" href="#gpu-scheduling-checklist" title="Permanent link">&para;</a></h2>
+<p>실제 cluster에서 다음 명령으로 시작한다.</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>get<span class="w"> </span>nodes
+kubectl<span class="w"> </span>describe<span class="w"> </span>node<span class="w"> </span>&lt;gpu-node-name&gt;
+kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-n<span class="w"> </span>kube-system<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>nvidia
+kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-A<span class="w"> </span>-o<span class="w"> </span>wide<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>&lt;gpu-node-name&gt;
+</code></pre></div>
+<p>그 다음 표를 채운다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>확인 명령</th>
+<th>기대 상태</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>driver</td>
+<td>node에서 <code>nvidia-smi</code></td>
+<td>GPU와 driver version 표시</td>
+</tr>
+<tr>
+<td>container runtime</td>
+<td>GPU test pod</td>
+<td>container 안에서 CUDA 사용 가능</td>
+</tr>
+<tr>
+<td>device plugin</td>
+<td><code>kubectl get ds -A</code></td>
+<td>NVIDIA device plugin Ready</td>
+</tr>
+<tr>
+<td>allocatable GPU</td>
+<td><code>kubectl describe node</code></td>
+<td><code>nvidia.com/gpu</code> capacity 표시</td>
+</tr>
+<tr>
+<td>node label</td>
+<td><code>kubectl get node --show-labels</code></td>
+<td>GPU type/node pool label 존재</td>
+</tr>
+<tr>
+<td>taint</td>
+<td><code>kubectl describe node</code></td>
+<td>GPU node에 <code>NoSchedule</code> taint</td>
+</tr>
+<tr>
+<td>toleration</td>
+<td>Pod spec</td>
+<td>GPU workload만 taint 통과</td>
+</tr>
+<tr>
+<td>affinity</td>
+<td>Pod spec</td>
+<td>올바른 GPU node pool 선택</td>
+</tr>
+<tr>
+<td>readiness</td>
+<td>service endpoint</td>
+<td>model load 후에만 traffic 수신</td>
+</tr>
+<tr>
+<td>drain</td>
+<td>rollout/scale down test</td>
+<td>active request 중단 최소화</td>
+</tr>
+</tbody>
+</table>
+<p>마지막으로 다음 한 문장을 쓴다.</p>
+<blockquote>
+<p>이 workload는 <code>gpu-a100-80g</code> node pool에만 배치되며, <code>nvidia.com/gpu: 1</code>을 요청하고, GPU node taint를 tolerate하며, model readiness가 성공하기 전에는 traffic을 받지 않는다.</p>
+</blockquote>
+<p>이 문장이 없다면 Kubernetes YAML은 있어도 운영 계약은 없는 상태다.</p>
+<h2 id="_1">실패 패턴<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h3 id="gpu-limit-node-pool">GPU limit만 넣고 node pool을 지정하지 않는다<a class="headerlink" href="#gpu-limit-node-pool" title="Permanent link">&para;</a></h3>
+<p>GPU 종류가 하나뿐인 작은 cluster에서는 우연히 동작할 수 있다. 하지만 A100, L40S, MIG, spot GPU가 섞이면 workload가 엉뚱한 node에 갈 수 있다.</p>
+<h3 id="gpu-node-taint">GPU node에 taint를 걸지 않는다<a class="headerlink" href="#gpu-node-taint" title="Permanent link">&para;</a></h3>
+<p>CPU-only Pod나 system workload가 GPU node에 올라와 CPU, memory, disk, network를 갉아먹을 수 있다. GPU node는 비싼 node이므로 workload admission을 명확히 해야 한다.</p>
+<h3 id="toleration-scheduling-rule">Toleration을 만능 scheduling rule로 착각한다<a class="headerlink" href="#toleration-scheduling-rule" title="Permanent link">&para;</a></h3>
+<p>Toleration은 taint를 통과하게 할 뿐이다. 원하는 GPU type을 선택하려면 node selector나 node affinity가 필요하다.</p>
+<h3 id="pod-running-gpu">Pod가 Running이면 GPU 사용 가능하다고 본다<a class="headerlink" href="#pod-running-gpu" title="Permanent link">&para;</a></h3>
+<p>Pod phase가 Running이어도 container 안에서 CUDA library, device mount, driver compatibility 문제가 날 수 있다. GPU test command와 runtime metric을 확인해야 한다.</p>
+<h3 id="autoscaling-warm-capacity">Autoscaling만 믿고 warm capacity를 두지 않는다<a class="headerlink" href="#autoscaling-warm-capacity" title="Permanent link">&para;</a></h3>
+<p>LLM server cold start는 길다. Model artifact download와 weight load가 몇 분 걸리면 HPA가 반응해도 SLO는 이미 깨질 수 있다.</p>
+<h2 id="_2">정리<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Kubernetes는 GPU를 device plugin 기반 extended resource로 노출한다.</li>
+<li>NVIDIA device plugin은 DaemonSet으로 GPU 수와 health를 Kubernetes에 알리고, Pod는 <code>nvidia.com/gpu</code> limit으로 GPU를 요청한다.</li>
+<li>GPU resource는 <code>limits</code>에 지정해야 하며, <code>requests</code>와 함께 쓸 경우 두 값은 같아야 한다.</li>
+<li>Node pool, labels, node affinity, taints/tolerations는 GPU workload placement의 핵심 운영 도구다.</li>
+<li>Toleration은 scheduling 허용 조건일 뿐 placement 보장은 아니다. GPU type 선택은 label과 affinity가 담당한다.</li>
+<li>LLM serving에서는 GPU 개수뿐 아니라 GPU type, VRAM, NVLink topology, local cache, network, warm capacity까지 node pool 설계에 포함해야 한다.</li>
+<li>Pending Pod는 scheduler event를 읽고 resource 부족, label mismatch, taint mismatch, runtime failure를 분리해 진단해야 한다.</li>
+</ul>
+<h2 id="source-anchors">Source anchors<a class="headerlink" href="#source-anchors" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Kubernetes GPU scheduling: <a href="https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/">https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/</a></li>
+<li>NVIDIA k8s-device-plugin: <a href="https://github.com/NVIDIA/k8s-device-plugin">https://github.com/NVIDIA/k8s-device-plugin</a></li>
+<li>Kubernetes assigning Pods to nodes: <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/">https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/</a></li>
+<li>Kubernetes taints and tolerations: <a href="https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/">https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../12-parallelism-nccl-multi-gpu/" class="md-footer__link md-footer__link--prev" aria-label="이전: 12장. Parallelism과 NCCL">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                12장. Parallelism과 NCCL
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../../source-policy/" class="md-footer__link md-footer__link--next" aria-label="다음: 소스 정책">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                소스 정책
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+        <script src="../../javascripts/header-home-link.js"></script>
+
+
+  </body>
+</html>
