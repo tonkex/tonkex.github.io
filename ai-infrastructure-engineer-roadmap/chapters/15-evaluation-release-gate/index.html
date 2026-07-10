@@ -1,0 +1,2189 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/15-evaluation-release-gate/">
+
+
+        <link rel="prev" href="../14-observability-gpu-runtime-request/">
+
+
+        <link rel="next" href="../../source-policy/">
+
+
+
+
+
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>15장. Evaluation gate - AI 인프라 엔지니어 로드맵</title>
+
+
+
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+      <link rel="stylesheet" href="../../stylesheets/site-navigation-v2.css">
+
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#15-evaluation-release-gate" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              15장. Evaluation gate
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    시작하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    책 구조
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    책 구조
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../outline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    전체 목차
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../sample-chapter-plan/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 챕터 계획
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 원고
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    샘플 원고
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-kv-cache-serving-bottleneck/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. KV cache 병목
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-first-llm-server-openai-endpoint/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. 첫 LLM server
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07-serving-metrics-ttft-tpot-throughput/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Serving metrics
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08-quantization-optimization-risk/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Quantization
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../09-vllm-serving-baseline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. vLLM baseline
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../10-runtime-selection-tensorrt-sglang-llamacpp/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. Runtime 선택
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../11-platform-layer-triton-kserve-rayserve/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. Platform 계층
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../12-parallelism-nccl-multi-gpu/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    12장. Parallelism과 NCCL
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../13-kubernetes-gpu-operations/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    13장. Kubernetes GPU 운영
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../14-observability-gpu-runtime-request/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    14장. Observability
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    15장. Evaluation gate
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    15장. Evaluation gate
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        "좋은 모델"은 하나의 숫자가 아니다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Evaluation을 세 층으로 나눈다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#golden-set" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Golden set은 운영 사건에서 자란다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#grader" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Grader는 정답의 모양에 맞춘다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#rag-eval-retrieval-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        RAG eval은 retrieval과 generation을 나눠야 한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#serving-benchmark-eval-artifact" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Serving benchmark는 품질 eval과 같은 artifact로 묶는다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#release-gate-passfail" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Release gate는 pass/fail 규칙이어야 한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#canary-production-eval" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Canary는 production eval이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#shadow-traffic-user-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Shadow traffic은 user impact 없이 차이를 본다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#eval-result-store" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Eval result store가 있어야 회귀를 설명할 수 있다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#cicd-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        CI/CD에서 evaluation을 어디에 넣는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#public-benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Public benchmark 점수만 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#grader-versioning" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Grader를 versioning하지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#quality-score" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        평균 quality score만 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#benchmark-workload" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Benchmark workload를 바꿔 놓고 비교한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#canary-metric-version-label" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Canary metric에 version label이 없다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#release-gate-spec" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: 첫 release gate spec 만들기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    제작 노트
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    제작 노트
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../source-policy/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    소스 정책
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    다음 작업
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        "좋은 모델"은 하나의 숫자가 아니다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Evaluation을 세 층으로 나눈다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#golden-set" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Golden set은 운영 사건에서 자란다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#grader" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Grader는 정답의 모양에 맞춘다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#rag-eval-retrieval-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        RAG eval은 retrieval과 generation을 나눠야 한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#serving-benchmark-eval-artifact" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Serving benchmark는 품질 eval과 같은 artifact로 묶는다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#release-gate-passfail" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Release gate는 pass/fail 규칙이어야 한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#canary-production-eval" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Canary는 production eval이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#shadow-traffic-user-impact" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Shadow traffic은 user impact 없이 차이를 본다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#eval-result-store" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Eval result store가 있어야 회귀를 설명할 수 있다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#cicd-evaluation" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        CI/CD에서 evaluation을 어디에 넣는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#public-benchmark" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Public benchmark 점수만 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#grader-versioning" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Grader를 versioning하지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#quality-score" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        평균 quality score만 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#benchmark-workload" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Benchmark workload를 바꿔 놓고 비교한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#canary-metric-version-label" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Canary metric에 version label이 없다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#release-gate-spec" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: 첫 release gate spec 만들기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="15-evaluation-release-gate">15장. Evaluation과 release gate: 빠른 모델이 좋은 모델인지 확인하기<a class="headerlink" href="#15-evaluation-release-gate" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>Draft v0.1</span>
+  <span>Updated: 2026-07-10</span>
+  <span>Part 6 - Production 운영 loop</span>
+</div>
+
+<p>14장에서는 운영 중인 LLM service를 metric, trace, log로 관측하는 방법을 봤다. 하지만 관측성은 배포된 뒤의 문제를 찾는 도구다. Production에 올리기 전에 더 중요한 질문이 있다.</p>
+<blockquote>
+<p>새 model, prompt, quantization, runtime config가 정말 배포해도 되는 상태인지 어떻게 판단할 것인가?</p>
+</blockquote>
+<p>Serving engineer는 "tokens/sec가 빨라졌다"는 말만으로 release를 승인하면 안 된다. LLM system은 더 빠르지만 더 틀릴 수 있고, 더 저렴하지만 특정 tenant에서 품질이 무너질 수 있으며, benchmark에서는 좋아도 canary traffic에서 p95 latency가 깨질 수 있다.</p>
+<p>이 장의 독자 질문은 다음과 같다.</p>
+<blockquote>
+<p>LLM release를 품질, latency, cost, safety 기준으로 막거나 통과시키려면 어떤 evaluation과 gate를 만들어야 하는가?</p>
+</blockquote>
+<p>핵심은 evaluation을 실험 노트가 아니라 release control plane의 일부로 다루는 것이다.</p>
+<h2 id="_1">"좋은 모델"은 하나의 숫자가 아니다<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>LLM release에서 바뀌는 대상은 모델 weight만이 아니다.</p>
+<table>
+<thead>
+<tr>
+<th>변경 대상</th>
+<th>예</th>
+<th>깨질 수 있는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model</td>
+<td>base model 교체, fine-tune, LoRA</td>
+<td>정답률, 문체, safety, latency, token cost</td>
+</tr>
+<tr>
+<td>Prompt</td>
+<td>system prompt, few-shot 예시, output schema</td>
+<td>format 준수, hallucination, refusal rate</td>
+</tr>
+<tr>
+<td>Retrieval</td>
+<td>embedding model, chunking, reranker, top-k</td>
+<td>context recall, faithfulness, latency</td>
+</tr>
+<tr>
+<td>Runtime</td>
+<td>vLLM 설정, TensorRT-LLM engine, batch policy</td>
+<td>TTFT, TPOT, throughput, OOM</td>
+</tr>
+<tr>
+<td>Quantization</td>
+<td>FP8, INT8, AWQ, GPTQ</td>
+<td>품질 회귀, 긴 context 안정성, 특정 언어 성능</td>
+</tr>
+<tr>
+<td>Platform</td>
+<td>GPU type, replica count, autoscaling, routing</td>
+<td>p95/p99, cost, failure isolation</td>
+</tr>
+</tbody>
+</table>
+<p>따라서 release gate는 "accuracy 1개" 또는 "latency 1개"로 충분하지 않다. 최소한 품질, serving 성능, 비용, 안전성, 운영 안정성을 함께 본다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/eval-release-gate-loop.svg" alt="LLM release gate loop from candidate change to offline eval, serving benchmark, safety checks, canary analysis, promote or rollback">
+  <figcaption><strong>Evaluation release gate loop.</strong> 새 후보는 offline eval, serving benchmark, safety check, canary analysis를 통과해야 promote된다. 실패하면 변경 단위를 줄이거나 이전 revision으로 rollback한다.</figcaption>
+</figure>
+
+<h2 id="evaluation">Evaluation을 세 층으로 나눈다<a class="headerlink" href="#evaluation" title="Permanent link">&para;</a></h2>
+<p>Production LLM evaluation은 한 번에 끝나는 테스트가 아니라 서로 다른 속도의 세 층이다.</p>
+<table>
+<thead>
+<tr>
+<th>층</th>
+<th>실행 시점</th>
+<th>목적</th>
+<th>예</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Offline eval</td>
+<td>PR, nightly, release candidate</td>
+<td>품질 회귀를 싸게 조기 탐지</td>
+<td>golden set, task benchmark, RAG eval</td>
+</tr>
+<tr>
+<td>Serving benchmark</td>
+<td>release candidate, capacity planning</td>
+<td>latency, throughput, VRAM, cost 확인</td>
+<td>TTFT/TPOT, p95/p99, tokens/sec</td>
+</tr>
+<tr>
+<td>Online canary</td>
+<td>실제 traffic 일부</td>
+<td>현실 workload에서 품질/성능/오류 확인</td>
+<td>version split, shadow traffic, canary analysis</td>
+</tr>
+</tbody>
+</table>
+<p>Offline eval은 품질을 빠르게 잡지만 production traffic의 queue, cache, GPU placement를 재현하지 못한다. Serving benchmark는 infra 병목을 드러내지만 답변 품질을 보장하지 않는다. Online canary는 현실성이 높지만 사용자 영향이 생길 수 있으므로 traffic 비율과 rollback 기준이 있어야 한다.</p>
+<p>세 층을 모두 연결해야 한다.</p>
+<ol>
+<li>Offline eval이 실패하면 배포 후보를 만들지 않는다.</li>
+<li>Offline eval은 통과했지만 serving benchmark가 실패하면 runtime/config를 고친다.</li>
+<li>Offline eval과 benchmark를 통과해도 canary가 실패하면 promote하지 않는다.</li>
+<li>Canary가 통과한 결과와 metric을 다음 release의 baseline으로 저장한다.</li>
+</ol>
+<h2 id="golden-set">Golden set은 운영 사건에서 자란다<a class="headerlink" href="#golden-set" title="Permanent link">&para;</a></h2>
+<p>처음부터 완벽한 eval dataset을 만들려고 하면 오래 걸리고 실패한다. 더 나은 출발점은 production incident와 사용자 피드백에서 golden set을 키우는 것이다.</p>
+<p>Golden set에는 다음 항목이 들어가야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>필드</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>case_id</code></td>
+<td>결과 추적과 회귀 분석</td>
+</tr>
+<tr>
+<td><code>task_type</code></td>
+<td>요약, 분류, 질의응답, tool call 등</td>
+</tr>
+<tr>
+<td><code>input</code></td>
+<td>사용자 요청 또는 재현 가능한 축약본</td>
+</tr>
+<tr>
+<td><code>context</code></td>
+<td>RAG 문서, tool 결과, policy snippet</td>
+</tr>
+<tr>
+<td><code>expected_behavior</code></td>
+<td>정답, 허용 범위, 금지 행동</td>
+</tr>
+<tr>
+<td><code>grading_method</code></td>
+<td>exact match, rubric, model grader, human review</td>
+</tr>
+<tr>
+<td><code>risk_level</code></td>
+<td>release gate에서 가중치 조정</td>
+</tr>
+<tr>
+<td><code>source</code></td>
+<td>incident, support ticket, synthetic, benchmark</td>
+</tr>
+</tbody>
+</table>
+<p>Golden set은 "많은 데이터"보다 "실제 실패를 재현하는 데이터"가 중요하다. 특히 다음 유형을 우선 넣는다.</p>
+<ul>
+<li>이전 release에서 깨졌던 case</li>
+<li>long context, multi-turn, tool call처럼 infra 비용이 큰 case</li>
+<li>특정 tenant 또는 언어에서 자주 발생하는 case</li>
+<li>safety, privacy, compliance와 연결된 case</li>
+<li>RAG에서 retrieval이 틀리면 답변도 틀리는 case</li>
+</ul>
+<p>Eval dataset에도 version이 필요하다. 모델이 바뀌었는지, prompt가 바뀌었는지, eval set이 바뀌었는지 모르면 점수 비교가 무의미해진다.</p>
+<h2 id="grader">Grader는 정답의 모양에 맞춘다<a class="headerlink" href="#grader" title="Permanent link">&para;</a></h2>
+<p>모든 답변을 같은 방식으로 채점할 수 없다.</p>
+<table>
+<thead>
+<tr>
+<th>답변 유형</th>
+<th>적합한 grader</th>
+<th>주의점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>분류 label</td>
+<td>exact match, string check</td>
+<td>label mapping을 고정한다</td>
+</tr>
+<tr>
+<td>JSON/tool call</td>
+<td>schema validation, field-level check</td>
+<td>부분 점수를 줄 수 있어야 한다</td>
+</tr>
+<tr>
+<td>짧은 사실 답변</td>
+<td>exact match + normalization</td>
+<td>표기 차이 처리</td>
+</tr>
+<tr>
+<td>긴 설명</td>
+<td>rubric 또는 model grader</td>
+<td>grader drift와 bias를 점검한다</td>
+</tr>
+<tr>
+<td>RAG 답변</td>
+<td>context recall, faithfulness, answer relevance</td>
+<td>retrieval과 generation을 분리한다</td>
+</tr>
+<tr>
+<td>Code/SQL</td>
+<td>unit test, execution result</td>
+<td>sandbox와 timeout이 필요하다</td>
+</tr>
+</tbody>
+</table>
+<p>OpenAI의 grader 문서는 string check, text similarity, score model grader, Python code execution 같은 grader 유형을 구분한다. 이 구분은 vendor와 무관하게 중요하다. 정답이 구조화되어 있으면 구조로 채점하고, 열린 답변이면 rubric을 명확히 만든다.</p>
+<p>Model grader를 쓸 때는 다음을 남겨야 한다.</p>
+<ul>
+<li>grader model/version</li>
+<li>grader prompt/rubric version</li>
+<li>sampling parameter</li>
+<li>pass threshold</li>
+<li>대표 failure sample</li>
+<li>human calibration sample</li>
+</ul>
+<p>Model grader도 모델이다. 따라서 model grader의 점수는 절대 진실이 아니라 release decision을 돕는 signal이다. 중요한 release에서는 일부 sample을 human review로 보정한다.</p>
+<h2 id="rag-eval-retrieval-generation">RAG eval은 retrieval과 generation을 나눠야 한다<a class="headerlink" href="#rag-eval-retrieval-generation" title="Permanent link">&para;</a></h2>
+<p>RAG system이 틀렸을 때 원인은 둘 중 하나다.</p>
+<ol>
+<li>필요한 문서를 가져오지 못했다.</li>
+<li>문서는 가져왔지만 답변이 문서에 충실하지 않았다.</li>
+</ol>
+<p>이 둘을 섞으면 개선 방향이 흐려진다.</p>
+<table>
+<thead>
+<tr>
+<th>평가 축</th>
+<th>질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Context recall</td>
+<td>필요한 근거 문서가 top-k 안에 들어왔는가?</td>
+</tr>
+<tr>
+<td>Context precision</td>
+<td>가져온 문서가 질문과 관련 있는가?</td>
+</tr>
+<tr>
+<td>Faithfulness</td>
+<td>답변이 제공된 context에 근거하는가?</td>
+</tr>
+<tr>
+<td>Answer correctness</td>
+<td>최종 답변이 기대 행동과 맞는가?</td>
+</tr>
+<tr>
+<td>Citation quality</td>
+<td>답변의 근거 위치를 추적할 수 있는가?</td>
+</tr>
+</tbody>
+</table>
+<p>Ragas는 LLM application evaluation을 "vibe check"가 아니라 체계적인 evaluation loop로 바꾸는 도구로 설명하고, metrics와 experiments, dataset 관리를 중심 개념으로 둔다. RAGAS 논문도 RAG 평가를 retrieval과 generation 측면으로 나누는 문제의식을 제시한다.</p>
+<p>AI infrastructure engineer 관점에서 중요한 점은 tool 이름이 아니라 failure isolation이다. Retrieval이 문제면 embedding, chunking, reranker, index refresh를 본다. Generation이 문제면 prompt, context ordering, model, decoding parameter를 본다. 둘 다 정상인데 latency가 나쁘면 runtime과 serving path로 내려간다.</p>
+<h2 id="serving-benchmark-eval-artifact">Serving benchmark는 품질 eval과 같은 artifact로 묶는다<a class="headerlink" href="#serving-benchmark-eval-artifact" title="Permanent link">&para;</a></h2>
+<p>7장에서 TTFT, TPOT, throughput, request rate를 배웠고 14장에서 metric label contract를 만들었다. 15장에서는 이 값을 release artifact로 저장한다.</p>
+<p>Release candidate마다 최소 다음 값을 남긴다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>예</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Candidate ID</td>
+<td><code>model=v3</code>, <code>prompt=2026-07-10</code>, <code>runtime=vllm-0.x</code>, <code>quant=fp8-kv</code></td>
+</tr>
+<tr>
+<td>Workload shape</td>
+<td>input token p50/p95, output token p50/p95, concurrency, request rate</td>
+</tr>
+<tr>
+<td>Quality score</td>
+<td>golden set pass rate, task별 score, critical failure count</td>
+</tr>
+<tr>
+<td>Latency</td>
+<td>TTFT p50/p95/p99, TPOT p50/p95/p99, e2e p95</td>
+</tr>
+<tr>
+<td>Throughput</td>
+<td>output tokens/sec, requests/sec, saturation point</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>GPU-hour, tokens per GPU-hour, cost per 1M tokens</td>
+</tr>
+<tr>
+<td>Stability</td>
+<td>OOM, 5xx, timeout, restart, preemption</td>
+</tr>
+<tr>
+<td>Hardware</td>
+<td>GPU type, count, MIG 여부, node pool</td>
+</tr>
+</tbody>
+</table>
+<p>중요한 것은 workload shape를 고정하는 것이다. 입력 200 token / 출력 50 token workload와 입력 16k token / 출력 2k token workload는 다른 시스템이다. 같은 release gate에서 비교하려면 workload를 분리한다.</p>
+<table>
+<thead>
+<tr>
+<th>Workload class</th>
+<th>예</th>
+<th>주로 보는 지표</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Short chat</td>
+<td>200 in / 200 out</td>
+<td>TTFT, request rate</td>
+</tr>
+<tr>
+<td>Long context QA</td>
+<td>16k in / 500 out</td>
+<td>prefill, KV cache, VRAM</td>
+</tr>
+<tr>
+<td>Long generation</td>
+<td>1k in / 4k out</td>
+<td>TPOT, decode throughput</td>
+</tr>
+<tr>
+<td>Tool agent</td>
+<td>multi-turn + tool call</td>
+<td>e2e latency, retry, tool failure</td>
+</tr>
+<tr>
+<td>RAG QA</td>
+<td>retrieval + answer</td>
+<td>retrieval recall, faithfulness, e2e</td>
+</tr>
+</tbody>
+</table>
+<h2 id="release-gate-passfail">Release gate는 pass/fail 규칙이어야 한다<a class="headerlink" href="#release-gate-passfail" title="Permanent link">&para;</a></h2>
+<p>Dashboard는 사람이 읽는 도구다. Release gate는 자동화가 읽을 수 있는 규칙이어야 한다.</p>
+<p>예를 들어 다음과 같이 정의한다.</p>
+<table>
+<thead>
+<tr>
+<th>Gate</th>
+<th>Pass rule</th>
+<th>Fail action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Critical quality</td>
+<td>critical set pass rate = 100%</td>
+<td>release block</td>
+</tr>
+<tr>
+<td>General quality</td>
+<td>golden set score &gt;= baseline - 1%</td>
+<td>review required</td>
+</tr>
+<tr>
+<td>Format</td>
+<td>JSON schema pass rate &gt;= 99.5%</td>
+<td>release block</td>
+</tr>
+<tr>
+<td>Safety</td>
+<td>safety violation count = 0 on critical set</td>
+<td>release block</td>
+</tr>
+<tr>
+<td>TTFT</td>
+<td>p95 &lt;= baseline p95 * 1.1</td>
+<td>tune or capacity review</td>
+</tr>
+<tr>
+<td>TPOT</td>
+<td>p95 &lt;= baseline p95 * 1.1</td>
+<td>runtime review</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>cost per 1M tokens &lt;= baseline * 1.15</td>
+<td>explicit approval</td>
+</tr>
+<tr>
+<td>Stability</td>
+<td>OOM, 5xx, restart = 0 in benchmark</td>
+<td>release block</td>
+</tr>
+</tbody>
+</table>
+<p>이 규칙은 팀마다 다르다. 하지만 "느낌상 괜찮다"가 아니라 숫자와 failure action이 있어야 한다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/quality-latency-cost-gate.svg" alt="Release gate matrix comparing quality, latency, cost, safety, and stability signals before promotion">
+  <figcaption><strong>Quality, latency, cost gate.</strong> LLM release는 품질만 높거나 latency만 낮다고 통과하지 않는다. 각 gate는 baseline, threshold, evidence, fail action을 함께 가져야 한다.</figcaption>
+</figure>
+
+<h2 id="canary-production-eval">Canary는 production eval이다<a class="headerlink" href="#canary-production-eval" title="Permanent link">&para;</a></h2>
+<p>KServe는 InferenceService의 새 revision에 일정 비율의 traffic을 보내는 canary rollout을 지원한다. Argo Rollouts는 AnalysisTemplate과 AnalysisRun을 통해 Prometheus 같은 provider의 metric을 측정하고, 결과에 따라 rollout을 계속 진행하거나 abort할 수 있다.</p>
+<p>LLM serving canary에서 볼 metric은 일반 web service보다 더 많다.</p>
+<table>
+<thead>
+<tr>
+<th>Canary signal</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request success/error rate</td>
+<td>기본 availability</td>
+</tr>
+<tr>
+<td>TTFT p95/p99</td>
+<td>첫 token 사용자 경험</td>
+</tr>
+<tr>
+<td>TPOT p95/p99</td>
+<td>streaming 품질</td>
+</tr>
+<tr>
+<td>queue time</td>
+<td>capacity와 scheduler pressure</td>
+</tr>
+<tr>
+<td>KV cache usage</td>
+<td>long context와 memory pressure</td>
+</tr>
+<tr>
+<td>output token length</td>
+<td>답변 길이 변화와 비용</td>
+</tr>
+<tr>
+<td>refusal / blocked rate</td>
+<td>safety policy 변화</td>
+</tr>
+<tr>
+<td>user correction / thumbs down</td>
+<td>online quality proxy</td>
+</tr>
+<tr>
+<td>fallback / retry rate</td>
+<td>routing 안정성</td>
+</tr>
+</tbody>
+</table>
+<p>Canary traffic은 작은 비율로 시작한다. 예를 들어 1%, 5%, 10%, 25%, 50%, 100%로 올린다. 각 단계에는 최소 관찰 시간과 sample 수가 있어야 한다. Traffic이 적으면 p99는 불안정하므로 sample 수가 충분하지 않은 상태에서 promote하지 않는다.</p>
+<p>Canary가 실패하면 "모델이 나쁘다"로 바로 결론 내리지 않는다. 다음을 분리한다.</p>
+<ul>
+<li>같은 model인데 새 prompt만 실패했는가?</li>
+<li>같은 model/prompt인데 새 runtime만 실패했는가?</li>
+<li>특정 workload class만 실패했는가?</li>
+<li>특정 pod/node/GPU에서만 실패했는가?</li>
+<li>quality score는 같은데 latency/cost만 나빠졌는가?</li>
+</ul>
+<p>이 질문이 14장의 label contract와 연결된다. <code>model_version</code>, <code>prompt_version</code>, <code>runtime_version</code>, <code>route</code>, <code>workload_class</code>, <code>pod</code>, <code>node</code>, <code>gpu_uuid</code>가 있어야 canary 실패를 해석할 수 있다.</p>
+<h2 id="shadow-traffic-user-impact">Shadow traffic은 user impact 없이 차이를 본다<a class="headerlink" href="#shadow-traffic-user-impact" title="Permanent link">&para;</a></h2>
+<p>Canary는 실제 사용자가 새 version의 답변을 받는다. Shadow traffic은 실제 요청을 복제해서 새 version에도 보내지만 사용자에게는 기존 version의 답변만 돌려준다.</p>
+<table>
+<thead>
+<tr>
+<th>방식</th>
+<th>장점</th>
+<th>한계</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Offline eval</td>
+<td>싸고 재현 가능</td>
+<td>production workload와 다를 수 있음</td>
+</tr>
+<tr>
+<td>Shadow traffic</td>
+<td>실제 입력 분포 확인</td>
+<td>사용자 feedback과 실제 행동 변화는 없음</td>
+</tr>
+<tr>
+<td>Canary</td>
+<td>실제 사용자 영향 확인</td>
+<td>실패하면 일부 사용자에게 영향</td>
+</tr>
+</tbody>
+</table>
+<p>Shadow traffic은 RAG, tool call, 외부 side effect가 있을 때 주의해야 한다. Tool call이 결제, 메일 발송, 티켓 생성처럼 실제 변화를 만들면 shadow path에서는 반드시 mock, dry-run, read-only mode를 써야 한다.</p>
+<h2 id="eval-result-store">Eval result store가 있어야 회귀를 설명할 수 있다<a class="headerlink" href="#eval-result-store" title="Permanent link">&para;</a></h2>
+<p>Release gate가 제대로 작동하려면 결과 저장소가 필요하다. 저장소는 반드시 큰 시스템일 필요는 없지만 다음 질문에 답해야 한다.</p>
+<ul>
+<li>지난 release 대비 어떤 task가 나빠졌는가?</li>
+<li>같은 model인데 prompt 변경만으로 점수가 바뀌었는가?</li>
+<li>latency regression은 workload class별로 어디서 생겼는가?</li>
+<li>quality와 cost의 trade-off가 승인됐는가?</li>
+<li>rollback한 이유와 evidence는 무엇인가?</li>
+</ul>
+<p>최소 schema는 다음과 같다.</p>
+<table>
+<thead>
+<tr>
+<th>테이블 또는 파일</th>
+<th>내용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>release_candidate</code></td>
+<td>model, prompt, runtime, quantization, hardware, git sha</td>
+</tr>
+<tr>
+<td><code>eval_run</code></td>
+<td>dataset version, grader version, score, failure count</td>
+</tr>
+<tr>
+<td><code>benchmark_run</code></td>
+<td>workload class, latency, throughput, cost, stability</td>
+</tr>
+<tr>
+<td><code>canary_run</code></td>
+<td>traffic percent, metric window, pass/fail, rollback reason</td>
+</tr>
+<tr>
+<td><code>sample_failure</code></td>
+<td>input hash, expected behavior, output, grader note</td>
+</tr>
+</tbody>
+</table>
+<p>OpenAI Evals 문서는 eval이 model output이 기대한 style과 content 기준을 만족하는지 확인하는 데 쓰인다고 설명한다. 동시에 2026-07-10 현재 문서는 Evals platform의 deprecation timeline도 안내한다. 따라서 특정 hosted eval platform에만 결과를 묶지 말고, dataset version, grader version, candidate ID, raw sample failure를 독립적으로 보관하는 습관이 필요하다.</p>
+<h2 id="cicd-evaluation">CI/CD에서 evaluation을 어디에 넣는가<a class="headerlink" href="#cicd-evaluation" title="Permanent link">&para;</a></h2>
+<p>LLM release pipeline은 보통 다음 단계로 나눈다.</p>
+<div class="highlight"><pre><span></span><code>change
+  -&gt; unit/schema tests
+  -&gt; offline eval
+  -&gt; build serving artifact
+  -&gt; serving benchmark
+  -&gt; staging soak
+  -&gt; canary
+  -&gt; promote
+  -&gt; post-release watch
+</code></pre></div>
+<p>각 단계의 실패는 다른 의미를 가진다.</p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>실패 의미</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit/schema</td>
+<td>application contract가 깨졌다</td>
+</tr>
+<tr>
+<td>Offline eval</td>
+<td>품질 또는 format 회귀가 있다</td>
+</tr>
+<tr>
+<td>Serving benchmark</td>
+<td>capacity, latency, cost, stability 문제가 있다</td>
+</tr>
+<tr>
+<td>Staging soak</td>
+<td>장시간 안정성 또는 resource leak 문제가 있다</td>
+</tr>
+<tr>
+<td>Canary</td>
+<td>실제 traffic에서 SLO 또는 quality proxy가 나쁘다</td>
+</tr>
+<tr>
+<td>Post-release watch</td>
+<td>full traffic에서 tail 또는 특정 tenant 문제가 나타났다</td>
+</tr>
+</tbody>
+</table>
+<p>Release gate는 빠른 실패부터 느린 실패 순서로 둔다. Offline eval은 cheap gate이므로 먼저 돌린다. GPU benchmark는 비싸므로 후보가 품질 gate를 통과한 뒤 돌린다. Canary는 사용자 영향이 있으므로 마지막에 둔다.</p>
+<h2 id="_2">실패 패턴<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="public-benchmark">Public benchmark 점수만 본다<a class="headerlink" href="#public-benchmark" title="Permanent link">&para;</a></h3>
+<p>Public benchmark는 비교 가능성을 준다. 하지만 production task, 언어, prompt, RAG context, tool call, latency/cost 요구사항을 대체하지 못한다. Public benchmark는 참고 signal이고, release gate의 중심은 own golden set이어야 한다.</p>
+<h3 id="grader-versioning">Grader를 versioning하지 않는다<a class="headerlink" href="#grader-versioning" title="Permanent link">&para;</a></h3>
+<p>Grader prompt나 grader model이 바뀌면 점수도 바뀐다. 이 변경을 기록하지 않으면 모델이 좋아진 것인지 grader가 달라진 것인지 모른다.</p>
+<h3 id="quality-score">평균 quality score만 본다<a class="headerlink" href="#quality-score" title="Permanent link">&para;</a></h3>
+<p>평균 점수는 critical failure를 숨긴다. 결제, 의료, 법률, 개인정보, 보안처럼 risk가 큰 case는 별도 critical set으로 분리하고 하나라도 깨지면 block해야 한다.</p>
+<h3 id="benchmark-workload">Benchmark workload를 바꿔 놓고 비교한다<a class="headerlink" href="#benchmark-workload" title="Permanent link">&para;</a></h3>
+<p>새 release가 빨라진 것처럼 보였는데 입력 길이 분포가 달라졌을 수 있다. Workload class, token shape, concurrency, request rate를 고정해야 한다.</p>
+<h3 id="canary-metric-version-label">Canary metric에 version label이 없다<a class="headerlink" href="#canary-metric-version-label" title="Permanent link">&para;</a></h3>
+<p>Canary에서 p95가 나빠졌는데 <code>model_version</code>이나 <code>runtime_version</code> label이 없으면 새 revision 탓인지 traffic 변화 탓인지 구분할 수 없다.</p>
+<h2 id="release-gate-spec">실습: 첫 release gate spec 만들기<a class="headerlink" href="#release-gate-spec" title="Permanent link">&para;</a></h2>
+<p>다음 표를 채우면 첫 release gate 문서가 된다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>결정</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Candidate ID</td>
+<td>model, prompt, runtime, quantization, hardware, git sha</td>
+</tr>
+<tr>
+<td>Golden set version</td>
+<td>critical/general/RAG/tool-call set</td>
+</tr>
+<tr>
+<td>Grader version</td>
+<td>exact/schema/model grader/rubric</td>
+</tr>
+<tr>
+<td>Quality threshold</td>
+<td>task별 pass rule</td>
+</tr>
+<tr>
+<td>Serving workload</td>
+<td>token shape, concurrency, request rate</td>
+</tr>
+<tr>
+<td>Performance threshold</td>
+<td>TTFT/TPOT/e2e/throughput/cost</td>
+</tr>
+<tr>
+<td>Stability threshold</td>
+<td>OOM, timeout, restart, error</td>
+</tr>
+<tr>
+<td>Canary plan</td>
+<td>traffic step, minimum sample, observation window</td>
+</tr>
+<tr>
+<td>Rollback rule</td>
+<td>어떤 metric이 몇 번 실패하면 rollback하는가</td>
+</tr>
+<tr>
+<td>Evidence store</td>
+<td>eval result, benchmark result, canary result 위치</td>
+</tr>
+</tbody>
+</table>
+<p>처음에는 gate가 단순해도 된다. 중요한 것은 release마다 같은 질문을 반복해서 묻는 것이다.</p>
+<h2 id="_3">정리<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li>LLM release는 모델 품질, serving latency, throughput, cost, safety, stability를 함께 통과해야 한다.</li>
+<li>Evaluation은 offline eval, serving benchmark, online canary의 세 층으로 나눠야 한다.</li>
+<li>Golden set은 실제 incident와 사용자 feedback에서 자라야 하며 dataset version을 가져야 한다.</li>
+<li>Grader는 답변 유형에 맞게 고르고, grader model/prompt/version을 기록해야 한다.</li>
+<li>RAG eval은 retrieval 실패와 generation 실패를 분리해야 개선 방향이 보인다.</li>
+<li>Serving benchmark는 workload shape, TTFT, TPOT, throughput, VRAM, cost를 release artifact로 남겨야 한다.</li>
+<li>Canary와 AnalysisRun은 production traffic에서 release를 promote하거나 abort하는 자동 gate가 된다.</li>
+<li>Release gate는 dashboard가 아니라 pass/fail 규칙과 evidence store로 운영되어야 한다.</li>
+</ul>
+<h2 id="source-anchors">Source anchors<a class="headerlink" href="#source-anchors" title="Permanent link">&para;</a></h2>
+<ul>
+<li>OpenAI Evals guide: <a href="https://platform.openai.com/docs/guides/evals">https://platform.openai.com/docs/guides/evals</a></li>
+<li>OpenAI Graders guide: <a href="https://platform.openai.com/docs/guides/graders">https://platform.openai.com/docs/guides/graders</a></li>
+<li>OpenAI Evals repository: <a href="https://github.com/openai/evals">https://github.com/openai/evals</a></li>
+<li>EleutherAI lm-evaluation-harness: <a href="https://github.com/EleutherAI/lm-evaluation-harness">https://github.com/EleutherAI/lm-evaluation-harness</a></li>
+<li>Hugging Face LightEval: <a href="https://huggingface.co/docs/lighteval/index">https://huggingface.co/docs/lighteval/index</a></li>
+<li>Ragas documentation: <a href="https://docs.ragas.io/">https://docs.ragas.io/</a></li>
+<li>RAGAS paper: <a href="https://arxiv.org/abs/2309.15217">https://arxiv.org/abs/2309.15217</a></li>
+<li>Argo Rollouts Analysis: <a href="https://argo-rollouts.readthedocs.io/en/stable/features/analysis/">https://argo-rollouts.readthedocs.io/en/stable/features/analysis/</a></li>
+<li>KServe Canary Rollout Strategy: <a href="https://kserve.github.io/website/docs/model-serving/predictive-inference/rollout-strategies/canary">https://kserve.github.io/website/docs/model-serving/predictive-inference/rollout-strategies/canary</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../14-observability-gpu-runtime-request/" class="md-footer__link md-footer__link--prev" aria-label="이전: 14장. Observability">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                14장. Observability
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../../source-policy/" class="md-footer__link md-footer__link--next" aria-label="다음: 소스 정책">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                소스 정책
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+        <script src="../../javascripts/header-home-link.js"></script>
+
+
+  </body>
+</html>

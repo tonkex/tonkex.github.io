@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">Quality latency cost gate matrix</title>
+  <desc id="desc">Release gate matrix comparing quality, latency, cost, safety, and stability signals against baseline and fail actions.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f8fafc}
+      .header{fill:#1f2937}
+      .cell{fill:#ffffff;stroke:#cbd5e1;stroke-width:1.5}
+      .pass{fill:#dcfce7;stroke:#16a34a;stroke-width:1.5}
+      .warn{fill:#fef3c7;stroke:#d97706;stroke-width:1.5}
+      .fail{fill:#ffe4e6;stroke:#e11d48;stroke-width:1.5}
+      .htext{font-family:Arial,Helvetica,sans-serif;fill:#ffffff;font-size:18px;font-weight:700}
+      .text{font-family:Arial,Helvetica,sans-serif;fill:#111827;font-size:18px;font-weight:700}
+      .small{font-family:Arial,Helvetica,sans-serif;fill:#374151;font-size:15px}
+      .caption{font-family:Arial,Helvetica,sans-serif;fill:#475569;font-size:16px}
+    </style>
+  </defs>
+  <rect class="bg" width="1200" height="560"/>
+  <rect class="header" x="60" y="60" width="1080" height="54" rx="8"/>
+  <text class="htext" x="145" y="94" text-anchor="middle">Gate</text>
+  <text class="htext" x="380" y="94" text-anchor="middle">Baseline</text>
+  <text class="htext" x="620" y="94" text-anchor="middle">Threshold</text>
+  <text class="htext" x="850" y="94" text-anchor="middle">Evidence</text>
+  <text class="htext" x="1050" y="94" text-anchor="middle">Fail action</text>
+  <g>
+    <rect class="cell" x="60" y="125" width="170" height="76"/>
+    <rect class="cell" x="230" y="125" width="280" height="76"/>
+    <rect class="pass" x="510" y="125" width="220" height="76"/>
+    <rect class="cell" x="730" y="125" width="250" height="76"/>
+    <rect class="fail" x="980" y="125" width="160" height="76"/>
+    <text class="text" x="145" y="158" text-anchor="middle">Quality</text>
+    <text class="small" x="370" y="154" text-anchor="middle">previous release</text>
+    <text class="small" x="370" y="176" text-anchor="middle">golden set score</text>
+    <text class="small" x="620" y="154" text-anchor="middle">>= baseline - 1%</text>
+    <text class="small" x="620" y="176" text-anchor="middle">critical set 100%</text>
+    <text class="small" x="855" y="154" text-anchor="middle">eval run</text>
+    <text class="small" x="855" y="176" text-anchor="middle">failure samples</text>
+    <text class="small" x="1060" y="166" text-anchor="middle">block</text>
+  </g>
+  <g>
+    <rect class="cell" x="60" y="201" width="170" height="76"/>
+    <rect class="cell" x="230" y="201" width="280" height="76"/>
+    <rect class="warn" x="510" y="201" width="220" height="76"/>
+    <rect class="cell" x="730" y="201" width="250" height="76"/>
+    <rect class="warn" x="980" y="201" width="160" height="76"/>
+    <text class="text" x="145" y="234" text-anchor="middle">Latency</text>
+    <text class="small" x="370" y="230" text-anchor="middle">TTFT / TPOT</text>
+    <text class="small" x="370" y="252" text-anchor="middle">p95 by workload</text>
+    <text class="small" x="620" y="230" text-anchor="middle"><= 1.1x baseline</text>
+    <text class="small" x="620" y="252" text-anchor="middle">p99 reviewed</text>
+    <text class="small" x="855" y="230" text-anchor="middle">serving benchmark</text>
+    <text class="small" x="855" y="252" text-anchor="middle">canary metrics</text>
+    <text class="small" x="1060" y="242" text-anchor="middle">tune</text>
+  </g>
+  <g>
+    <rect class="cell" x="60" y="277" width="170" height="76"/>
+    <rect class="cell" x="230" y="277" width="280" height="76"/>
+    <rect class="warn" x="510" y="277" width="220" height="76"/>
+    <rect class="cell" x="730" y="277" width="250" height="76"/>
+    <rect class="warn" x="980" y="277" width="160" height="76"/>
+    <text class="text" x="145" y="310" text-anchor="middle">Cost</text>
+    <text class="small" x="370" y="306" text-anchor="middle">cost per 1M tokens</text>
+    <text class="small" x="370" y="328" text-anchor="middle">GPU-hour</text>
+    <text class="small" x="620" y="306" text-anchor="middle"><= 1.15x baseline</text>
+    <text class="small" x="620" y="328" text-anchor="middle">or explicit approval</text>
+    <text class="small" x="855" y="306" text-anchor="middle">benchmark + billing</text>
+    <text class="small" x="855" y="328" text-anchor="middle">token accounting</text>
+    <text class="small" x="1060" y="318" text-anchor="middle">approve</text>
+  </g>
+  <g>
+    <rect class="cell" x="60" y="353" width="170" height="76"/>
+    <rect class="cell" x="230" y="353" width="280" height="76"/>
+    <rect class="pass" x="510" y="353" width="220" height="76"/>
+    <rect class="cell" x="730" y="353" width="250" height="76"/>
+    <rect class="fail" x="980" y="353" width="160" height="76"/>
+    <text class="text" x="145" y="386" text-anchor="middle">Safety</text>
+    <text class="small" x="370" y="382" text-anchor="middle">policy eval</text>
+    <text class="small" x="370" y="404" text-anchor="middle">critical scenarios</text>
+    <text class="small" x="620" y="382" text-anchor="middle">0 critical violation</text>
+    <text class="small" x="620" y="404" text-anchor="middle">format pass >= 99.5%</text>
+    <text class="small" x="855" y="382" text-anchor="middle">safety eval</text>
+    <text class="small" x="855" y="404" text-anchor="middle">human sample</text>
+    <text class="small" x="1060" y="394" text-anchor="middle">block</text>
+  </g>
+  <g>
+    <rect class="cell" x="60" y="429" width="170" height="76"/>
+    <rect class="cell" x="230" y="429" width="280" height="76"/>
+    <rect class="pass" x="510" y="429" width="220" height="76"/>
+    <rect class="cell" x="730" y="429" width="250" height="76"/>
+    <rect class="fail" x="980" y="429" width="160" height="76"/>
+    <text class="text" x="145" y="462" text-anchor="middle">Stability</text>
+    <text class="small" x="370" y="458" text-anchor="middle">last good revision</text>
+    <text class="small" x="370" y="480" text-anchor="middle">soak run</text>
+    <text class="small" x="620" y="458" text-anchor="middle">0 OOM / crash</text>
+    <text class="small" x="620" y="480" text-anchor="middle">error within SLO</text>
+    <text class="small" x="855" y="458" text-anchor="middle">logs / metrics</text>
+    <text class="small" x="855" y="480" text-anchor="middle">AnalysisRun</text>
+    <text class="small" x="1060" y="470" text-anchor="middle">rollback</text>
+  </g>
+  <text class="caption" x="600" y="535" text-anchor="middle">Promotion requires every gate to have a baseline, threshold, evidence artifact, and explicit fail action.</text>
+</svg>
