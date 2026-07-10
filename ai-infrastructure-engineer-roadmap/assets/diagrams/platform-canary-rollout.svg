@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="620" viewBox="0 0 1180 620" role="img" aria-labelledby="title desc">
+  <title id="title">Platform canary rollout path</title>
+  <desc id="desc">A canary rollout path from model registry to baseline service, canary service, traffic split, metrics, eval gate, promote or rollback.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect width="1180" height="620" fill="#ffffff"/>
+  <g font-family="Arial, sans-serif">
+    <text x="590" y="48" text-anchor="middle" font-size="29" font-weight="800" fill="#111827">Canary rollout은 platform 책임을 드러낸다</text>
+    <text x="590" y="82" text-anchor="middle" font-size="16" fill="#4b5563">새 runtime을 띄우는 것보다 traffic split, metric gate, eval gate, rollback path가 중요하다</text>
+
+    <rect x="55" y="145" width="170" height="82" rx="12" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+    <text x="140" y="177" text-anchor="middle" font-size="18" font-weight="800" fill="#334155">Release artifact</text>
+    <text x="140" y="203" text-anchor="middle" font-size="13" fill="#475569">model + runtime + config</text>
+
+    <rect x="285" y="115" width="210" height="82" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="390" y="147" text-anchor="middle" font-size="18" font-weight="800" fill="#047857">Baseline service</text>
+    <text x="390" y="173" text-anchor="middle" font-size="13" fill="#475569">current version</text>
+
+    <rect x="285" y="245" width="210" height="82" rx="12" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+    <text x="390" y="277" text-anchor="middle" font-size="18" font-weight="800" fill="#c2410c">Canary service</text>
+    <text x="390" y="303" text-anchor="middle" font-size="13" fill="#475569">new version</text>
+
+    <rect x="565" y="180" width="190" height="82" rx="12" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+    <text x="660" y="212" text-anchor="middle" font-size="18" font-weight="800" fill="#1d4ed8">Traffic split</text>
+    <text x="660" y="238" text-anchor="middle" font-size="13" fill="#475569">95% stable / 5% canary</text>
+
+    <rect x="825" y="115" width="250" height="82" rx="12" fill="#f5f3ff" stroke="#a78bfa" stroke-width="2"/>
+    <text x="950" y="147" text-anchor="middle" font-size="18" font-weight="800" fill="#6d28d9">Metric gate</text>
+    <text x="950" y="173" text-anchor="middle" font-size="13" fill="#475569">latency, error, queue, GPU</text>
+
+    <rect x="825" y="245" width="250" height="82" rx="12" fill="#fff1f2" stroke="#fb7185" stroke-width="2"/>
+    <text x="950" y="277" text-anchor="middle" font-size="18" font-weight="800" fill="#9f1239">Quality eval gate</text>
+    <text x="950" y="303" text-anchor="middle" font-size="13" fill="#475569">tool call, grounding, safety</text>
+
+    <rect x="310" y="455" width="210" height="82" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="415" y="487" text-anchor="middle" font-size="18" font-weight="800" fill="#047857">Promote</text>
+    <text x="415" y="513" text-anchor="middle" font-size="13" fill="#475569">increase traffic to 100%</text>
+
+    <rect x="660" y="455" width="210" height="82" rx="12" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+    <text x="765" y="487" text-anchor="middle" font-size="18" font-weight="800" fill="#991b1b">Rollback</text>
+    <text x="765" y="513" text-anchor="middle" font-size="13" fill="#475569">drain and restore stable</text>
+
+    <g stroke="#2563eb" stroke-width="3" fill="none" marker-end="url(#arrow)">
+      <path d="M225 186 H277"/>
+      <path d="M225 186 C252 225 265 268 277 286"/>
+      <path d="M495 156 C535 165 550 190 557 210"/>
+      <path d="M495 286 C535 276 550 252 557 232"/>
+      <path d="M755 221 C790 190 806 164 817 156"/>
+      <path d="M755 221 C790 254 806 278 817 286"/>
+      <path d="M950 327 C905 405 570 442 520 480"/>
+      <path d="M950 327 C910 392 830 432 775 447"/>
+    </g>
+
+    <text x="590" y="585" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Generative AI rollout은 latency gate와 quality gate가 함께 있어야 한다</text>
+  </g>
+</svg>

@@ -1,0 +1,1653 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/11-platform-layer-triton-kserve-rayserve/">
+
+
+        <link rel="prev" href="../10-runtime-selection-tensorrt-sglang-llamacpp/">
+
+
+        <link rel="next" href="../../source-policy/">
+
+
+
+
+
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>11장. Platform 계층 - AI 인프라 엔지니어 로드맵</title>
+
+
+
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+      <link rel="stylesheet" href="../../stylesheets/site-navigation-v2.css">
+
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#11-triton-kserve-ray-serve-runtime-platform" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              11장. Platform 계층
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    시작하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    책 구조
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    책 구조
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../outline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    전체 목차
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../sample-chapter-plan/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 챕터 계획
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 원고
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    샘플 원고
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-kv-cache-serving-bottleneck/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. KV cache 병목
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-first-llm-server-openai-endpoint/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. 첫 LLM server
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07-serving-metrics-ttft-tpot-throughput/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Serving metrics
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08-quantization-optimization-risk/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Quantization
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../09-vllm-serving-baseline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. vLLM baseline
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../10-runtime-selection-tensorrt-sglang-llamacpp/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. Runtime 선택
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. Platform 계층
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. Platform 계층
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#runtime-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        runtime과 platform을 먼저 분리한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#triton-multi-framework-inference-server" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Triton: multi-framework inference server
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#kserve-kubernetes-native-model-serving-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        KServe: Kubernetes-native model serving platform
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#ray-serve-python-composition-distributed-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Ray Serve: Python composition과 distributed serving
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        세 도구를 같은 표에 억지로 넣지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#canary-rollout-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Canary rollout은 platform 책임을 보여 준다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Platform을 도입하기 전에 고정할 계약
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#platform-responsibility-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: platform responsibility checklist 만들기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#yaml-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        YAML을 platform이라고 착각한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#runtime-tuning-platform-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        runtime tuning과 platform scaling을 섞는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#gpu-autoscaling-qps" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU autoscaling을 QPS만으로 한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#canary-latency" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        canary를 latency만으로 판단한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#platform-security-governance" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        platform이 security와 governance를 자동으로 해결한다고 본다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    제작 노트
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    제작 노트
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../source-policy/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    소스 정책
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    다음 작업
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#runtime-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        runtime과 platform을 먼저 분리한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#triton-multi-framework-inference-server" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Triton: multi-framework inference server
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#kserve-kubernetes-native-model-serving-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        KServe: Kubernetes-native model serving platform
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#ray-serve-python-composition-distributed-serving" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Ray Serve: Python composition과 distributed serving
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        세 도구를 같은 표에 억지로 넣지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#canary-rollout-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Canary rollout은 platform 책임을 보여 준다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Platform을 도입하기 전에 고정할 계약
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#platform-responsibility-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: platform responsibility checklist 만들기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#yaml-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        YAML을 platform이라고 착각한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#runtime-tuning-platform-scaling" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        runtime tuning과 platform scaling을 섞는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#gpu-autoscaling-qps" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU autoscaling을 QPS만으로 한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#canary-latency" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        canary를 latency만으로 판단한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#platform-security-governance" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        platform이 security와 governance를 자동으로 해결한다고 본다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="11-triton-kserve-ray-serve-runtime-platform">11장. Triton, KServe, Ray Serve: runtime 위의 platform 계층<a class="headerlink" href="#11-triton-kserve-ray-serve-runtime-platform" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>Draft v0.1</span>
+  <span>Updated: 2026-07-10</span>
+  <span>Part 4 - Serving runtime 선택</span>
+</div>
+
+<p>10장에서 우리는 vLLM, TensorRT-LLM, SGLang, llama.cpp를 runtime으로 비교했다. 그런데 production에 가까워질수록 질문이 바뀐다.</p>
+<blockquote>
+<p>모델 서버를 띄운 다음 production platform은 무엇을 더 해줘야 하는가?</p>
+</blockquote>
+<p>Runtime은 모델을 실행한다. Platform은 그 runtime을 안전하게 배포하고, 라우팅하고, 스케일하고, 관측하고, 되돌릴 수 있게 만든다. 이 둘을 섞으면 YAML은 많아지는데 운영 책임은 흐려진다.</p>
+<p>이 장의 독자 질문은 다음과 같다.</p>
+<blockquote>
+<p>Inference server, model serving platform, orchestration framework는 어떻게 다르고, Triton, KServe, Ray Serve는 각각 어디에 놓아야 하는가?</p>
+</blockquote>
+<p>핵심은 하나다. Platform은 "모델을 실행하는 방법"보다 "모델 서비스를 운영 가능한 단위로 만드는 방법"에 가깝다.</p>
+<h2 id="runtime-platform">runtime과 platform을 먼저 분리한다<a class="headerlink" href="#runtime-platform" title="Permanent link">&para;</a></h2>
+<p>10장의 runtime 선택은 model artifact와 GPU execution path에 가까웠다. 11장의 platform 선택은 운영 책임에 가깝다.</p>
+<table>
+<thead>
+<tr>
+<th>계층</th>
+<th>주된 질문</th>
+<th>예</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>runtime</td>
+<td>이 모델을 어떤 engine으로 실행할 것인가?</td>
+<td>vLLM, TensorRT-LLM, SGLang, llama.cpp</td>
+</tr>
+<tr>
+<td>inference server</td>
+<td>여러 model/backend를 어떤 protocol과 scheduler로 서빙할 것인가?</td>
+<td>Triton Inference Server</td>
+</tr>
+<tr>
+<td>serving platform</td>
+<td>Kubernetes에서 model service lifecycle을 어떻게 표준화할 것인가?</td>
+<td>KServe</td>
+</tr>
+<tr>
+<td>orchestration framework</td>
+<td>Python business logic, model composition, distributed execution을 어떻게 묶을 것인가?</td>
+<td>Ray Serve</td>
+</tr>
+<tr>
+<td>gateway / product layer</td>
+<td>auth, quota, tenant, routing, fallback, audit를 어떻게 적용할 것인가?</td>
+<td>API gateway, service mesh, internal platform</td>
+</tr>
+</tbody>
+</table>
+<p>이 구분이 중요한 이유는 간단하다. Runtime을 바꿔도 rollout, autoscaling, auth, model registry, incident response가 자동으로 생기지 않는다. 반대로 platform을 도입해도 runtime의 KV cache 병목이나 tokenizer mismatch가 사라지지는 않는다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/platform-layer-stack.svg" alt="Layered diagram separating runtime, inference server, serving platform, orchestration framework, and gateway responsibilities">
+  <figcaption><strong>Runtime vs platform layer.</strong> Runtime은 model execution path를 다루고, platform은 deployment lifecycle, routing, scaling, rollout, observability를 다룬다.</figcaption>
+</figure>
+
+<h2 id="triton-multi-framework-inference-server">Triton: multi-framework inference server<a class="headerlink" href="#triton-multi-framework-inference-server" title="Permanent link">&para;</a></h2>
+<p>NVIDIA Triton Inference Server는 여러 deep learning과 machine learning framework의 model을 배포하기 위한 open-source inference serving software다. 공식 문서는 TensorRT, PyTorch, ONNX, OpenVINO, Python backend 등 여러 framework를 지원하고, cloud, data center, edge, embedded 환경에서 inference를 제공한다고 설명한다.</p>
+<p>Triton의 중심 개념은 "model repository와 backend를 가진 inference server"다. Request는 HTTP/REST 또는 gRPC로 들어오고, model별 scheduler로 라우팅된다. Scheduler는 필요하면 batching을 수행하고, backend가 실제 inference를 실행한다.</p>
+<p>Triton이 잘 맞는 상황은 다음과 같다.</p>
+<ul>
+<li>LLM뿐 아니라 vision, ranking, embedding, tabular model 등 여러 framework model을 함께 서빙한다.</li>
+<li>HTTP/gRPC inference protocol, model repository, model management API가 필요하다.</li>
+<li>dynamic batching, sequence batching, concurrent model execution, ensemble pipeline이 중요하다.</li>
+<li>TensorRT-LLM, vLLM backend, Python backend 등 backend 기반으로 model serving을 표준화하고 싶다.</li>
+<li>Kubernetes와 붙일 readiness/liveness, metrics, tracing, model analyzer 같은 운영 도구가 필요하다.</li>
+</ul>
+<p>Triton은 runtime이기도 하고 server이기도 하지만, Kubernetes-native platform 전체는 아니다. Triton이 model execution과 server protocol을 잘 다룬다면, Kubernetes 배포, rollout, traffic split, autoscaling policy, tenant policy는 다른 계층에서 다뤄야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>Triton이 해주는 것</th>
+<th>별도로 설계해야 하는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>model repository, backend, scheduler, batching</td>
+<td>service-level canary rollout</td>
+</tr>
+<tr>
+<td>HTTP/gRPC/KServe protocol endpoint</td>
+<td>Kubernetes CRD lifecycle</td>
+</tr>
+<tr>
+<td>readiness/liveness, metrics, tracing</td>
+<td>tenant auth, quota, product gateway</td>
+</tr>
+<tr>
+<td>ensemble/BLS pipeline</td>
+<td>application-level eval, release approval</td>
+</tr>
+</tbody>
+</table>
+<p>AI 인프라 엔지니어는 Triton을 "NVIDIA용 빠른 서버" 정도로만 보면 안 된다. Triton의 강점은 multi-framework inference server로서 model management와 protocol, batching, backend 확장성을 제공하는 데 있다.</p>
+<h2 id="kserve-kubernetes-native-model-serving-platform">KServe: Kubernetes-native model serving platform<a class="headerlink" href="#kserve-kubernetes-native-model-serving-platform" title="Permanent link">&para;</a></h2>
+<p>KServe는 Kubernetes 위에서 predictive AI와 generative AI inference를 표준화하는 serving platform이다. 공식 사이트는 KServe를 scalable, multi-framework deployment를 위한 Kubernetes 기반 platform으로 설명하고, InferenceService CRD가 autoscaling, networking, health checking, server configuration 복잡도를 캡슐화한다고 설명한다.</p>
+<p>KServe의 중심 단위는 <code>InferenceService</code>다. 사용자는 model format, storage URI, resource request, GPU limit 같은 정보를 선언하고, KServe는 deployment lifecycle과 routing을 관리한다.</p>
+<p>KServe가 잘 맞는 상황은 다음과 같다.</p>
+<ul>
+<li>팀이 이미 Kubernetes를 production platform으로 쓰고 있다.</li>
+<li>모델 배포 단위를 CRD로 표준화하고 싶다.</li>
+<li>model service마다 networking, autoscaling, health check, revision, traffic routing을 일관되게 관리해야 한다.</li>
+<li>predictive model과 generative model을 같은 platform 관점에서 운영하고 싶다.</li>
+<li>canary rollout, A/B testing, inference graph, pre/post processing 같은 deployment pattern이 중요하다.</li>
+</ul>
+<p>KServe의 장점은 runtime을 감싸는 platform contract를 제공한다는 점이다. 예를 들어 LLM serving에서는 vLLM 또는 llm-d 같은 backend를 활용하고, OpenAI-compatible protocol, model caching, GPU acceleration, autoscaling 같은 platform 기능을 함께 제공할 수 있다.</p>
+<p>하지만 KServe도 모든 문제를 해결하지 않는다.</p>
+<table>
+<thead>
+<tr>
+<th>KServe가 해주는 것</th>
+<th>여전히 필요한 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Kubernetes CRD 기반 model lifecycle</td>
+<td>model 품질 eval과 release approval</td>
+</tr>
+<tr>
+<td>autoscaling, networking, health checking</td>
+<td>GPU capacity planning과 node pool 설계</td>
+</tr>
+<tr>
+<td>canary rollout, A/B testing</td>
+<td>application-level fallback policy</td>
+</tr>
+<tr>
+<td>model storage URI와 resource declaration</td>
+<td>model artifact versioning 기준</td>
+</tr>
+<tr>
+<td>predictive/generative serving abstraction</td>
+<td>runtime별 tuning과 metric 해석</td>
+</tr>
+</tbody>
+</table>
+<p>KServe를 YAML부터 배우면 목적을 놓치기 쉽다. 중요한 것은 <code>InferenceService</code> spec의 모든 필드를 외우는 것이 아니라, model serving을 Kubernetes production object로 바꾸는 책임이 무엇인지 이해하는 것이다.</p>
+<h2 id="ray-serve-python-composition-distributed-serving">Ray Serve: Python composition과 distributed serving<a class="headerlink" href="#ray-serve-python-composition-distributed-serving" title="Permanent link">&para;</a></h2>
+<p>Ray Serve는 Ray 위에서 online inference API를 만들기 위한 scalable model serving library다. 공식 문서는 Ray Serve가 framework-agnostic이며 PyTorch, TensorFlow, Keras, Scikit-Learn model부터 arbitrary Python business logic까지 하나의 toolkit으로 서빙할 수 있다고 설명한다. 또한 LLM serving을 위한 response streaming, dynamic request batching, multi-node/multi-GPU serving 같은 기능을 제공한다.</p>
+<p>Ray Serve가 특히 강한 지점은 model composition이다. 여러 model, retriever, preprocessor, postprocessor, validation logic, business rule을 Python code로 묶고, 각 step을 독립적으로 스케일할 수 있다.</p>
+<p>Ray Serve가 잘 맞는 상황은 다음과 같다.</p>
+<ul>
+<li>inference path가 단일 model call이 아니라 Python business logic과 여러 component의 조합이다.</li>
+<li>RAG, agent, validation, custom routing, postprocessing을 한 application graph로 다루고 싶다.</li>
+<li>Kubernetes 없이 로컬 또는 Ray cluster에서 먼저 개발하고, 나중에 KubeRay로 확장하고 싶다.</li>
+<li>각 component를 독립적으로 autoscale하고 싶다.</li>
+<li>model-specific optimized server보다 application composition과 distributed execution이 더 중요하다.</li>
+</ul>
+<p>Ray Serve는 KServe나 Triton과 다른 질문에 답한다. "이 모델을 어떤 backend로 서빙할까"보다 "여러 model과 Python logic으로 된 inference application을 어떻게 scalable service로 만들까"에 가깝다.</p>
+<p>주의할 점도 있다. Ray Serve 문서도 Ray Serve가 full-fledged ML platform은 아니라고 설명한다. Model lifecycle 관리, 성능 시각화, organization-wide governance는 별도 platform 계층이 필요할 수 있다. 또한 model-specific kernel optimization은 Triton이나 TensorRT-LLM 같은 runtime/server 계층과 별도로 봐야 한다.</p>
+<h2 id="_1">세 도구를 같은 표에 억지로 넣지 않는다<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Triton, KServe, Ray Serve는 모두 "serving"이라는 단어를 쓰지만 같은 범주의 제품이 아니다.</p>
+<table>
+<thead>
+<tr>
+<th>도구</th>
+<th>가장 가까운 역할</th>
+<th>먼저 물어볼 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Triton</td>
+<td>multi-framework inference server</td>
+<td>여러 backend와 model을 protocol, batching, metrics로 표준화할 것인가?</td>
+</tr>
+<tr>
+<td>KServe</td>
+<td>Kubernetes-native model serving platform</td>
+<td>model service lifecycle, rollout, autoscaling을 Kubernetes CRD로 표준화할 것인가?</td>
+</tr>
+<tr>
+<td>Ray Serve</td>
+<td>programmable distributed serving framework</td>
+<td>model composition과 Python business logic을 scalable service로 만들 것인가?</td>
+</tr>
+</tbody>
+</table>
+<p>따라서 선택은 배타적이지 않을 수 있다. 어떤 조직은 Triton을 model server로 쓰고 KServe로 Kubernetes lifecycle을 관리할 수 있다. 어떤 팀은 Ray Serve로 RAG application graph를 구성하고, 내부 step에서 optimized runtime을 호출할 수 있다. 중요한 것은 "하나만 골라야 한다"가 아니라 "어떤 계층의 책임을 해결하는가"다.</p>
+<h2 id="canary-rollout-platform">Canary rollout은 platform 책임을 보여 준다<a class="headerlink" href="#canary-rollout-platform" title="Permanent link">&para;</a></h2>
+<p>Runtime 관점에서는 새 model artifact를 로드하면 끝처럼 보인다. Platform 관점에서는 그때부터가 시작이다. Production rollout은 보통 다음 질문을 포함한다.</p>
+<ul>
+<li>새 model/runtime version을 몇 퍼센트 traffic에 보낼 것인가?</li>
+<li>p95 latency, error rate, refusal rate, tool call success rate가 나빠지면 자동으로 멈출 것인가?</li>
+<li>기존 version으로 rollback할 경로가 있는가?</li>
+<li>user cohort, tenant, endpoint별로 traffic을 나눌 수 있는가?</li>
+<li>metric과 trace가 version label을 포함하는가?</li>
+</ul>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/platform-canary-rollout.svg" alt="Canary rollout path from model registry to baseline service, canary service, traffic split, metrics, eval gate, promote or rollback">
+  <figcaption><strong>Canary rollout path.</strong> Platform은 새 runtime을 띄우는 것보다 traffic split, metric gate, eval gate, rollback path를 책임져야 한다.</figcaption>
+</figure>
+
+<p>KServe는 canary rollout과 A/B testing을 platform 기능으로 강조한다. Ray Serve는 application graph와 component-level autoscaling을 통해 rollout 전략을 만들 수 있다. Triton은 model repository와 model management, metrics를 제공하지만 service-level traffic split은 Kubernetes/service mesh/gateway 계층과 함께 설계해야 한다.</p>
+<h2 id="platform">Platform을 도입하기 전에 고정할 계약<a class="headerlink" href="#platform" title="Permanent link">&para;</a></h2>
+<p>Platform을 고르기 전에 먼저 service contract를 문서화해야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>계약</th>
+<th>질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>endpoint contract</td>
+<td>OpenAI-compatible인가, native protocol인가, gRPC인가?</td>
+</tr>
+<tr>
+<td>artifact contract</td>
+<td>HF checkpoint, TensorRT engine, GGUF, container image, model storage URI 중 무엇이 release 단위인가?</td>
+</tr>
+<tr>
+<td>resource contract</td>
+<td>GPU type, GPU count, CPU, memory, model cache, local SSD가 얼마나 필요한가?</td>
+</tr>
+<tr>
+<td>scaling contract</td>
+<td>무엇을 기준으로 replica를 늘릴 것인가? QPS, concurrency, queue, GPU memory, custom metric?</td>
+</tr>
+<tr>
+<td>rollout contract</td>
+<td>canary traffic 비율, promotion gate, rollback trigger는 무엇인가?</td>
+</tr>
+<tr>
+<td>observability contract</td>
+<td>metric, log, trace, eval result에 model/runtime/version label이 있는가?</td>
+</tr>
+<tr>
+<td>failure contract</td>
+<td>timeout, OOM, bad output, safety failure, dependency failure를 어떻게 구분하는가?</td>
+</tr>
+</tbody>
+</table>
+<p>이 계약 없이 platform부터 도입하면 YAML과 controller는 생기지만 운영 판단은 여전히 사람 머릿속에 남는다.</p>
+<h2 id="platform-responsibility-checklist">실습: platform responsibility checklist 만들기<a class="headerlink" href="#platform-responsibility-checklist" title="Permanent link">&para;</a></h2>
+<p>10장에서 runtime 후보를 고른 뒤, 11장에서는 다음 checklist를 채운다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>현재 상태</th>
+<th>필요한 platform 책임</th>
+<th>후보</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>runtime</td>
+<td>vLLM / TensorRT-LLM / SGLang / llama.cpp</td>
+<td>실행과 tuning</td>
+<td>runtime</td>
+</tr>
+<tr>
+<td>packaging</td>
+<td>container image / model storage URI</td>
+<td>재현 가능한 release</td>
+<td>CI/CD, registry</td>
+</tr>
+<tr>
+<td>deployment</td>
+<td>manual command / Kubernetes YAML</td>
+<td>rollout과 rollback</td>
+<td>KServe, Ray Serve, custom</td>
+</tr>
+<tr>
+<td>routing</td>
+<td>direct endpoint / gateway</td>
+<td>traffic split, tenant routing</td>
+<td>gateway, KServe, service mesh</td>
+</tr>
+<tr>
+<td>scaling</td>
+<td>fixed replica / HPA / custom</td>
+<td>queue와 GPU 기준 scaling</td>
+<td>KServe, Ray Serve, KEDA, HPA</td>
+</tr>
+<tr>
+<td>observability</td>
+<td>runtime metrics only</td>
+<td>version-aware dashboard</td>
+<td>Prometheus, Grafana, tracing</td>
+</tr>
+<tr>
+<td>eval gate</td>
+<td>manual spot check</td>
+<td>quality and safety gate</td>
+<td>eval pipeline</td>
+</tr>
+<tr>
+<td>incident response</td>
+<td>restart server</td>
+<td>rollback, drain, rate limit</td>
+<td>platform runbook</td>
+</tr>
+</tbody>
+</table>
+<p>이 표의 목적은 특정 도구를 고르는 것이 아니라 빠진 책임을 찾는 것이다. 예를 들어 runtime metrics는 있는데 version-aware dashboard가 없다면, canary rollout을 해도 어떤 version이 문제인지 추적하기 어렵다. Kubernetes deployment는 있는데 model artifact release record가 없다면 rollback은 형식만 있는 셈이다.</p>
+<h2 id="_2">실패 패턴<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h3 id="yaml-platform">YAML을 platform이라고 착각한다<a class="headerlink" href="#yaml-platform" title="Permanent link">&para;</a></h3>
+<p>Kubernetes YAML이 있다고 platform이 되는 것은 아니다. Release approval, traffic policy, metric gate, rollback runbook이 없다면 배포 파일만 있는 상태다.</p>
+<h3 id="runtime-tuning-platform-scaling">runtime tuning과 platform scaling을 섞는다<a class="headerlink" href="#runtime-tuning-platform-scaling" title="Permanent link">&para;</a></h3>
+<p><code>max_num_seqs</code>, KV cache size, batch token limit은 runtime tuning이다. Replica count, node pool, autoscaling policy는 platform scaling이다. 둘은 연결되지만 같은 레버가 아니다.</p>
+<h3 id="gpu-autoscaling-qps">GPU autoscaling을 QPS만으로 한다<a class="headerlink" href="#gpu-autoscaling-qps" title="Permanent link">&para;</a></h3>
+<p>LLM serving에서 QPS 10은 token shape에 따라 완전히 다른 부하다. Platform scaling은 QPS뿐 아니라 input token, output token, active sequence, queue time, KV cache usage를 함께 봐야 한다.</p>
+<h3 id="canary-latency">canary를 latency만으로 판단한다<a class="headerlink" href="#canary-latency" title="Permanent link">&para;</a></h3>
+<p>새 model이 빠르더라도 tool call format, grounding, refusal behavior, citation quality가 나빠질 수 있다. Generative AI rollout은 latency gate와 quality gate가 함께 필요하다.</p>
+<h3 id="platform-security-governance">platform이 security와 governance를 자동으로 해결한다고 본다<a class="headerlink" href="#platform-security-governance" title="Permanent link">&para;</a></h3>
+<p>KServe나 Ray Serve를 도입해도 tenant isolation, auth, audit log, data retention, policy enforcement는 별도 설계가 필요하다.</p>
+<h2 id="_3">정리<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Runtime은 model execution path를 다루고, platform은 deployment lifecycle과 운영 책임을 다룬다.</li>
+<li>Triton은 multi-framework inference server로 model repository, backend, scheduler, batching, metrics에 강하다.</li>
+<li>KServe는 Kubernetes-native model serving platform으로 <code>InferenceService</code>, autoscaling, networking, health checking, rollout을 표준화한다.</li>
+<li>Ray Serve는 Python business logic과 model composition을 scalable online service로 만드는 데 강하다.</li>
+<li>Canary rollout은 platform 책임을 가장 잘 보여 주는 예다. Traffic split, metric gate, eval gate, rollback path가 함께 있어야 한다.</li>
+<li>Platform 도입 전에는 endpoint, artifact, resource, scaling, rollout, observability, failure contract를 먼저 문서화해야 한다.</li>
+</ul>
+<h2 id="source-anchors">Source anchors<a class="headerlink" href="#source-anchors" title="Permanent link">&para;</a></h2>
+<ul>
+<li>NVIDIA Triton Inference Server docs: <a href="https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/">https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/</a></li>
+<li>KServe website and docs: <a href="https://kserve.github.io/website/">https://kserve.github.io/website/</a></li>
+<li>Ray Serve docs: <a href="https://docs.ray.io/en/latest/serve/index.html">https://docs.ray.io/en/latest/serve/index.html</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../10-runtime-selection-tensorrt-sglang-llamacpp/" class="md-footer__link md-footer__link--prev" aria-label="이전: 10장. Runtime 선택">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                10장. Runtime 선택
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../../source-policy/" class="md-footer__link md-footer__link--next" aria-label="다음: 소스 정책">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                소스 정책
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+        <script src="../../javascripts/header-home-link.js"></script>
+
+
+  </body>
+</html>

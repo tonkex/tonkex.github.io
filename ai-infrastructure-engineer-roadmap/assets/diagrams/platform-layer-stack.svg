@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="650" viewBox="0 0 1180 650" role="img" aria-labelledby="title desc">
+  <title id="title">Runtime and platform layer stack</title>
+  <desc id="desc">A layered diagram separating runtime, inference server, serving platform, orchestration framework, and gateway responsibilities.</desc>
+  <rect width="1180" height="650" fill="#ffffff"/>
+  <g font-family="Arial, sans-serif">
+    <text x="590" y="48" text-anchor="middle" font-size="29" font-weight="800" fill="#111827">모델 서버 위에는 platform 책임이 쌓인다</text>
+    <text x="590" y="82" text-anchor="middle" font-size="16" fill="#4b5563">execution path와 production lifecycle을 분리해서 봐야 한다</text>
+
+    <rect x="170" y="120" width="840" height="74" rx="12" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+    <text x="590" y="150" text-anchor="middle" font-size="20" font-weight="800" fill="#1d4ed8">Gateway / product policy</text>
+    <text x="590" y="176" text-anchor="middle" font-size="14" fill="#475569">auth, quota, tenant routing, fallback, audit, product SLA</text>
+
+    <rect x="170" y="215" width="840" height="74" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="590" y="245" text-anchor="middle" font-size="20" font-weight="800" fill="#047857">Serving platform</text>
+    <text x="590" y="271" text-anchor="middle" font-size="14" fill="#475569">KServe: InferenceService, rollout, autoscaling, networking, health checks</text>
+
+    <rect x="170" y="310" width="840" height="74" rx="12" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+    <text x="590" y="340" text-anchor="middle" font-size="20" font-weight="800" fill="#c2410c">Inference server / orchestration framework</text>
+    <text x="590" y="366" text-anchor="middle" font-size="14" fill="#475569">Triton: multi-framework inference server / Ray Serve: Python composition and distributed serving</text>
+
+    <rect x="170" y="405" width="840" height="74" rx="12" fill="#f5f3ff" stroke="#a78bfa" stroke-width="2"/>
+    <text x="590" y="435" text-anchor="middle" font-size="20" font-weight="800" fill="#6d28d9">Runtime</text>
+    <text x="590" y="461" text-anchor="middle" font-size="14" fill="#475569">vLLM, TensorRT-LLM, SGLang, llama.cpp: scheduler, KV cache, kernels, artifact loading</text>
+
+    <rect x="170" y="500" width="840" height="74" rx="12" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+    <text x="590" y="530" text-anchor="middle" font-size="20" font-weight="800" fill="#334155">Hardware and model artifacts</text>
+    <text x="590" y="556" text-anchor="middle" font-size="14" fill="#475569">GPU node, driver, CUDA, local SSD, HF checkpoint, TensorRT engine, GGUF, container image</text>
+
+    <text x="590" y="622" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Runtime을 바꿔도 rollout, scaling, gateway, observability 책임은 사라지지 않는다</text>
+  </g>
+</svg>
