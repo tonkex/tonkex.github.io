@@ -1,0 +1,1783 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+      
+      
+      
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/07-serving-metrics-ttft-tpot-throughput/">
+      
+      
+        <link rel="prev" href="../06-first-llm-server-openai-endpoint/">
+      
+      
+        <link rel="next" href="../../source-policy/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>7장. Serving metrics - AI 인프라 엔지니어 로드맵</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/site-navigation-v1.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#7-ttft-tpot-throughput-p95" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              7장. Serving metrics
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    시작하기
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    책 구조
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    책 구조
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../outline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    전체 목차
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sample-chapter-plan/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    샘플 챕터 계획
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    샘플 원고
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    샘플 원고
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../05-kv-cache-serving-bottleneck/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5장. KV cache 병목
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../06-first-llm-server-openai-endpoint/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    6장. 첫 LLM server
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7장. Serving metrics
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    7장. Serving metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        먼저 workload를 고정한다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ttft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TTFT: 사용자가 기다리기 시작하는 시간
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TTFT: 사용자가 기다리기 시작하는 시간">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ttft_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TTFT가 길 때 먼저 볼 것
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tpot-itl-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TPOT와 ITL: token이 흘러나오는 속도
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#end-to-end-latency-sla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        End-to-end latency: 제품 SLA의 숫자
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Throughput: 서버가 처리한 일의 양
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#p95-p99-tail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        p95와 p99: 평균이 숨기는 tail
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#queue-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Queue time을 분리하지 않으면 최적화가 틀린다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark command를 읽는 법
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workload_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        세 workload로 결과표 만들기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        성능 숫자를 비교할 때의 금지 사항
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="성능 숫자를 비교할 때의 금지 사항">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#token-shape-workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        다른 token shape를 같은 workload처럼 비교하기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaming-non-streaming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        streaming과 non-streaming 결과를 섞기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        평균만 보고 tail을 무시하기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpu-utilization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU utilization만 보고 성공이라고 말하기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#benchmark-dataset-production-workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        benchmark dataset을 production workload라고 착각하기
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost-per-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost per token은 마지막에 붙인다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        읽는 순서: 네 단계
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#incident" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        작은 incident 예시
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        이 장의 결론
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources-checked-for-this-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources checked for this draft
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    제작 노트
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    제작 노트
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../source-policy/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    소스 정책
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    다음 작업
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        먼저 workload를 고정한다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ttft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TTFT: 사용자가 기다리기 시작하는 시간
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TTFT: 사용자가 기다리기 시작하는 시간">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ttft_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TTFT가 길 때 먼저 볼 것
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tpot-itl-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TPOT와 ITL: token이 흘러나오는 속도
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#end-to-end-latency-sla" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        End-to-end latency: 제품 SLA의 숫자
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#throughput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Throughput: 서버가 처리한 일의 양
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#p95-p99-tail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        p95와 p99: 평균이 숨기는 tail
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#queue-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Queue time을 분리하지 않으면 최적화가 틀린다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benchmark-command" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benchmark command를 읽는 법
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#workload_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        세 workload로 결과표 만들기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        성능 숫자를 비교할 때의 금지 사항
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="성능 숫자를 비교할 때의 금지 사항">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#token-shape-workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        다른 token shape를 같은 workload처럼 비교하기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#streaming-non-streaming" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        streaming과 non-streaming 결과를 섞기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tail" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        평균만 보고 tail을 무시하기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpu-utilization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GPU utilization만 보고 성공이라고 말하기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#benchmark-dataset-production-workload" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        benchmark dataset을 production workload라고 착각하기
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cost-per-token" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cost per token은 마지막에 붙인다
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        읽는 순서: 네 단계
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#incident" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        작은 incident 예시
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        이 장의 결론
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sources-checked-for-this-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sources checked for this draft
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="7-ttft-tpot-throughput-p95">7장. TTFT, TPOT, throughput, p95를 읽는 법<a class="headerlink" href="#7-ttft-tpot-throughput-p95" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>Draft v0.1</span>
+  <span>Updated: 2026-07-10</span>
+  <span>Part 3 - 단일 GPU에서 serving을 측정하기</span>
+</div>
+
+<p>6장에서 첫 LLM server를 띄웠다. 이제 다음 질문은 "빠른가?"이다. 이 질문은 단순해 보이지만, LLM serving에서는 가장 자주 잘못 묻는 질문이기도 하다.</p>
+<p><code>tokens/sec</code>가 높으면 빠른가? 평균 latency가 낮으면 사용자가 만족하는가? GPU utilization이 높으면 좋은 상태인가? p95가 튀면 모델이 느린 것인가, queue가 밀린 것인가, prompt가 긴 것인가?</p>
+<p>이 장의 독자 질문은 다음과 같다.</p>
+<blockquote>
+<p>tokens/sec가 높다는 말이 사용자에게 빠르다는 뜻인가?</p>
+</blockquote>
+<p>답은 "그럴 수도 있지만, 그것만으로는 모른다"이다. LLM serving 성능은 하나의 숫자로 읽지 않는다. TTFT, TPOT, end-to-end latency, throughput, request rate, p95/p99, token shape, queue, KV cache를 함께 읽어야 한다.</p>
+<h2 id="workload">먼저 workload를 고정한다<a class="headerlink" href="#workload" title="Permanent link">&para;</a></h2>
+<p>Benchmark 숫자를 읽기 전에 workload를 고정해야 한다. LLM serving에서 "요청 1개"는 일정한 단위가 아니다. 입력 token 200개와 출력 token 50개짜리 요청, 입력 token 16k개와 출력 token 50개짜리 요청, 입력 token 500개와 출력 token 2k개짜리 요청은 모두 다른 시스템 문제다.</p>
+<p>첫 측정에서는 최소 세 workload를 분리한다.</p>
+<table>
+<thead>
+<tr>
+<th>workload</th>
+<th>목적</th>
+<th>주로 보는 지표</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>short chat</td>
+<td>일반 대화형 응답</td>
+<td>TTFT, TPOT, p95 latency</td>
+</tr>
+<tr>
+<td>long prompt</td>
+<td>긴 문서/RAG 질의</td>
+<td>TTFT, prefill time, KV cache usage</td>
+</tr>
+<tr>
+<td>high concurrency</td>
+<td>동시 요청 처리</td>
+<td>throughput, queue time, p95/p99</td>
+</tr>
+</tbody>
+</table>
+<p>이 세 가지를 섞어서 평균을 내면 아무것도 설명하지 못한다. short chat은 interactive latency 문제이고, long prompt는 prefill과 KV cache 문제이며, high concurrency는 scheduler와 queue 문제다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/llm-latency-decomposition.svg" alt="LLM request latency split into queue, prefill, first token, decode, and final response">
+  <figcaption><strong>LLM request latency 분해.</strong> 전체 latency는 queue, prefill, 첫 token, decode로 나뉜다. 어떤 구간이 늘었는지 알아야 올바른 최적화를 선택할 수 있다.</figcaption>
+</figure>
+
+<h2 id="ttft">TTFT: 사용자가 기다리기 시작하는 시간<a class="headerlink" href="#ttft" title="Permanent link">&para;</a></h2>
+<p>TTFT는 time to first token이다. 요청을 보낸 시점부터 첫 token 또는 첫 streaming chunk가 도착할 때까지의 시간이다. NVIDIA GenAI-Perf 문서는 TTFT를 request가 전송된 뒤 첫 response가 수신될 때까지의 시간으로 정의한다. vLLM production metrics도 <code>vllm:time_to_first_token_seconds</code> histogram을 제공한다.</p>
+<p>TTFT는 interactive chat에서 매우 중요하다. 사용자는 전체 답변이 끝나기 전에도 첫 글자가 빨리 나오면 시스템이 반응한다고 느낀다. 반대로 전체 답변 시간이 짧아도 첫 token이 늦으면 "멈춘 것 같다"고 느낀다.</p>
+<p>TTFT에는 보통 다음이 섞인다.</p>
+<ul>
+<li>client와 server 사이 network 시간</li>
+<li>API gateway 또는 application queue</li>
+<li>runtime scheduler queue</li>
+<li>tokenizer와 prompt serialization</li>
+<li>prefill compute</li>
+<li>KV cache allocation</li>
+<li>첫 decode step</li>
+</ul>
+<p>따라서 TTFT가 높다고 바로 "모델이 느리다"고 말하면 안 된다. queue가 길어도 TTFT가 늘고, prompt가 길어도 TTFT가 늘고, cold start나 prefix cache miss가 있어도 TTFT가 늘어난다.</p>
+<h3 id="ttft_1">TTFT가 길 때 먼저 볼 것<a class="headerlink" href="#ttft_1" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>관찰</th>
+<th>가능한 원인</th>
+<th>다음 확인</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>모든 요청의 TTFT가 길다</td>
+<td>model/runtime baseline 자체가 느림</td>
+<td>단일 요청, 짧은 prompt로 재측정</td>
+</tr>
+<tr>
+<td>긴 prompt만 TTFT가 길다</td>
+<td>prefill 병목</td>
+<td>input tokens, <code>request_prefill_time_seconds</code></td>
+</tr>
+<tr>
+<td>동시 요청에서만 TTFT가 길다</td>
+<td>queue/scheduler pressure</td>
+<td><code>num_requests_waiting</code>, queue time</td>
+</tr>
+<tr>
+<td>같은 prefix 반복인데 TTFT가 줄지 않는다</td>
+<td>prefix cache 미적용</td>
+<td>cache hit, prompt normalization</td>
+</tr>
+<tr>
+<td>첫 요청만 유난히 느리다</td>
+<td>cold start, compile, weight/page cache</td>
+<td>warmup 분리</td>
+</tr>
+</tbody>
+</table>
+<p>TTFT는 "사용자 체감 시작점"이지만, 원인은 여러 계층에 있다.</p>
+<h2 id="tpot-itl-token">TPOT와 ITL: token이 흘러나오는 속도<a class="headerlink" href="#tpot-itl-token" title="Permanent link">&para;</a></h2>
+<p>TPOT는 time per output token이다. 첫 token 이후 output token 하나를 생성하는 데 걸리는 평균 시간으로 이해하면 된다. vLLM benchmark 출력도 "Time per Output Token (excl. 1st token)"을 따로 보여준다. vLLM metrics에는 <code>vllm:request_time_per_output_token_seconds</code>가 있고, <code>vllm:inter_token_latency_seconds</code>도 제공된다.</p>
+<p>ITL은 inter-token latency다. streaming 응답에서 중간 response 사이의 시간이다. NVIDIA GenAI-Perf는 inter token latency를 한 request 안에서 중간 response 사이의 시간으로 집계한다.</p>
+<p>둘은 비슷해 보이지만 관점이 다르다.</p>
+<table>
+<thead>
+<tr>
+<th>지표</th>
+<th>질문</th>
+<th>해석</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TPOT</td>
+<td>이 요청의 decode는 평균적으로 token당 얼마나 걸렸는가?</td>
+<td>request 단위 decode 속도</td>
+</tr>
+<tr>
+<td>ITL</td>
+<td>streaming 중 token 간격은 얼마나 안정적인가?</td>
+<td>사용자에게 보이는 출력 리듬</td>
+</tr>
+<tr>
+<td>output tokens/sec</td>
+<td>전체 benchmark 동안 output token을 얼마나 많이 냈는가?</td>
+<td>system throughput</td>
+</tr>
+</tbody>
+</table>
+<p>Interactive chat에서는 TTFT와 ITL이 중요하다. 사용자는 첫 token이 빠르게 나오고 이후 token이 일정하게 흐르기를 기대한다. Offline batch summarization에서는 TTFT보다 전체 throughput이 더 중요할 수 있다.</p>
+<h2 id="end-to-end-latency-sla">End-to-end latency: 제품 SLA의 숫자<a class="headerlink" href="#end-to-end-latency-sla" title="Permanent link">&para;</a></h2>
+<p>End-to-end latency는 request를 보낸 시점부터 최종 response가 끝날 때까지의 시간이다. NVIDIA GenAI-Perf의 request latency 정의도 request 전송부터 final response 수신까지다. vLLM metrics에는 <code>vllm:e2e_request_latency_seconds</code>가 있다.</p>
+<p>End-to-end latency는 제품 SLA에 가깝다. 사용자가 보는 최종 대기 시간이기 때문이다. 하지만 이 숫자만 보면 원인을 잃는다.</p>
+<p>대략적으로는 다음처럼 볼 수 있다.</p>
+<div class="arithmatex">\[
+T_{e2e} \approx T_{queue} + T_{prefill} + T_{first\_decode} + (N_{out} - 1) \times T_{pot}
+\]</div>
+<p>정확한 runtime 내부 구현은 더 복잡하지만, 운영자가 볼 mental model로는 충분하다.</p>
+<p>이 식에서 중요한 점은 output length다. 같은 TPOT라도 output token이 50개인 요청과 1000개인 요청의 total latency는 다르다. 그래서 latency를 비교할 때는 input tokens와 output tokens를 항상 같이 기록해야 한다.</p>
+<h2 id="throughput">Throughput: 서버가 처리한 일의 양<a class="headerlink" href="#throughput" title="Permanent link">&para;</a></h2>
+<p>Throughput은 서버가 단위 시간에 처리한 일의 양이다. 여기에는 여러 종류가 있다.</p>
+<table>
+<thead>
+<tr>
+<th>지표</th>
+<th>의미</th>
+<th>주의점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>request throughput</td>
+<td>초당 완료 request 수</td>
+<td>request token shape가 다르면 비교 불가</td>
+</tr>
+<tr>
+<td>output token throughput</td>
+<td>초당 생성 output token 수</td>
+<td>사용자 latency를 직접 보장하지 않음</td>
+</tr>
+<tr>
+<td>total token throughput</td>
+<td>input+output token 처리량</td>
+<td>prefill-heavy workload에서 커짐</td>
+</tr>
+<tr>
+<td>per-user throughput</td>
+<td>한 사용자에게 보이는 token/sec</td>
+<td>전체 throughput과 다를 수 있음</td>
+</tr>
+</tbody>
+</table>
+<p>vLLM benchmark 예시는 request throughput, output token throughput, total token throughput을 함께 출력한다. NVIDIA GenAI-Perf도 output token throughput과 request throughput을 별도 지표로 둔다.</p>
+<p>Throughput은 capacity planning에 중요하다. 하지만 throughput만 높이는 최적화는 tail latency를 망칠 수 있다. batch를 키우면 GPU utilization과 output token throughput은 좋아질 수 있지만, 요청이 queue에서 기다리는 시간이 늘면 p95 latency는 나빠질 수 있다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/throughput-latency-tradeoff.svg" alt="Throughput and latency trade-off curve with safe operating region and saturation region">
+  <figcaption><strong>Throughput-latency trade-off.</strong> 동시성을 올리면 처리량은 증가하지만 어느 지점부터 queue와 tail latency가 급격히 커진다. 운영점은 최대 throughput 지점이 아니라 latency budget 안쪽에서 잡는다.</figcaption>
+</figure>
+
+<h2 id="p95-p99-tail">p95와 p99: 평균이 숨기는 tail<a class="headerlink" href="#p95-p99-tail" title="Permanent link">&para;</a></h2>
+<p>평균 latency는 좋은 첫 요약이지만 production 판단에는 부족하다. 사용자 100명 중 95번째 또는 99번째 요청이 얼마나 느린지 봐야 한다. p95와 p99는 tail latency를 보여준다.</p>
+<p>예를 들어 평균 latency가 1.2초이고 p99가 12초라면, 평균만 보고 "빠르다"고 말할 수 없다. 특히 LLM serving에서는 다음 이유로 tail이 쉽게 생긴다.</p>
+<ul>
+<li>일부 request의 input token이 매우 길다.</li>
+<li>일부 request의 output token이 매우 길다.</li>
+<li>동시 요청이 몰려 queue가 생긴다.</li>
+<li>KV cache가 부족해 preemption 또는 eviction이 발생한다.</li>
+<li>prefix cache hit/miss가 섞인다.</li>
+<li>tool call, structured output, reasoning output처럼 decode path가 달라진다.</li>
+<li>cold start, model load, CUDA graph capture, compilation이 일부 요청에만 섞인다.</li>
+</ul>
+<p>p95/p99를 볼 때도 token shape를 같이 봐야 한다. 긴 요청이 느린 것은 자연스럽다. 문제는 같은 token shape인데 tail이 길어지는 경우다.</p>
+<h2 id="queue-time">Queue time을 분리하지 않으면 최적화가 틀린다<a class="headerlink" href="#queue-time" title="Permanent link">&para;</a></h2>
+<p>동시 요청이 들어오면 모든 요청이 즉시 GPU에서 실행되는 것은 아니다. scheduler는 현재 batch, KV cache capacity, max concurrency, prefill/decode 정책을 보고 요청을 실행한다. 밀린 요청은 waiting 상태에 머문다.</p>
+<p>vLLM metrics에는 <code>vllm:num_requests_running</code>, <code>vllm:num_requests_waiting</code>, <code>vllm:request_queue_time_seconds</code>가 있다. <code>num_requests_waiting_by_reason</code>은 capacity 대기와 deferred 대기를 reason label로 나눠 보여준다.</p>
+<p>Queue time을 분리하지 않으면 다음처럼 잘못 판단할 수 있다.</p>
+<table>
+<thead>
+<tr>
+<th>보이는 현상</th>
+<th>성급한 결론</th>
+<th>더 나은 해석</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>p95 latency 증가</td>
+<td>model이 느리다</td>
+<td>queue가 길어진 것일 수 있다</td>
+</tr>
+<tr>
+<td>TTFT 증가</td>
+<td>prefill이 느리다</td>
+<td>scheduling 대기일 수 있다</td>
+</tr>
+<tr>
+<td>throughput 증가, latency 악화</td>
+<td>최적화 성공</td>
+<td>capacity 한계에 가까워진 것일 수 있다</td>
+</tr>
+<tr>
+<td>GPU utilization 높음</td>
+<td>좋은 상태</td>
+<td>tail SLA를 깨고 있을 수 있다</td>
+</tr>
+</tbody>
+</table>
+<p>AI 인프라 엔지니어는 "느리다"를 "어느 단계에서 기다렸는가"로 바꿔 말해야 한다.</p>
+<h2 id="benchmark-command">Benchmark command를 읽는 법<a class="headerlink" href="#benchmark-command" title="Permanent link">&para;</a></h2>
+<p>vLLM benchmark CLI는 online serving benchmark에서 <code>vllm bench serve</code>를 사용한다. 공식 예시는 먼저 <code>vllm serve ...</code>로 model server를 띄운 뒤, benchmark command로 dataset, backend, endpoint, prompt 수를 지정한다. 출력에는 successful requests, duration, total input/generated tokens, request throughput, output token throughput, TTFT, TPOT, ITL이 포함된다.</p>
+<p>첫 실습에서는 다음처럼 작은 synthetic workload부터 시작하는 편이 안전하다.</p>
+<div class="highlight"><pre><span></span><code>vllm<span class="w"> </span>bench<span class="w"> </span>serve<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--backend<span class="w"> </span>openai-chat<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>Qwen/Qwen2.5-1.5B-Instruct<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--endpoint<span class="w"> </span>/v1/chat/completions<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dataset-name<span class="w"> </span>random<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--num-prompts<span class="w"> </span><span class="m">30</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--random-input-len<span class="w"> </span><span class="m">512</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--random-output-len<span class="w"> </span><span class="m">128</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--max-concurrency<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--save-result
+</code></pre></div>
+<p>그 다음 concurrency를 올린다.</p>
+<div class="highlight"><pre><span></span><code>vllm<span class="w"> </span>bench<span class="w"> </span>serve<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--backend<span class="w"> </span>openai-chat<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--model<span class="w"> </span>Qwen/Qwen2.5-1.5B-Instruct<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--endpoint<span class="w"> </span>/v1/chat/completions<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dataset-name<span class="w"> </span>random<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--num-prompts<span class="w"> </span><span class="m">100</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--random-input-len<span class="w"> </span><span class="m">512</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--random-output-len<span class="w"> </span><span class="m">128</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--max-concurrency<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--save-result
+</code></pre></div>
+<p>여기서 중요한 것은 "숫자가 좋아졌는가"가 아니다. <code>max_concurrency</code>를 올렸을 때 다음이 어떻게 움직이는지 보는 것이다.</p>
+<ul>
+<li>request throughput</li>
+<li>output token throughput</li>
+<li>mean/p95/p99 TTFT</li>
+<li>mean/p95/p99 TPOT 또는 ITL</li>
+<li>e2e latency</li>
+<li>waiting requests</li>
+<li>KV cache usage</li>
+<li>GPU utilization</li>
+</ul>
+<p>vLLM benchmark 문서는 <code>--request-rate</code>, <code>--burstiness</code>, <code>--max-concurrency</code>로 request 생성 속도와 동시 outstanding request를 조절할 수 있다고 설명한다. 특히 <code>--request-rate=inf --max-concurrency=&lt;limit&gt;</code> 패턴은 load balancer나 API gateway가 동시 연결을 제한하는 상황을 흉내 내는 데 유용하다.</p>
+<h2 id="workload_1">세 workload로 결과표 만들기<a class="headerlink" href="#workload_1" title="Permanent link">&para;</a></h2>
+<p>7장의 실습 산출물은 benchmark command가 아니라 비교표다.</p>
+<table>
+<thead>
+<tr>
+<th>run</th>
+<th style="text-align: right;">input len</th>
+<th style="text-align: right;">output len</th>
+<th style="text-align: right;">concurrency</th>
+<th style="text-align: right;">TTFT p95</th>
+<th style="text-align: right;">TPOT p95</th>
+<th style="text-align: right;">e2e p95</th>
+<th style="text-align: right;">output tok/s</th>
+<th style="text-align: right;">waiting p95</th>
+<th>해석</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">낮음</td>
+<td style="text-align: right;">낮음</td>
+<td style="text-align: right;">낮음</td>
+<td style="text-align: right;">낮음</td>
+<td style="text-align: right;">0</td>
+<td>baseline</td>
+</tr>
+<tr>
+<td>B</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">증가</td>
+<td style="text-align: right;">비슷</td>
+<td style="text-align: right;">증가</td>
+<td style="text-align: right;">비슷</td>
+<td style="text-align: right;">0</td>
+<td>prefill 영향</td>
+</tr>
+<tr>
+<td>C</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">증가</td>
+<td style="text-align: right;">약간 증가</td>
+<td style="text-align: right;">증가</td>
+<td style="text-align: right;">증가</td>
+<td style="text-align: right;">증가</td>
+<td>queue/scheduler 영향</td>
+</tr>
+<tr>
+<td>D</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">1024</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">증가</td>
+<td style="text-align: right;">증가 가능</td>
+<td style="text-align: right;">크게 증가</td>
+<td style="text-align: right;">증가</td>
+<td style="text-align: right;">증가</td>
+<td>decode 길이 영향</td>
+</tr>
+</tbody>
+</table>
+<p>수치는 실제 환경에서 채운다. 중요한 것은 "어떤 지표가 같이 움직였는가"다.</p>
+<ul>
+<li>input length를 늘렸더니 TTFT만 커졌다: prefill 쪽을 본다.</li>
+<li>output length를 늘렸더니 e2e latency가 커졌다: decode 길이가 지배한다.</li>
+<li>concurrency를 올렸더니 throughput과 p95가 같이 올랐다: saturation 지점을 찾는다.</li>
+<li>waiting requests가 생겼다: model compute 이전에 queue가 병목이다.</li>
+<li>KV cache usage가 높고 p95가 튄다: context length, max concurrency, eviction/preemption 정책을 본다.</li>
+</ul>
+<h2 id="_1">성능 숫자를 비교할 때의 금지 사항<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>다음 비교는 피해야 한다.</p>
+<h3 id="token-shape-workload">다른 token shape를 같은 workload처럼 비교하기<a class="headerlink" href="#token-shape-workload" title="Permanent link">&para;</a></h3>
+<p>한 결과는 평균 input 300 tokens, output 100 tokens이고 다른 결과는 input 4k tokens, output 100 tokens라면 같은 benchmark가 아니다. TTFT가 다른 것은 당연하다.</p>
+<h3 id="streaming-non-streaming">streaming과 non-streaming 결과를 섞기<a class="headerlink" href="#streaming-non-streaming" title="Permanent link">&para;</a></h3>
+<p>TTFT와 ITL은 streaming 관찰과 관련이 깊다. non-streaming client에서는 첫 token 시점을 직접 보지 못한다. end-to-end latency만 비교하게 된다.</p>
+<h3 id="tail">평균만 보고 tail을 무시하기<a class="headerlink" href="#tail" title="Permanent link">&para;</a></h3>
+<p>평균은 capacity planning 초기에 유용하지만 product SLA에는 p95/p99가 더 중요하다. 특히 multi-tenant serving에서는 tail이 사용자 불만과 incident로 이어진다.</p>
+<h3 id="gpu-utilization">GPU utilization만 보고 성공이라고 말하기<a class="headerlink" href="#gpu-utilization" title="Permanent link">&para;</a></h3>
+<p>GPU utilization이 높다는 것은 GPU가 바쁘다는 뜻이지, 사용자가 빠르게 응답을 받는다는 뜻은 아니다. queue가 길어져도 GPU는 바쁠 수 있다.</p>
+<h3 id="benchmark-dataset-production-workload">benchmark dataset을 production workload라고 착각하기<a class="headerlink" href="#benchmark-dataset-production-workload" title="Permanent link">&para;</a></h3>
+<p>ShareGPT, random, synthetic workload는 비교와 재현에는 좋지만 실제 traffic을 그대로 대표하지 않는다. Production에서는 prompt 길이, output 길이, tool call 비율, cache hit 비율, tenant별 burst가 다르다.</p>
+<h2 id="cost-per-token">Cost per token은 마지막에 붙인다<a class="headerlink" href="#cost-per-token" title="Permanent link">&para;</a></h2>
+<p>운영에서는 비용도 봐야 한다. 하지만 비용을 너무 일찍 붙이면 잘못된 결론이 나온다. 먼저 latency와 throughput을 안정적으로 읽어야 한다.</p>
+<p>대략적인 cost per 1M output tokens는 다음처럼 계산할 수 있다.</p>
+<div class="arithmatex">\[
+Cost_{1M\ output} \approx \frac{GPU\ hourly\ cost}{output\ tokens/sec \times 3600} \times 1{,}000{,}000
+\]</div>
+<p>이 계산은 단순화다. 실제 비용에는 다음이 들어간다.</p>
+<ul>
+<li>GPU instance 비용</li>
+<li>idle capacity</li>
+<li>replica 여유분</li>
+<li>prefill-heavy workload의 input token 처리 비용</li>
+<li>CPU, memory, network, storage</li>
+<li>observability와 logging 비용</li>
+<li>failed/retried request</li>
+<li>model load와 warmup 시간</li>
+</ul>
+<p>따라서 cost per token은 throughput 숫자 하나로 결정하지 않는다. SLA를 만족하는 운영점에서 계산해야 한다.</p>
+<h2 id="_2">읽는 순서: 네 단계<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Benchmark 결과를 받으면 다음 순서로 읽는다.</p>
+<ol>
+<li>Workload shape: input tokens, output tokens, concurrency, request rate, streaming 여부를 확인한다.</li>
+<li>User-facing latency: TTFT, ITL/TPOT, e2e latency의 p50/p95/p99를 본다.</li>
+<li>Server pressure: request throughput, output token throughput, queue time, running/waiting requests, KV cache usage를 본다.</li>
+<li>Bottleneck hypothesis: prefill 문제인지, decode 문제인지, queue 문제인지, KV cache 문제인지, workload mismatch인지 가설을 적는다.</li>
+</ol>
+<p>이 네 단계를 거치면 benchmark 숫자가 "좋다/나쁘다"가 아니라 "어느 운영점에서 어떤 trade-off가 생겼다"로 바뀐다.</p>
+<h2 id="incident">작은 incident 예시<a class="headerlink" href="#incident" title="Permanent link">&para;</a></h2>
+<p>상황을 하나 보자.</p>
+<p>팀이 6장에서 만든 vLLM server에 concurrency 1, 4, 8, 16으로 benchmark를 돌렸다. 결과는 다음과 같았다.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">concurrency</th>
+<th style="text-align: right;">output tok/s</th>
+<th style="text-align: right;">TTFT p95</th>
+<th style="text-align: right;">TPOT p95</th>
+<th style="text-align: right;">e2e p95</th>
+<th style="text-align: right;">waiting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">120</td>
+<td style="text-align: right;">180 ms</td>
+<td style="text-align: right;">12 ms</td>
+<td style="text-align: right;">1.8 s</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">360</td>
+<td style="text-align: right;">260 ms</td>
+<td style="text-align: right;">14 ms</td>
+<td style="text-align: right;">2.1 s</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">520</td>
+<td style="text-align: right;">900 ms</td>
+<td style="text-align: right;">18 ms</td>
+<td style="text-align: right;">4.8 s</td>
+<td style="text-align: right;">일부</td>
+</tr>
+<tr>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;">570</td>
+<td style="text-align: right;">3.5 s</td>
+<td style="text-align: right;">30 ms</td>
+<td style="text-align: right;">13 s</td>
+<td style="text-align: right;">많음</td>
+</tr>
+</tbody>
+</table>
+<p>concurrency 16에서 throughput은 조금 더 좋아졌지만 p95 latency는 크게 나빠졌다. 이 상태를 "성능이 좋아졌다"고 말하면 안 된다. 이 서버의 interactive workload 운영점은 concurrency 4와 8 사이일 가능성이 높다. 이후 할 일은 더 큰 batch를 밀어 넣는 것이 아니라 다음 중 하나를 고르는 것이다.</p>
+<ul>
+<li>latency budget을 기준으로 <code>max_concurrency</code>를 제한한다.</li>
+<li>replica를 늘린다.</li>
+<li>input/output token limit을 조정한다.</li>
+<li>prefix caching 또는 prompt 구조를 검토한다.</li>
+<li>더 작은 model이나 quantization을 검토한다.</li>
+<li>prefill/decode disaggregation 같은 구조적 변경은 나중 단계에서 검토한다.</li>
+</ul>
+<p>성능 지표는 최적화 목록을 자동으로 주지 않는다. 하지만 잘 읽으면 어디를 만지면 안 되는지 먼저 알려준다.</p>
+<h2 id="_3">이 장의 결론<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>LLM serving 성능은 하나의 숫자로 읽지 않는다. 사용자 체감, 서버 처리량, tail latency, workload shape, queue pressure를 분리해서 읽어야 한다.</p>
+<ul>
+<li>TTFT는 사용자가 응답을 받기 시작하는 시간이고, queue와 prefill 영향을 크게 받는다.</li>
+<li>TPOT/ITL은 첫 token 이후 token이 흘러나오는 속도이며, decode 병목을 읽는 데 중요하다.</li>
+<li>End-to-end latency는 제품 SLA에 가깝지만 원인 분석에는 분해가 필요하다.</li>
+<li>Throughput은 capacity planning에 중요하지만 tail latency를 보장하지 않는다.</li>
+<li>p95/p99는 평균이 숨기는 긴 요청, queue, KV cache pressure를 드러낸다.</li>
+<li>Benchmark 결과는 항상 input tokens, output tokens, concurrency, request rate와 함께 읽어야 한다.</li>
+</ul>
+<p>다음 장에서는 이 측정값을 바탕으로 quantization을 다룬다. Quantization은 memory와 throughput을 개선할 수 있지만, kernel support, accuracy, latency, KV cache 정책에 따라 기대와 다른 결과를 만들 수 있다.</p>
+<h2 id="sources-checked-for-this-draft">Sources checked for this draft<a class="headerlink" href="#sources-checked-for-this-draft" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://docs.vllm.ai/en/stable/usage/metrics/">vLLM Production Metrics</a></li>
+<li><a href="https://docs.vllm.ai/en/stable/benchmarking/cli/">vLLM Benchmark CLI</a></li>
+<li><a href="https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/perf_analyzer/genai-perf/README.html">NVIDIA GenAI-Perf metrics</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+        
+          
+          <a href="../06-first-llm-server-openai-endpoint/" class="md-footer__link md-footer__link--prev" aria-label="이전: 6장. 첫 LLM server">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                6장. 첫 LLM server
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../source-policy/" class="md-footer__link md-footer__link--next" aria-label="다음: 소스 정책">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                소스 정책
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/header-home-link.js"></script>
+      
+    
+  </body>
+</html>

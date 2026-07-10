@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="420" viewBox="0 0 1100 420" role="img" aria-labelledby="title desc">
+  <title id="title">LLM request latency decomposition</title>
+  <desc id="desc">A timeline splitting one LLM request into queue, prefill, first token, decode, and final response.</desc>
+  <rect width="1100" height="420" fill="#ffffff"/>
+  <text x="550" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="800" fill="#111827">전체 latency는 하나의 숫자가 아니라 여러 구간의 합이다</text>
+  <text x="550" y="82" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#4b5563">TTFT는 queue + prefill + 첫 decode를 포함하고, 이후 token 간격은 TPOT/ITL로 읽는다</text>
+
+  <line x1="120" y1="190" x2="980" y2="190" stroke="#111827" stroke-width="3"/>
+  <polygon points="980,190 958,178 958,202" fill="#111827"/>
+
+  <rect x="140" y="145" width="150" height="90" rx="8" fill="#fee2e2" stroke="#ef4444" stroke-width="2"/>
+  <text x="215" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#991b1b">Queue</text>
+  <text x="215" y="208" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#7f1d1d">waiting</text>
+
+  <rect x="300" y="145" width="190" height="90" rx="8" fill="#dbeafe" stroke="#3b82f6" stroke-width="2"/>
+  <text x="395" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#1e3a8a">Prefill</text>
+  <text x="395" y="208" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#1d4ed8">input tokens</text>
+
+  <rect x="500" y="145" width="135" height="90" rx="8" fill="#dcfce7" stroke="#22c55e" stroke-width="2"/>
+  <text x="567" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#166534">First token</text>
+  <text x="567" y="208" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#15803d">TTFT point</text>
+
+  <rect x="645" y="145" width="250" height="90" rx="8" fill="#ede9fe" stroke="#8b5cf6" stroke-width="2"/>
+  <text x="770" y="180" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#5b21b6">Decode stream</text>
+  <text x="770" y="208" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6d28d9">TPOT / ITL</text>
+
+  <circle cx="925" cy="190" r="18" fill="#f59e0b"/>
+  <text x="925" y="197" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="800" fill="#ffffff">E</text>
+  <text x="925" y="245" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#92400e">final response</text>
+
+  <line x1="140" y1="292" x2="635" y2="292" stroke="#059669" stroke-width="4"/>
+  <polygon points="635,292 615,281 615,303" fill="#059669"/>
+  <text x="387" y="323" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#047857">TTFT</text>
+  <text x="387" y="348" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#065f46">request start부터 첫 token까지</text>
+
+  <line x1="645" y1="292" x2="895" y2="292" stroke="#7c3aed" stroke-width="4" stroke-dasharray="12 8"/>
+  <text x="770" y="323" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#6d28d9">TPOT / ITL</text>
+  <text x="770" y="348" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#5b21b6">첫 token 이후 생성 속도</text>
+</svg>
