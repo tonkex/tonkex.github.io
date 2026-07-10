@@ -1,0 +1,2002 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/14-observability-gpu-runtime-request/">
+
+
+        <link rel="prev" href="../13-kubernetes-gpu-operations/">
+
+
+        <link rel="next" href="../../source-policy/">
+
+
+
+
+
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>14장. Observability - AI 인프라 엔지니어 로드맵</title>
+
+
+
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+      <link rel="stylesheet" href="../../stylesheets/site-navigation-v2.css">
+
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#14-observability-gpu-runtime-request-metric" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              14장. Observability
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    시작하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    책 구조
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    책 구조
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../outline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    전체 목차
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../sample-chapter-plan/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 챕터 계획
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 원고
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    샘플 원고
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-kv-cache-serving-bottleneck/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. KV cache 병목
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-first-llm-server-openai-endpoint/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. 첫 LLM server
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07-serving-metrics-ttft-tpot-throughput/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Serving metrics
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08-quantization-optimization-risk/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Quantization
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../09-vllm-serving-baseline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. vLLM baseline
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../10-runtime-selection-tensorrt-sglang-llamacpp/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. Runtime 선택
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../11-platform-layer-triton-kserve-rayserve/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. Platform 계층
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../12-parallelism-nccl-multi-gpu/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    12장. Parallelism과 NCCL
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../13-kubernetes-gpu-operations/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    13장. Kubernetes GPU 운영
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    14장. Observability
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    14장. Observability
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        "GPU가 바쁘다"는 충분한 설명이 아니다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#metric" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        네 종류의 metric을 분리해서 본다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#vllm-metric-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        vLLM metric은 runtime 내부를 보여 준다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#gpu-metric-dcgm-exporter" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU metric은 DCGM exporter로 가져온다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#prometheus-metric-type-query" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Prometheus metric type을 잘못 쓰면 query가 틀어진다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#label-contract-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Label contract가 없으면 dashboard는 예쁘지만 쓸모없다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#trace" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Trace는 "왜 이 요청이 느렸는가"를 복원한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#incident-triage" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Incident triage는 순서가 있어야 한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Dashboard는 역할별로 나눈다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#alert" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Alert는 증상과 원인을 섞지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#llm-serving-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: 첫 LLM serving dashboard 설계
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#latency" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        평균 latency만 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#gpu-utilization-success-metric" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU utilization을 success metric으로 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#label-cardinality" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Label cardinality를 통제하지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#runtime-metric-gpu-metric" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Runtime metric과 GPU metric이 연결되지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#rollout-label" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Rollout label이 없다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    제작 노트
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    제작 노트
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../source-policy/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    소스 정책
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    다음 작업
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        "GPU가 바쁘다"는 충분한 설명이 아니다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#metric" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        네 종류의 metric을 분리해서 본다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#vllm-metric-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        vLLM metric은 runtime 내부를 보여 준다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#gpu-metric-dcgm-exporter" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU metric은 DCGM exporter로 가져온다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#prometheus-metric-type-query" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Prometheus metric type을 잘못 쓰면 query가 틀어진다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#label-contract-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Label contract가 없으면 dashboard는 예쁘지만 쓸모없다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#trace" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Trace는 "왜 이 요청이 느렸는가"를 복원한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#incident-triage" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Incident triage는 순서가 있어야 한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Dashboard는 역할별로 나눈다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#alert" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Alert는 증상과 원인을 섞지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#llm-serving-dashboard" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: 첫 LLM serving dashboard 설계
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#latency" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        평균 latency만 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#gpu-utilization-success-metric" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        GPU utilization을 success metric으로 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#label-cardinality" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Label cardinality를 통제하지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#runtime-metric-gpu-metric" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Runtime metric과 GPU metric이 연결되지 않는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#rollout-label" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Rollout label이 없다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="14-observability-gpu-runtime-request-metric">14장. Observability: GPU, runtime, request metric을 한 화면에 연결하기<a class="headerlink" href="#14-observability-gpu-runtime-request-metric" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>Draft v0.1</span>
+  <span>Updated: 2026-07-10</span>
+  <span>Part 6 - Production 운영 loop</span>
+</div>
+
+<p>13장까지는 GPU workload를 Kubernetes에 올리는 방법을 봤다. 이제 production 운영에서 가장 자주 부딪히는 질문이 나온다.</p>
+<blockquote>
+<p>사용자는 "느리다"고 말하는데, 우리는 어디가 느린지 어떻게 증명할 것인가?</p>
+</blockquote>
+<p>GPU dashboard만 보면 GPU utilization은 보인다. Runtime dashboard만 보면 queue와 KV cache는 보인다. API gateway metric만 보면 request latency는 보인다. 하지만 이 세 화면이 연결되어 있지 않으면 incident 때 원인을 추정만 하게 된다.</p>
+<p>이 장의 독자 질문은 다음과 같다.</p>
+<blockquote>
+<p>LLM serving observability는 어떤 metric과 label을 연결해야 p95 latency, GPU 병목, KV cache pressure, rollout 문제를 한 번에 추적할 수 있는가?</p>
+</blockquote>
+<p>핵심은 하나다. Observability는 metric을 많이 모으는 일이 아니라, 같은 사건을 여러 계층의 signal로 다시 찾을 수 있게 만드는 일이다.</p>
+<h2 id="gpu">"GPU가 바쁘다"는 충분한 설명이 아니다<a class="headerlink" href="#gpu" title="Permanent link">&para;</a></h2>
+<p>LLM serving에서 느려지는 이유는 여러 가지다.</p>
+<table>
+<thead>
+<tr>
+<th>사용자 증상</th>
+<th>가능한 원인</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>첫 token이 늦다</td>
+<td>queue 증가, prefill 병목, model cold start, long prompt</td>
+</tr>
+<tr>
+<td>token이 천천히 나온다</td>
+<td>decode TPOT 악화, tensor parallel communication, GPU memory pressure</td>
+</tr>
+<tr>
+<td>일부 tenant만 느리다</td>
+<td>routing skew, long context tenant, quota 정책, 특정 replica 문제</td>
+</tr>
+<tr>
+<td>새 version만 느리다</td>
+<td>runtime config 변경, quantization regression, prompt template 변경</td>
+</tr>
+<tr>
+<td>GPU utilization은 낮은데 latency가 높다</td>
+<td>queue/scheduler 병목, CPU/tokenizer 병목, network, rate limiting</td>
+</tr>
+<tr>
+<td>GPU utilization은 높은데 throughput이 낮다</td>
+<td>작은 batch, KV cache fragmentation, memory bandwidth 병목</td>
+</tr>
+</tbody>
+</table>
+<p>따라서 dashboard의 첫 화면은 "GPU 사용률"이 아니라 "사용자 증상에서 병목 계층까지 내려가는 지도"여야 한다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/observability-signal-stack.svg" alt="Observability signal stack connecting GPU, Kubernetes, runtime, request, trace, and logs with shared labels">
+  <figcaption><strong>Observability signal stack.</strong> GPU, Kubernetes, runtime, request, trace/log signal은 `model_name`, `model_version`, `pod`, `node`, `gpu_uuid`, `route`, `tenant`, `request_id` 같은 label로 연결되어야 한다.</figcaption>
+</figure>
+
+<h2 id="metric">네 종류의 metric을 분리해서 본다<a class="headerlink" href="#metric" title="Permanent link">&para;</a></h2>
+<p>LLM serving dashboard는 최소 네 계층을 가져야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>계층</th>
+<th>대표 signal</th>
+<th>답하는 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Request</td>
+<td>QPS, error rate, TTFT, TPOT, e2e latency, p95/p99</td>
+<td>사용자가 무엇을 겪는가?</td>
+</tr>
+<tr>
+<td>Runtime</td>
+<td>queue, running/waiting request, KV cache usage, batch token, preemption</td>
+<td>runtime 안에서 무엇이 막히는가?</td>
+</tr>
+<tr>
+<td>GPU</td>
+<td>utilization, memory used, memory bandwidth proxy, temperature, power, ECC, XID</td>
+<td>hardware가 병목인가, 불안정한가?</td>
+</tr>
+<tr>
+<td>Kubernetes</td>
+<td>pod restart, node pressure, rollout version, replica placement, pending pod</td>
+<td>platform 상태가 바뀌었는가?</td>
+</tr>
+</tbody>
+</table>
+<p>이 네 계층이 각각 다른 dashboard에 있어도 괜찮다. 중요한 것은 같은 시간대와 같은 label로 연결할 수 있어야 한다는 점이다. <code>pod</code>는 runtime metric과 Kubernetes metric을 이어 주고, <code>node</code>와 <code>gpu_uuid</code>는 GPU metric으로 내려가는 경로가 된다. <code>model_name</code>과 <code>model_version</code>은 rollout regression을 찾는 축이 된다.</p>
+<h2 id="vllm-metric-runtime">vLLM metric은 runtime 내부를 보여 준다<a class="headerlink" href="#vllm-metric-runtime" title="Permanent link">&para;</a></h2>
+<p>vLLM은 OpenAI-compatible API server의 <code>/metrics</code> endpoint로 production metric을 노출한다. 공식 문서의 production metrics에는 <code>vllm:kv_cache_usage_perc</code>, <code>vllm:num_requests_running</code>, <code>vllm:num_requests_waiting</code>, <code>vllm:e2e_request_latency_seconds</code>, <code>vllm:inter_token_latency_seconds</code>, <code>vllm:request_queue_time_seconds</code>, <code>vllm:time_to_first_token_seconds</code> 같은 metric이 포함되어 있다.</p>
+<p>이 metric들은 7장에서 배운 지표와 직접 연결된다.</p>
+<table>
+<thead>
+<tr>
+<th>vLLM metric</th>
+<th>해석</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vllm:time_to_first_token_seconds</code></td>
+<td>TTFT</td>
+</tr>
+<tr>
+<td><code>vllm:inter_token_latency_seconds</code></td>
+<td>token 사이 latency, TPOT에 가까운 signal</td>
+</tr>
+<tr>
+<td><code>vllm:e2e_request_latency_seconds</code></td>
+<td>request 전체 latency</td>
+</tr>
+<tr>
+<td><code>vllm:request_queue_time_seconds</code></td>
+<td>runtime scheduling 전 대기 시간</td>
+</tr>
+<tr>
+<td><code>vllm:num_requests_waiting</code></td>
+<td>처리 대기 중인 request 수</td>
+</tr>
+<tr>
+<td><code>vllm:num_requests_running</code></td>
+<td>execution batch에 들어간 request 수</td>
+</tr>
+<tr>
+<td><code>vllm:kv_cache_usage_perc</code></td>
+<td>KV cache pressure</td>
+</tr>
+<tr>
+<td><code>vllm:request_prefill_time_seconds</code></td>
+<td>prefill 구간 시간</td>
+</tr>
+<tr>
+<td><code>vllm:request_decode_time_seconds</code></td>
+<td>decode 구간 시간</td>
+</tr>
+</tbody>
+</table>
+<p>이 표가 중요한 이유는 latency를 쪼갤 수 있기 때문이다. E2E latency가 올랐을 때 queue time이 같이 올랐다면 capacity/scheduling 문제일 가능성이 크다. TTFT만 올랐다면 prefill, queue, cold start, long prompt를 본다. Inter-token latency가 올랐다면 decode path, GPU compute, tensor parallel communication, KV cache 접근을 본다.</p>
+<h2 id="gpu-metric-dcgm-exporter">GPU metric은 DCGM exporter로 가져온다<a class="headerlink" href="#gpu-metric-dcgm-exporter" title="Permanent link">&para;</a></h2>
+<p>NVIDIA DCGM exporter는 DCGM을 활용해 GPU metric을 Prometheus 형식으로 노출한다. README는 GPU metric exporter for Prometheus라고 설명하고, Kubernetes에서는 Helm chart 또는 manifest로 배포한 뒤 <code>/metrics</code>를 scrape하는 흐름을 제시한다.</p>
+<p>GPU dashboard에서 먼저 볼 항목은 다음이다.</p>
+<table>
+<thead>
+<tr>
+<th>GPU signal</th>
+<th>해석</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPU utilization</td>
+<td>compute가 실제로 바쁜가</td>
+</tr>
+<tr>
+<td>framebuffer memory used</td>
+<td>model weight와 KV cache가 VRAM을 압박하는가</td>
+</tr>
+<tr>
+<td>SM clock / memory clock</td>
+<td>throttling 또는 power state 변화가 있는가</td>
+</tr>
+<tr>
+<td>temperature / power</td>
+<td>thermal 또는 power limit이 있는가</td>
+</tr>
+<tr>
+<td>ECC / XID / retired page</td>
+<td>hardware fault 가능성이 있는가</td>
+</tr>
+<tr>
+<td>per-pod labels</td>
+<td>어떤 workload가 GPU를 쓰는가</td>
+</tr>
+</tbody>
+</table>
+<p>GPU utilization은 단독으로 해석하지 않는다. GPU utilization 95%가 좋은 상태일 수도 있고, queue가 폭증하는 나쁜 상태일 수도 있다. 반대로 GPU utilization 30%인데 p95가 나쁘다면 CPU/tokenizer, network, scheduler, small batch, rate limit을 의심해야 한다.</p>
+<h2 id="prometheus-metric-type-query">Prometheus metric type을 잘못 쓰면 query가 틀어진다<a class="headerlink" href="#prometheus-metric-type-query" title="Permanent link">&para;</a></h2>
+<p>Prometheus는 counter, gauge, histogram 같은 metric type을 제공한다. 공식 문서는 counter를 단조 증가하는 누적 값, gauge를 오르내릴 수 있는 값, histogram을 관측값을 bucket에 세는 방식으로 설명한다.</p>
+<p>LLM serving에서 자주 쓰는 패턴은 다음과 같다.</p>
+<table>
+<thead>
+<tr>
+<th>Metric type</th>
+<th>예</th>
+<th>Query 방향</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Counter</td>
+<td>request count, token count, error count</td>
+<td><code>rate()</code>로 초당 변화량 계산</td>
+</tr>
+<tr>
+<td>Gauge</td>
+<td>running request, waiting request, KV cache usage, GPU memory</td>
+<td>현재값 또는 max/avg</td>
+</tr>
+<tr>
+<td>Histogram</td>
+<td>TTFT, TPOT, queue time, e2e latency</td>
+<td><code>histogram_quantile()</code>로 p95/p99 계산</td>
+</tr>
+</tbody>
+</table>
+<p>예를 들어 latency histogram에서 p95를 보려면 bucket을 rate로 바꾼 뒤 quantile을 계산한다.</p>
+<div class="highlight"><pre><span></span><code><span class="kr">histogram_quantile</span><span class="o">(</span>
+<span class="w">  </span><span class="mf">0.95</span><span class="p">,</span>
+<span class="w">  </span><span class="k">sum</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="o">(</span><span class="nv">le</span><span class="p">,</span><span class="w"> </span><span class="nv">model_name</span><span class="o">)</span><span class="w"> </span><span class="o">(</span>
+<span class="w">    </span><span class="kr">rate</span><span class="o">(</span><span class="nv">vllm</span><span class="err">:</span><span class="nv">time_to_first_token_seconds_bucket</span><span class="p">[</span><span class="s">5m</span><span class="p">]</span><span class="o">)</span>
+<span class="w">  </span><span class="o">)</span>
+<span class="o">)</span>
+</code></pre></div>
+<p>Request count는 counter이므로 현재값 자체보다 rate가 중요하다.</p>
+<div class="highlight"><pre><span></span><code><span class="k">sum</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="o">(</span><span class="nv">model_name</span><span class="o">)</span><span class="w"> </span><span class="o">(</span>
+<span class="w">  </span><span class="kr">rate</span><span class="o">(</span><span class="nv">vllm</span><span class="err">:</span><span class="nv">request_success_total</span><span class="p">[</span><span class="s">5m</span><span class="p">]</span><span class="o">)</span>
+<span class="o">)</span>
+</code></pre></div>
+<p>Gauge는 rate를 붙이면 의미가 이상해질 수 있다. <code>vllm:kv_cache_usage_perc</code> 같은 값은 현재 pressure를 직접 보거나 time window의 max를 본다.</p>
+<div class="highlight"><pre><span></span><code><span class="kr">max_over_time</span><span class="o">(</span><span class="nv">vllm</span><span class="err">:</span><span class="nv">kv_cache_usage_perc</span><span class="p">[</span><span class="s">5m</span><span class="p">]</span><span class="o">)</span>
+</code></pre></div>
+<h2 id="label-contract-dashboard">Label contract가 없으면 dashboard는 예쁘지만 쓸모없다<a class="headerlink" href="#label-contract-dashboard" title="Permanent link">&para;</a></h2>
+<p>Production dashboard에서 가장 중요한 것은 label contract다.</p>
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>필요한 이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>model_name</code></td>
+<td>모델별 latency와 capacity 비교</td>
+</tr>
+<tr>
+<td><code>model_version</code></td>
+<td>rollout regression 추적</td>
+</tr>
+<tr>
+<td><code>runtime</code></td>
+<td>vLLM, TensorRT-LLM, SGLang 등 runtime 차이</td>
+</tr>
+<tr>
+<td><code>pod</code></td>
+<td>runtime metric과 Kubernetes 상태 연결</td>
+</tr>
+<tr>
+<td><code>node</code></td>
+<td>Pod와 GPU/node metric 연결</td>
+</tr>
+<tr>
+<td><code>gpu_uuid</code></td>
+<td>같은 node의 특정 GPU 문제 추적</td>
+</tr>
+<tr>
+<td><code>route</code></td>
+<td>chat/completions/embeddings/tool endpoint 분리</td>
+</tr>
+<tr>
+<td><code>tenant</code> 또는 <code>workload_class</code></td>
+<td>noisy tenant와 SLO 등급 분리</td>
+</tr>
+<tr>
+<td><code>request_id</code></td>
+<td>metric에서 trace/log로 이동</td>
+</tr>
+</tbody>
+</table>
+<p>모든 metric에 모든 label을 붙이라는 뜻은 아니다. Cardinality가 폭발하면 Prometheus 운영이 어려워진다. 특히 <code>request_id</code>를 metric label에 넣는 것은 피해야 한다. 대신 request metric은 낮은 cardinality label로 집계하고, 개별 request 추적은 trace/log에서 <code>request_id</code>로 찾는다.</p>
+<p>즉 label contract는 두 층으로 나눈다.</p>
+<table>
+<thead>
+<tr>
+<th>위치</th>
+<th>label 예</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Metric</td>
+<td>model_name, model_version, route, pod, node, workload_class</td>
+</tr>
+<tr>
+<td>Trace/log</td>
+<td>request_id, user_id hash, prompt length, output length, error detail</td>
+</tr>
+</tbody>
+</table>
+<h2 id="trace">Trace는 "왜 이 요청이 느렸는가"를 복원한다<a class="headerlink" href="#trace" title="Permanent link">&para;</a></h2>
+<p>OpenTelemetry 문서는 trace를 request가 application을 통과하는 path로 설명한다. Metric은 "p95가 올랐다"를 알려 주고, trace는 "이 request가 gateway, router, runtime queue, prefill, decode, postprocess 중 어디에 머물렀는가"를 보여 준다.</p>
+<p>LLM serving trace에는 다음 span이 유용하다.</p>
+<table>
+<thead>
+<tr>
+<th>Span</th>
+<th>포함할 정보</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gateway.request</code></td>
+<td>route, tenant, auth result, rate limit</td>
+</tr>
+<tr>
+<td><code>router.select_replica</code></td>
+<td>chosen pod, model version, retry/fallback</td>
+</tr>
+<tr>
+<td><code>runtime.queue</code></td>
+<td>queue wait, reason, concurrency</td>
+</tr>
+<tr>
+<td><code>runtime.prefill</code></td>
+<td>prompt tokens, cached tokens, prefill time</td>
+</tr>
+<tr>
+<td><code>runtime.decode</code></td>
+<td>output tokens, TPOT, stop reason</td>
+</tr>
+<tr>
+<td><code>tool.call</code></td>
+<td>tool name, latency, success/failure</td>
+</tr>
+<tr>
+<td><code>postprocess</code></td>
+<td>safety filter, formatting, serialization</td>
+</tr>
+</tbody>
+</table>
+<p>Trace와 metric은 서로 대체재가 아니다. Metric은 넓게 보고, trace는 깊게 본다. Incident 중에는 metric으로 범위를 좁히고 trace로 대표 request를 해부한다.</p>
+<h2 id="incident-triage">Incident triage는 순서가 있어야 한다<a class="headerlink" href="#incident-triage" title="Permanent link">&para;</a></h2>
+<p>느린 request가 들어왔을 때의 기본 triage flow는 다음과 같다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/llm-incident-triage-flow.svg" alt="Incident triage flow from user latency symptom to request metrics, runtime metrics, GPU metrics, Kubernetes state, and trace evidence">
+  <figcaption><strong>LLM incident triage flow.</strong> 사용자 증상에서 request metric으로 시작해 runtime, GPU, Kubernetes 상태를 좁히고 trace/log로 증거를 남긴다.</figcaption>
+</figure>
+
+<ol>
+<li>사용자 증상을 request metric으로 확인한다.</li>
+<li>E2E latency를 TTFT, TPOT, queue time으로 나눈다.</li>
+<li>Runtime queue, running/waiting request, KV cache usage를 본다.</li>
+<li>같은 시간대의 GPU utilization, memory, temperature, error를 본다.</li>
+<li>Pod restart, rollout, replica placement, node pressure를 본다.</li>
+<li>대표 request trace와 log로 증거를 닫는다.</li>
+</ol>
+<p>이 순서를 지키면 "GPU가 높다" 같은 막연한 결론을 피할 수 있다.</p>
+<h2 id="dashboard">Dashboard는 역할별로 나눈다<a class="headerlink" href="#dashboard" title="Permanent link">&para;</a></h2>
+<p>하나의 거대한 dashboard보다 역할별 dashboard가 낫다.</p>
+<table>
+<thead>
+<tr>
+<th>Dashboard</th>
+<th>주요 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Executive / SLO</td>
+<td>현재 service가 SLO를 지키는가?</td>
+</tr>
+<tr>
+<td>Request latency</td>
+<td>TTFT, TPOT, e2e, p95/p99가 어디서 깨지는가?</td>
+</tr>
+<tr>
+<td>Runtime capacity</td>
+<td>queue, KV cache, running/waiting request가 어떤가?</td>
+</tr>
+<tr>
+<td>GPU health</td>
+<td>utilization, memory, temperature, power, error가 어떤가?</td>
+</tr>
+<tr>
+<td>Rollout</td>
+<td>version별 latency, error, traffic split이 어떤가?</td>
+</tr>
+<tr>
+<td>Tenant / workload</td>
+<td>특정 tenant, route, workload class가 noisy한가?</td>
+</tr>
+</tbody>
+</table>
+<p>첫 화면에는 alert와 연결된 golden signals를 둔다. Deep dive 화면에는 PromQL, per-pod breakdown, GPU UUID, trace link를 둔다.</p>
+<h2 id="alert">Alert는 증상과 원인을 섞지 않는다<a class="headerlink" href="#alert" title="Permanent link">&para;</a></h2>
+<p>Alert는 두 종류로 나눈다.</p>
+<table>
+<thead>
+<tr>
+<th>Alert type</th>
+<th>예</th>
+<th>목적</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Symptom alert</td>
+<td>p95 latency SLO violation, error rate spike</td>
+<td>사용자 영향 감지</td>
+</tr>
+<tr>
+<td>Cause alert</td>
+<td>KV cache usage high, GPU XID error, pod crash loop</td>
+<td>원인 후보 감지</td>
+</tr>
+</tbody>
+</table>
+<p>증상 alert 없이 cause alert만 많으면 on-call은 피로해진다. GPU utilization high는 항상 장애가 아니다. 반대로 p95 latency가 깨졌는데 GPU alert가 없다고 정상도 아니다.</p>
+<p>좋은 alert는 다음 정보를 포함한다.</p>
+<ul>
+<li>affected model/version</li>
+<li>affected route/tenant/workload class</li>
+<li>current p95/p99 and threshold</li>
+<li>queue/KV/GPU/node 중 가장 의심되는 signal</li>
+<li>최근 rollout 여부</li>
+<li>dashboard link와 trace query link</li>
+</ul>
+<h2 id="llm-serving-dashboard">실습: 첫 LLM serving dashboard 설계<a class="headerlink" href="#llm-serving-dashboard" title="Permanent link">&para;</a></h2>
+<p>다음 표를 채우면 첫 dashboard spec이 된다.</p>
+<table>
+<thead>
+<tr>
+<th>Panel</th>
+<th>PromQL 또는 데이터</th>
+<th>해석</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Request rate</td>
+<td><code>rate(vllm:request_success_total[5m])</code></td>
+<td>traffic 변화</td>
+</tr>
+<tr>
+<td>TTFT p95</td>
+<td><code>histogram_quantile(0.95, sum by(le, model_name)(rate(vllm:time_to_first_token_seconds_bucket[5m])))</code></td>
+<td>first token 지연</td>
+</tr>
+<tr>
+<td>TPOT p95</td>
+<td><code>histogram_quantile(0.95, sum by(le, model_name)(rate(vllm:inter_token_latency_seconds_bucket[5m])))</code></td>
+<td>decode 지연</td>
+</tr>
+<tr>
+<td>Queue time p95</td>
+<td><code>histogram_quantile(0.95, sum by(le, model_name)(rate(vllm:request_queue_time_seconds_bucket[5m])))</code></td>
+<td>scheduling 대기</td>
+</tr>
+<tr>
+<td>Waiting requests</td>
+<td><code>vllm:num_requests_waiting</code></td>
+<td>capacity pressure</td>
+</tr>
+<tr>
+<td>KV cache usage</td>
+<td><code>vllm:kv_cache_usage_perc</code></td>
+<td>memory pressure</td>
+</tr>
+<tr>
+<td>GPU utilization</td>
+<td>DCGM GPU utilization metric</td>
+<td>hardware busy</td>
+</tr>
+<tr>
+<td>GPU memory</td>
+<td>DCGM framebuffer memory metric</td>
+<td>VRAM pressure</td>
+</tr>
+<tr>
+<td>Pod restarts</td>
+<td>Kubernetes pod restart metric</td>
+<td>platform instability</td>
+</tr>
+<tr>
+<td>Version split</td>
+<td>request rate by <code>model_version</code></td>
+<td>rollout 영향</td>
+</tr>
+</tbody>
+</table>
+<p>이 표를 만든 뒤 질문을 하나씩 던진다.</p>
+<ul>
+<li>p95 latency가 오를 때 queue time도 같이 오르는가?</li>
+<li>TTFT와 TPOT 중 어느 쪽이 먼저 움직이는가?</li>
+<li>KV cache usage가 높은데 waiting request가 늘어나는가?</li>
+<li>GPU utilization이 낮은데 queue가 늘어나는가?</li>
+<li>특정 model version만 나쁜가?</li>
+<li>특정 pod/node/gpu_uuid에서만 나쁜가?</li>
+</ul>
+<p>이 질문에 답할 수 있으면 dashboard는 incident 도구가 된다.</p>
+<h2 id="_1">실패 패턴<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h3 id="latency">평균 latency만 본다<a class="headerlink" href="#latency" title="Permanent link">&para;</a></h3>
+<p>LLM serving은 tail이 중요하다. 평균은 정상인데 p95/p99가 무너지는 경우가 흔하다. 특히 long context와 burst traffic은 tail latency를 먼저 망가뜨린다.</p>
+<h3 id="gpu-utilization-success-metric">GPU utilization을 success metric으로 본다<a class="headerlink" href="#gpu-utilization-success-metric" title="Permanent link">&para;</a></h3>
+<p>GPU utilization이 높다고 service가 좋은 것은 아니다. SLO와 throughput, queue, error를 함께 봐야 한다.</p>
+<h3 id="label-cardinality">Label cardinality를 통제하지 않는다<a class="headerlink" href="#label-cardinality" title="Permanent link">&para;</a></h3>
+<p>모든 request_id나 user_id를 metric label로 넣으면 Prometheus가 감당하기 어렵다. High-cardinality 식별자는 trace/log로 보내고 metric label은 집계 축으로 제한한다.</p>
+<h3 id="runtime-metric-gpu-metric">Runtime metric과 GPU metric이 연결되지 않는다<a class="headerlink" href="#runtime-metric-gpu-metric" title="Permanent link">&para;</a></h3>
+<p><code>pod</code>, <code>node</code>, <code>gpu_uuid</code> mapping이 없으면 특정 vLLM queue 증가가 어떤 GPU의 memory pressure와 연결되는지 알 수 없다.</p>
+<h3 id="rollout-label">Rollout label이 없다<a class="headerlink" href="#rollout-label" title="Permanent link">&para;</a></h3>
+<p>새 model이나 runtime config 배포 후 latency가 나빠져도 <code>model_version</code> 또는 <code>runtime_version</code> label이 없으면 regression을 찾기 어렵다.</p>
+<h2 id="_2">정리<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<ul>
+<li>LLM serving observability는 GPU, Kubernetes, runtime, request, trace/log signal을 연결하는 일이다.</li>
+<li>vLLM의 <code>/metrics</code>는 queue, KV cache, TTFT, inter-token latency, e2e latency 같은 runtime signal을 제공한다.</li>
+<li>DCGM exporter는 GPU utilization, memory, temperature, clock, error 같은 hardware signal을 Prometheus로 노출한다.</li>
+<li>Prometheus counter, gauge, histogram의 의미를 구분해야 query가 맞다.</li>
+<li>Metric label은 낮은 cardinality의 집계 축으로 제한하고, request-level 상세는 trace/log로 보낸다.</li>
+<li>Incident triage는 사용자 증상, request metric, runtime metric, GPU metric, Kubernetes 상태, trace/log 순서로 좁힌다.</li>
+<li>좋은 dashboard는 "무슨 일이 났는가"뿐 아니라 "어떤 model/version/pod/node/gpu가 관련됐는가"를 바로 보여 준다.</li>
+</ul>
+<h2 id="source-anchors">Source anchors<a class="headerlink" href="#source-anchors" title="Permanent link">&para;</a></h2>
+<ul>
+<li>vLLM Production Metrics: <a href="https://docs.vllm.ai/en/latest/usage/metrics/">https://docs.vllm.ai/en/latest/usage/metrics/</a></li>
+<li>vLLM Prometheus and Grafana example: <a href="https://docs.vllm.ai/en/latest/examples/online_serving/prometheus_grafana/">https://docs.vllm.ai/en/latest/examples/online_serving/prometheus_grafana/</a></li>
+<li>NVIDIA DCGM exporter: <a href="https://github.com/NVIDIA/dcgm-exporter">https://github.com/NVIDIA/dcgm-exporter</a></li>
+<li>Prometheus metric types: <a href="https://prometheus.io/docs/concepts/metric_types/">https://prometheus.io/docs/concepts/metric_types/</a></li>
+<li>OpenTelemetry traces: <a href="https://opentelemetry.io/docs/concepts/signals/traces/">https://opentelemetry.io/docs/concepts/signals/traces/</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../13-kubernetes-gpu-operations/" class="md-footer__link md-footer__link--prev" aria-label="이전: 13장. Kubernetes GPU 운영">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                13장. Kubernetes GPU 운영
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../../source-policy/" class="md-footer__link md-footer__link--next" aria-label="다음: 소스 정책">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                소스 정책
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+        <script src="../../javascripts/header-home-link.js"></script>
+
+
+  </body>
+</html>
