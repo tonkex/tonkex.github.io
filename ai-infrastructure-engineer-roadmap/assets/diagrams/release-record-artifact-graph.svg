@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="620" viewBox="0 0 1120 620" role="img" aria-labelledby="title desc">
+  <title id="title">LLM release record artifact graph</title>
+  <desc id="desc">A release record connects model, tokenizer, prompt, RAG index, runtime config, platform manifest, evaluation, guardrails, and provenance.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .center { fill: #eef2ff; stroke: #4f46e5; stroke-width: 3; }
+      .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 12; }
+      .model { fill: #e0f2fe; stroke: #0284c7; }
+      .rag { fill: #ecfdf5; stroke: #059669; }
+      .runtime { fill: #fff7ed; stroke: #f97316; }
+      .sec { fill: #fef2f2; stroke: #dc2626; }
+      .eval { fill: #f5f3ff; stroke: #7c3aed; }
+      .ops { fill: #f1f5f9; stroke: #64748b; }
+      .label { font-family: Inter, Arial, sans-serif; font-size: 19px; font-weight: 700; fill: #0f172a; }
+      .small { font-family: Inter, Arial, sans-serif; font-size: 14px; fill: #334155; }
+      .tiny { font-family: Inter, Arial, sans-serif; font-size: 12px; fill: #475569; }
+      .arrow { stroke: #475569; stroke-width: 2.2; fill: none; marker-end: url(#arrow); }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#475569" />
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1120" height="620" rx="18" />
+
+  <rect class="center" x="408" y="236" width="304" height="148" rx="20" />
+  <text class="label" x="474" y="294">Release record</text>
+  <text class="small" x="462" y="326">immutable manifest for one</text>
+  <text class="small" x="448" y="350">production execution combination</text>
+
+  <rect class="box model" x="58" y="56" width="220" height="112" rx="12" />
+  <text class="label" x="98" y="96">Model stack</text>
+  <text class="small" x="86" y="126">model, tokenizer</text>
+  <text class="small" x="86" y="148">adapter, digest</text>
+
+  <rect class="box model" x="450" y="56" width="220" height="112" rx="12" />
+  <text class="label" x="498" y="96">Prompt</text>
+  <text class="small" x="480" y="126">template, schema</text>
+  <text class="small" x="480" y="148">few-shot, digest</text>
+
+  <rect class="box rag" x="842" y="56" width="220" height="112" rx="12" />
+  <text class="label" x="898" y="96">RAG index</text>
+  <text class="small" x="870" y="126">corpus snapshot</text>
+  <text class="small" x="870" y="148">embedding, reranker</text>
+
+  <rect class="box runtime" x="58" y="254" width="220" height="112" rx="12" />
+  <text class="label" x="102" y="294">Runtime</text>
+  <text class="small" x="86" y="324">image digest</text>
+  <text class="small" x="86" y="346">serving config</text>
+
+  <rect class="box runtime" x="842" y="254" width="220" height="112" rx="12" />
+  <text class="label" x="890" y="294">Platform</text>
+  <text class="small" x="870" y="324">K8s manifest</text>
+  <text class="small" x="870" y="346">routing, scaling</text>
+
+  <rect class="box sec" x="58" y="452" width="220" height="112" rx="12" />
+  <text class="label" x="104" y="492">Security</text>
+  <text class="small" x="86" y="522">guardrails, authz</text>
+  <text class="small" x="86" y="544">redaction policy</text>
+
+  <rect class="box eval" x="450" y="452" width="220" height="112" rx="12" />
+  <text class="label" x="514" y="492">Evidence</text>
+  <text class="small" x="480" y="522">eval, benchmark</text>
+  <text class="small" x="480" y="544">canary result</text>
+
+  <rect class="box ops" x="842" y="452" width="220" height="112" rx="12" />
+  <text class="label" x="890" y="492">Provenance</text>
+  <text class="small" x="870" y="522">source commit</text>
+  <text class="small" x="870" y="544">builder, approver</text>
+
+  <path class="arrow" d="M278 112 C360 128, 406 196, 456 236" />
+  <path class="arrow" d="M560 168 L560 236" />
+  <path class="arrow" d="M842 112 C760 128, 714 196, 664 236" />
+  <path class="arrow" d="M278 310 L408 310" />
+  <path class="arrow" d="M842 310 L712 310" />
+  <path class="arrow" d="M278 508 C360 492, 406 424, 456 384" />
+  <path class="arrow" d="M560 452 L560 384" />
+  <path class="arrow" d="M842 508 C760 492, 714 424, 664 384" />
+
+  <text class="tiny" x="442" y="204">One release ID binds all artifacts and evidence.</text>
+  <text class="tiny" x="382" y="596">Rollback should move back to a previous release record, not just a previous model file.</text>
+</svg>
