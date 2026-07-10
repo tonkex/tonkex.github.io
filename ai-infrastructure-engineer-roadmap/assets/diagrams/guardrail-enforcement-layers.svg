@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="560" viewBox="0 0 1120 560" role="img" aria-labelledby="title desc">
+  <title id="title">Guardrail enforcement layers</title>
+  <desc id="desc">Layered guardrails across input, retrieval authorization, tool input, tool output, final output, approval, and audit logging.</desc>
+  <defs>
+    <style>
+      .bg { fill: #fbfbf8; }
+      .box { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 12; }
+      .guard { fill: #ecfdf5; stroke: #059669; }
+      .risk { fill: #fff7ed; stroke: #f97316; }
+      .model { fill: #eef2ff; stroke: #6366f1; }
+      .side { fill: #fef2f2; stroke: #dc2626; }
+      .label { font-family: Inter, Arial, sans-serif; font-size: 18px; font-weight: 700; fill: #0f172a; }
+      .small { font-family: Inter, Arial, sans-serif; font-size: 14px; fill: #334155; }
+      .tiny { font-family: Inter, Arial, sans-serif; font-size: 12px; fill: #475569; }
+      .arrow { stroke: #475569; stroke-width: 2.4; fill: none; marker-end: url(#arrow); }
+      .block { stroke: #dc2626; stroke-width: 2.4; fill: none; marker-end: url(#arrowRed); stroke-dasharray: 7 5; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#475569" />
+    </marker>
+    <marker id="arrowRed" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#dc2626" />
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1120" height="560" rx="18" />
+
+  <rect class="box risk" x="42" y="90" width="142" height="94" rx="12" />
+  <text class="label" x="78" y="128">Input</text>
+  <text class="small" x="66" y="156">user, file</text>
+
+  <rect class="box guard" x="222" y="70" width="158" height="134" rx="12" />
+  <text class="label" x="250" y="108">Input</text>
+  <text class="label" x="244" y="132">guardrail</text>
+  <text class="small" x="248" y="162">moderate</text>
+  <text class="small" x="248" y="184">narrow scope</text>
+
+  <rect class="box guard" x="418" y="70" width="158" height="134" rx="12" />
+  <text class="label" x="448" y="108">Retrieval</text>
+  <text class="label" x="456" y="132">authz</text>
+  <text class="small" x="444" y="162">tenant ACL</text>
+  <text class="small" x="444" y="184">metadata filter</text>
+
+  <rect class="box model" x="614" y="90" width="142" height="94" rx="12" />
+  <text class="label" x="664" y="128">LLM</text>
+  <text class="small" x="642" y="156">plan / call</text>
+
+  <rect class="box guard" x="794" y="70" width="158" height="134" rx="12" />
+  <text class="label" x="826" y="108">Tool input</text>
+  <text class="label" x="830" y="132">guardrail</text>
+  <text class="small" x="824" y="162">schema</text>
+  <text class="small" x="824" y="184">permission</text>
+
+  <rect class="box side" x="990" y="90" width="92" height="94" rx="12" />
+  <text class="label" x="1012" y="128">Tool</text>
+  <text class="small" x="1014" y="156">effect</text>
+
+  <rect class="box risk" x="614" y="286" width="142" height="94" rx="12" />
+  <text class="label" x="642" y="324">Tool</text>
+  <text class="label" x="638" y="348">output</text>
+
+  <rect class="box guard" x="418" y="266" width="158" height="134" rx="12" />
+  <text class="label" x="446" y="304">Output</text>
+  <text class="label" x="432" y="328">guardrail</text>
+  <text class="small" x="444" y="358">redact</text>
+  <text class="small" x="444" y="380">sanitize</text>
+
+  <rect class="box model" x="222" y="286" width="158" height="94" rx="12" />
+  <text class="label" x="280" y="324">LLM</text>
+  <text class="small" x="254" y="352">final answer</text>
+
+  <rect class="box guard" x="42" y="266" width="142" height="134" rx="12" />
+  <text class="label" x="72" y="304">Final</text>
+  <text class="label" x="58" y="328">validation</text>
+  <text class="small" x="68" y="358">PII / policy</text>
+  <text class="small" x="68" y="380">citation</text>
+
+  <rect class="box side" x="794" y="286" width="158" height="134" rx="12" />
+  <text class="label" x="834" y="324">Approval</text>
+  <text class="small" x="822" y="354">high-risk write</text>
+  <text class="small" x="822" y="376">idempotency</text>
+
+  <rect class="box" x="322" y="452" width="476" height="70" rx="12" />
+  <text class="label" x="528" y="486">Audit trace</text>
+  <text class="small" x="384" y="510">trajectory_id, policy decision, tool call, side effect, redaction result</text>
+
+  <path class="arrow" d="M184 137 L222 137" />
+  <path class="arrow" d="M380 137 L418 137" />
+  <path class="arrow" d="M576 137 L614 137" />
+  <path class="arrow" d="M756 137 L794 137" />
+  <path class="arrow" d="M952 137 L990 137" />
+  <path class="arrow" d="M1036 184 C1036 250, 796 252, 756 312" />
+  <path class="arrow" d="M614 333 L576 333" />
+  <path class="arrow" d="M418 333 L380 333" />
+  <path class="arrow" d="M222 333 L184 333" />
+  <path class="arrow" d="M873 204 L873 286" />
+  <path class="arrow" d="M113 400 C140 472, 250 487, 322 487" />
+  <path class="arrow" d="M873 420 C840 468, 806 487, 798 487" />
+  <path class="block" d="M794 190 C746 236, 726 258, 704 286" />
+
+  <text class="tiny" x="792" y="236">reject or require approval</text>
+  <text class="tiny" x="52" y="432">Each guardrail has an explicit fail action.</text>
+</svg>

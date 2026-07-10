@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="560" viewBox="0 0 1120 560" role="img" aria-labelledby="title desc">
+  <title id="title">LLM application security trust boundaries</title>
+  <desc id="desc">Trusted instructions, user input, untrusted content, model, tools, data stores, policy checks, and audit logs separated by application boundaries.</desc>
+  <defs>
+    <style>
+      .bg { fill: #f8fafc; }
+      .zone { fill: #ffffff; stroke: #cbd5e1; stroke-width: 2; rx: 12; }
+      .trusted { fill: #e0f2fe; stroke: #0284c7; }
+      .untrusted { fill: #fff7ed; stroke: #ea580c; }
+      .model { fill: #eef2ff; stroke: #4f46e5; }
+      .enforce { fill: #dcfce7; stroke: #16a34a; }
+      .audit { fill: #f1f5f9; stroke: #64748b; }
+      .label { font-family: Inter, Arial, sans-serif; font-size: 20px; font-weight: 700; fill: #0f172a; }
+      .small { font-family: Inter, Arial, sans-serif; font-size: 15px; fill: #334155; }
+      .tiny { font-family: Inter, Arial, sans-serif; font-size: 13px; fill: #475569; }
+      .arrow { stroke: #475569; stroke-width: 2.4; fill: none; marker-end: url(#arrow); }
+      .warn { stroke: #ea580c; stroke-width: 2.4; fill: none; marker-end: url(#arrowWarn); stroke-dasharray: 7 5; }
+      .gate { stroke: #16a34a; stroke-width: 3; stroke-dasharray: 8 5; }
+    </style>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#475569" />
+    </marker>
+    <marker id="arrowWarn" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#ea580c" />
+    </marker>
+  </defs>
+  <rect class="bg" x="0" y="0" width="1120" height="560" rx="18" />
+
+  <rect class="zone trusted" x="44" y="54" width="220" height="120" rx="12" />
+  <text class="label" x="70" y="92">Trusted policy</text>
+  <text class="small" x="70" y="122">system instructions</text>
+  <text class="small" x="70" y="146">workflow config</text>
+
+  <rect class="zone untrusted" x="44" y="220" width="220" height="120" rx="12" />
+  <text class="label" x="70" y="258">User input</text>
+  <text class="small" x="70" y="288">prompt, upload</text>
+  <text class="small" x="70" y="312">session request</text>
+
+  <rect class="zone untrusted" x="44" y="386" width="220" height="120" rx="12" />
+  <text class="label" x="70" y="424">External content</text>
+  <text class="small" x="70" y="454">web, email, docs</text>
+  <text class="small" x="70" y="478">tool observations</text>
+
+  <rect class="zone enforce" x="328" y="110" width="220" height="340" rx="12" />
+  <text class="label" x="356" y="150">Application</text>
+  <text class="label" x="356" y="177">boundary</text>
+  <text class="small" x="356" y="220">authn / authz</text>
+  <text class="small" x="356" y="250">ACL retrieval filter</text>
+  <text class="small" x="356" y="280">tool allowlist</text>
+  <text class="small" x="356" y="310">schema validation</text>
+  <text class="small" x="356" y="340">approval gate</text>
+  <text class="small" x="356" y="370">output validation</text>
+
+  <line class="gate" x1="594" y1="58" x2="594" y2="500" />
+  <text class="tiny" x="612" y="76">model context is not a security boundary</text>
+
+  <rect class="zone model" x="660" y="158" width="190" height="190" rx="16" />
+  <text class="label" x="718" y="234">LLM</text>
+  <text class="small" x="696" y="266">generates text</text>
+  <text class="small" x="690" y="292">and tool calls</text>
+
+  <rect class="zone trusted" x="914" y="72" width="164" height="112" rx="12" />
+  <text class="label" x="952" y="116">Tools</text>
+  <text class="small" x="946" y="146">scoped APIs</text>
+
+  <rect class="zone trusted" x="914" y="224" width="164" height="112" rx="12" />
+  <text class="label" x="952" y="268">Data</text>
+  <text class="small" x="940" y="298">tenant ACL</text>
+
+  <rect class="zone audit" x="914" y="376" width="164" height="112" rx="12" />
+  <text class="label" x="952" y="420">Audit</text>
+  <text class="small" x="942" y="450">trace evidence</text>
+
+  <path class="arrow" d="M264 114 C292 114, 300 180, 328 194" />
+  <path class="arrow" d="M264 280 L328 280" />
+  <path class="warn" d="M264 446 C292 446, 300 380, 328 366" />
+  <path class="arrow" d="M548 250 L660 250" />
+  <path class="arrow" d="M850 220 C882 194, 884 128, 914 128" />
+  <path class="arrow" d="M850 280 L914 280" />
+  <path class="arrow" d="M850 324 C884 352, 884 432, 914 432" />
+  <path class="arrow" d="M914 128 C884 128, 882 178, 850 205" />
+  <path class="arrow" d="M914 280 L850 280" />
+  <path class="arrow" d="M548 386 C642 512, 810 516, 914 446" />
+
+  <text class="tiny" x="300" y="90">All untrusted data is labeled before entering the model context.</text>
+  <text class="tiny" x="654" y="384">The model can request action, but code decides permission.</text>
+</svg>
