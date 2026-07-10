@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="620" viewBox="0 0 1180 620" role="img" aria-labelledby="title desc">
+  <title id="title">vLLM metrics map</title>
+  <desc id="desc">A map connecting vLLM metrics to workload shape, scheduler pressure, KV cache pressure, prefix reuse, and user latency.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect width="1180" height="620" fill="#ffffff"/>
+  <g font-family="Arial, sans-serif">
+    <text x="590" y="48" text-anchor="middle" font-size="29" font-weight="800" fill="#111827">vLLM metrics는 질문별로 묶어 읽는다</text>
+    <text x="590" y="82" text-anchor="middle" font-size="16" fill="#4b5563">Workload shape -> scheduler pressure -> KV cache pressure -> prefix reuse -> user latency</text>
+
+    <rect x="55" y="135" width="205" height="135" rx="12" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+    <text x="157" y="166" text-anchor="middle" font-size="19" font-weight="800" fill="#1d4ed8">Workload shape</text>
+    <text x="157" y="199" text-anchor="middle" font-size="14" fill="#334155">prompt tokens</text>
+    <text x="157" y="223" text-anchor="middle" font-size="14" fill="#334155">generation tokens</text>
+    <text x="157" y="247" text-anchor="middle" font-size="14" fill="#334155">max_tokens</text>
+
+    <rect x="305" y="135" width="220" height="135" rx="12" fill="#ecfdf5" stroke="#34d399" stroke-width="2"/>
+    <text x="415" y="166" text-anchor="middle" font-size="19" font-weight="800" fill="#047857">Scheduler</text>
+    <text x="415" y="199" text-anchor="middle" font-size="14" fill="#334155">running requests</text>
+    <text x="415" y="223" text-anchor="middle" font-size="14" fill="#334155">waiting requests</text>
+    <text x="415" y="247" text-anchor="middle" font-size="14" fill="#334155">queue time</text>
+
+    <rect x="570" y="135" width="220" height="135" rx="12" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+    <text x="680" y="166" text-anchor="middle" font-size="19" font-weight="800" fill="#c2410c">KV cache</text>
+    <text x="680" y="199" text-anchor="middle" font-size="14" fill="#334155">usage percent</text>
+    <text x="680" y="223" text-anchor="middle" font-size="14" fill="#334155">block lifetime</text>
+    <text x="680" y="247" text-anchor="middle" font-size="14" fill="#334155">block reuse gap</text>
+
+    <rect x="835" y="135" width="290" height="135" rx="12" fill="#f5f3ff" stroke="#a78bfa" stroke-width="2"/>
+    <text x="980" y="166" text-anchor="middle" font-size="19" font-weight="800" fill="#6d28d9">Prefix reuse</text>
+    <text x="980" y="199" text-anchor="middle" font-size="14" fill="#334155">prefix cache hits</text>
+    <text x="980" y="223" text-anchor="middle" font-size="14" fill="#334155">prefix cache queries</text>
+    <text x="980" y="247" text-anchor="middle" font-size="14" fill="#334155">prompt tokens cached</text>
+
+    <g stroke="#2563eb" stroke-width="3" fill="none" marker-end="url(#arrow)">
+      <path d="M260 202 H297"/>
+      <path d="M525 202 H562"/>
+      <path d="M790 202 H827"/>
+    </g>
+
+    <rect x="140" y="372" width="250" height="120" rx="12" fill="#fefce8" stroke="#facc15" stroke-width="2"/>
+    <text x="265" y="405" text-anchor="middle" font-size="19" font-weight="800" fill="#854d0e">Prefill health</text>
+    <text x="265" y="438" text-anchor="middle" font-size="14" fill="#334155">prefill time</text>
+    <text x="265" y="462" text-anchor="middle" font-size="14" fill="#334155">TTFT impact</text>
+
+    <rect x="465" y="372" width="250" height="120" rx="12" fill="#f0fdfa" stroke="#14b8a6" stroke-width="2"/>
+    <text x="590" y="405" text-anchor="middle" font-size="19" font-weight="800" fill="#0f766e">Decode health</text>
+    <text x="590" y="438" text-anchor="middle" font-size="14" fill="#334155">decode time</text>
+    <text x="590" y="462" text-anchor="middle" font-size="14" fill="#334155">TPOT impact</text>
+
+    <rect x="790" y="372" width="250" height="120" rx="12" fill="#fff1f2" stroke="#fb7185" stroke-width="2"/>
+    <text x="915" y="405" text-anchor="middle" font-size="19" font-weight="800" fill="#9f1239">User latency</text>
+    <text x="915" y="438" text-anchor="middle" font-size="14" fill="#334155">time to first token</text>
+    <text x="915" y="462" text-anchor="middle" font-size="14" fill="#334155">e2e request latency</text>
+
+    <g stroke="#64748b" stroke-width="2.8" fill="none" marker-end="url(#arrow)">
+      <path d="M157 270 C164 314 205 342 245 372"/>
+      <path d="M415 270 C446 314 505 344 560 372"/>
+      <path d="M680 270 C666 314 632 344 608 372"/>
+      <path d="M980 270 C973 316 947 344 925 372"/>
+      <path d="M390 432 H457"/>
+      <path d="M715 432 H782"/>
+    </g>
+
+    <text x="590" y="560" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Metric 이름을 외우는 것보다, 어떤 운영 질문에 답하는지 먼저 정한다</text>
+  </g>
+</svg>

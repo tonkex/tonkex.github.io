@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="610" viewBox="0 0 1180 610" role="img" aria-labelledby="title desc">
+  <title id="title">vLLM runtime components</title>
+  <desc id="desc">A vLLM runtime diagram showing OpenAI-compatible API, tokenizer, scheduler, KV cache manager, model executor, GPU kernels, and metrics.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect width="1180" height="610" fill="#ffffff"/>
+  <g font-family="Arial, sans-serif">
+    <text x="590" y="46" text-anchor="middle" font-size="29" font-weight="800" fill="#111827">vLLM은 API server가 아니라 scheduler와 KV cache runtime이다</text>
+    <text x="590" y="80" text-anchor="middle" font-size="16" fill="#4b5563">OpenAI-compatible endpoint 아래에서 token, batch, KV block, GPU kernels, metrics가 함께 움직인다</text>
+
+    <rect x="55" y="135" width="160" height="78" rx="10" fill="#eff6ff" stroke="#60a5fa" stroke-width="2"/>
+    <text x="135" y="168" text-anchor="middle" font-size="17" font-weight="800" fill="#1e3a8a">Client</text>
+    <text x="135" y="192" text-anchor="middle" font-size="13" fill="#475569">SDK / gateway</text>
+
+    <rect x="265" y="135" width="190" height="78" rx="10" fill="#eef2ff" stroke="#818cf8" stroke-width="2"/>
+    <text x="360" y="168" text-anchor="middle" font-size="17" font-weight="800" fill="#3730a3">OpenAI API</text>
+    <text x="360" y="192" text-anchor="middle" font-size="13" fill="#475569">chat / completions</text>
+
+    <rect x="505" y="135" width="175" height="78" rx="10" fill="#fefce8" stroke="#facc15" stroke-width="2"/>
+    <text x="592" y="168" text-anchor="middle" font-size="17" font-weight="800" fill="#854d0e">Tokenizer</text>
+    <text x="592" y="192" text-anchor="middle" font-size="13" fill="#475569">template -> tokens</text>
+
+    <rect x="730" y="135" width="180" height="78" rx="10" fill="#ecfdf5" stroke="#34d399" stroke-width="2"/>
+    <text x="820" y="168" text-anchor="middle" font-size="17" font-weight="800" fill="#065f46">Scheduler</text>
+    <text x="820" y="192" text-anchor="middle" font-size="13" fill="#475569">queue / running batch</text>
+
+    <rect x="960" y="135" width="165" height="78" rx="10" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+    <text x="1042" y="168" text-anchor="middle" font-size="17" font-weight="800" fill="#9a3412">Model executor</text>
+    <text x="1042" y="192" text-anchor="middle" font-size="13" fill="#475569">forward steps</text>
+
+    <g stroke="#2563eb" stroke-width="3" fill="none" marker-end="url(#arrow)">
+      <path d="M215 174 H257"/>
+      <path d="M455 174 H497"/>
+      <path d="M680 174 H722"/>
+      <path d="M910 174 H952"/>
+    </g>
+
+    <rect x="660" y="298" width="290" height="118" rx="12" fill="#f0fdfa" stroke="#14b8a6" stroke-width="2"/>
+    <text x="805" y="332" text-anchor="middle" font-size="19" font-weight="800" fill="#0f766e">KV cache manager</text>
+    <text x="805" y="361" text-anchor="middle" font-size="14" fill="#334155">paged blocks / prefix reuse</text>
+    <text x="805" y="386" text-anchor="middle" font-size="14" fill="#334155">capacity, eviction, sharing</text>
+
+    <rect x="980" y="298" width="145" height="118" rx="12" fill="#f8fafc" stroke="#94a3b8" stroke-width="2"/>
+    <text x="1052" y="332" text-anchor="middle" font-size="18" font-weight="800" fill="#334155">GPU kernels</text>
+    <text x="1052" y="361" text-anchor="middle" font-size="14" fill="#475569">attention</text>
+    <text x="1052" y="386" text-anchor="middle" font-size="14" fill="#475569">matmul</text>
+
+    <rect x="390" y="298" width="220" height="118" rx="12" fill="#f5f3ff" stroke="#a78bfa" stroke-width="2"/>
+    <text x="500" y="332" text-anchor="middle" font-size="18" font-weight="800" fill="#5b21b6">Request state</text>
+    <text x="500" y="361" text-anchor="middle" font-size="14" fill="#475569">prefill / decode</text>
+    <text x="500" y="386" text-anchor="middle" font-size="14" fill="#475569">running / waiting</text>
+
+    <rect x="55" y="298" width="275" height="118" rx="12" fill="#fff1f2" stroke="#fb7185" stroke-width="2"/>
+    <text x="192" y="332" text-anchor="middle" font-size="18" font-weight="800" fill="#9f1239">Metrics endpoint</text>
+    <text x="192" y="361" text-anchor="middle" font-size="14" fill="#475569">/metrics</text>
+    <text x="192" y="386" text-anchor="middle" font-size="14" fill="#475569">latency / queue / KV usage</text>
+
+    <g stroke="#64748b" stroke-width="2.8" fill="none" marker-end="url(#arrow)">
+      <path d="M820 213 V290"/>
+      <path d="M910 357 H972"/>
+      <path d="M960 213 C928 250 888 277 852 298"/>
+      <path d="M730 200 C638 240 566 270 520 298"/>
+      <path d="M330 357 H382"/>
+    </g>
+
+    <rect x="232" y="486" width="716" height="64" rx="10" fill="#f8fafc" stroke="#cbd5e1"/>
+    <text x="590" y="514" text-anchor="middle" font-size="17" font-weight="800" fill="#111827">운영자가 보는 것은 endpoint가 아니라 token workload의 흐름이다</text>
+    <text x="590" y="538" text-anchor="middle" font-size="14" fill="#475569">TTFT, TPOT, queue, KV cache usage, prefix hits를 같은 request path 위에서 읽는다</text>
+  </g>
+</svg>
