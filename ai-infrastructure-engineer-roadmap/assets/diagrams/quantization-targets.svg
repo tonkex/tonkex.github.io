@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="520" viewBox="0 0 1120 520" role="img" aria-labelledby="title desc">
+  <title id="title">Quantization targets for LLM serving</title>
+  <desc id="desc">A diagram separating weight, activation, and KV cache quantization and their serving effects.</desc>
+  <rect width="1120" height="520" fill="#ffffff"/>
+  <text x="560" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="800" fill="#111827">Quantization은 하나가 아니라 세 대상의 선택이다</text>
+  <text x="560" y="82" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#4b5563">weights, activations, KV cache는 서로 다른 memory와 latency 축을 건드린다</text>
+
+  <rect x="80" y="125" width="290" height="255" rx="12" fill="#eef2ff" stroke="#4f46e5" stroke-width="2"/>
+  <text x="225" y="168" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#312e81">Weights</text>
+  <text x="225" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#3730a3">model weight memory</text>
+  <text x="225" y="238" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">FP16/BF16 -> INT8/INT4</text>
+  <text x="225" y="273" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">model load 가능성</text>
+  <text x="225" y="302" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">weight memory 절감</text>
+  <text x="225" y="331" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#991b1b">risk: kernel / quality</text>
+
+  <rect x="415" y="125" width="290" height="255" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+  <text x="560" y="168" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#065f46">Activations</text>
+  <text x="560" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#047857">intermediate compute path</text>
+  <text x="560" y="238" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">W8A8 / FP8 execution</text>
+  <text x="560" y="273" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">memory traffic 감소</text>
+  <text x="560" y="302" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">throughput 가능성</text>
+  <text x="560" y="331" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#991b1b">risk: hardware dependency</text>
+
+  <rect x="750" y="125" width="290" height="255" rx="12" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+  <text x="895" y="168" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" font-weight="800" fill="#9a3412">KV Cache</text>
+  <text x="895" y="205" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#c2410c">request context state</text>
+  <text x="895" y="238" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">FP8 KV cache</text>
+  <text x="895" y="273" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">longer context</text>
+  <text x="895" y="302" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#374151">higher concurrency</text>
+  <text x="895" y="331" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="#991b1b">risk: calibration / long context</text>
+
+  <line x1="225" y1="400" x2="895" y2="400" stroke="#111827" stroke-width="3"/>
+  <polygon points="895,400 873,388 873,412" fill="#111827"/>
+  <text x="560" y="435" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#111827">먼저 병목을 고르고, 그 다음 quantization target을 고른다</text>
+</svg>

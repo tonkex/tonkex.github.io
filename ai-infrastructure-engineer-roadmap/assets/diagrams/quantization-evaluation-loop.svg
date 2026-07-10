@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="560" viewBox="0 0 1120 560" role="img" aria-labelledby="title desc">
+  <title id="title">Quantization evaluation loop</title>
+  <desc id="desc">A loop comparing baseline, quantized candidate, serving metrics, quality evaluation, and rollout decision.</desc>
+  <rect width="1120" height="560" fill="#ffffff"/>
+  <text x="560" y="48" text-anchor="middle" font-family="Arial, sans-serif" font-size="28" font-weight="800" fill="#111827">Quantization은 metric과 quality를 함께 통과해야 한다</text>
+  <text x="560" y="82" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#4b5563">작아진 model이 production에 적합한지는 같은 workload, 같은 지표, 같은 eval로 비교한다</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#334155"/>
+    </marker>
+  </defs>
+
+  <rect x="90" y="180" width="205" height="95" rx="12" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+  <text x="192" y="218" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="800" fill="#1e3a8a">Baseline</text>
+  <text x="192" y="248" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#1d4ed8">BF16/FP16 metrics</text>
+
+  <rect x="355" y="180" width="205" height="95" rx="12" fill="#fef3c7" stroke="#f59e0b" stroke-width="2"/>
+  <text x="457" y="218" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="800" fill="#92400e">Candidate</text>
+  <text x="457" y="248" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#92400e">INT4 / FP8 / KV cache</text>
+
+  <rect x="620" y="180" width="205" height="95" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+  <text x="722" y="218" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="800" fill="#065f46">Serving metrics</text>
+  <text x="722" y="248" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#047857">TTFT / TPOT / p95</text>
+
+  <rect x="620" y="345" width="205" height="95" rx="12" fill="#fce7f3" stroke="#db2777" stroke-width="2"/>
+  <text x="722" y="383" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="800" fill="#9d174d">Quality eval</text>
+  <text x="722" y="413" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#be185d">task / format / safety</text>
+
+  <rect x="355" y="345" width="205" height="95" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+  <text x="457" y="383" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" font-weight="800" fill="#5b21b6">Decision</text>
+  <text x="457" y="413" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#6d28d9">adopt / limit / rollback</text>
+
+  <line x1="295" y1="228" x2="350" y2="228" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="560" y1="228" x2="615" y2="228" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="722" y1="275" x2="722" y2="340" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <line x1="620" y1="393" x2="565" y2="393" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+  <path d="M355 393 C 250 385, 188 330, 188 280" fill="none" stroke="#334155" stroke-width="3" marker-end="url(#arrow)"/>
+
+  <text x="192" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#475569">같은 workload</text>
+  <text x="457" y="310" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" fill="#475569">한 번에 하나만 변경</text>
+  <text x="930" y="230" font-family="Arial, sans-serif" font-size="15" fill="#374151">memory가 줄어도</text>
+  <text x="930" y="254" font-family="Arial, sans-serif" font-size="15" fill="#374151">quality가 깨지면 실패</text>
+  <text x="930" y="394" font-family="Arial, sans-serif" font-size="15" fill="#374151">p95와 rollback까지</text>
+  <text x="930" y="418" font-family="Arial, sans-serif" font-size="15" fill="#374151">release record에 기록</text>
+</svg>

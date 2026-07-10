@@ -1,0 +1,1694 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/08-quantization-optimization-risk/">
+
+
+        <link rel="prev" href="../07-serving-metrics-ttft-tpot-throughput/">
+
+
+        <link rel="next" href="../../source-policy/">
+
+
+
+
+
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>8장. Quantization - AI 인프라 엔지니어 로드맵</title>
+
+
+
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+      <link rel="stylesheet" href="../../stylesheets/site-navigation-v2.css">
+
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#8-quantization" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              8장. Quantization
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    시작하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    책 구조
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    책 구조
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../outline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    전체 목차
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../sample-chapter-plan/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 챕터 계획
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 원고
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    샘플 원고
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-kv-cache-serving-bottleneck/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. KV cache 병목
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-first-llm-server-openai-endpoint/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. 첫 LLM server
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07-serving-metrics-ttft-tpot-throughput/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Serving metrics
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Quantization
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Quantization
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#quantize" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        먼저 무엇을 quantize하는지 분리한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        "작아진다"와 "빨라진다"는 다르다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#weight-only-quantization-model" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Weight-only quantization: model을 올리기 위한 첫 도구
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#activation-quantization-kernel-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Activation quantization: kernel과 hardware 의존성이 더 크다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#kv-cache-quantization-long-context-concurrency" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        KV cache quantization: long context와 concurrency를 위한 도구
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#quantization-format-release-artifact" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Quantization format은 release artifact다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        측정 순서: baseline을 먼저 만든다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        어떤 지표가 좋아져야 성공인가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#model-tpot" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Model은 작아졌지만 TPOT가 나빠진다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#throughput-p95" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        평균 throughput은 좋아졌지만 p95가 나빠진다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#short-chat-long-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Short chat은 괜찮지만 long prompt가 나빠진다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#qa-tool-call-format" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        일반 QA는 괜찮지만 tool call format이 깨진다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#gpu-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        특정 GPU에서는 빠르고 다른 GPU에서는 느리다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#7-quantization-column" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: 7장의 표에 quantization column을 추가한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        언제 quantization을 선택하지 말아야 하는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        이 장의 결론
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#sources-checked-for-this-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Sources checked for this draft
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    제작 노트
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    제작 노트
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../source-policy/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    소스 정책
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    다음 작업
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#quantize" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        먼저 무엇을 quantize하는지 분리한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        "작아진다"와 "빨라진다"는 다르다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#weight-only-quantization-model" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Weight-only quantization: model을 올리기 위한 첫 도구
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#activation-quantization-kernel-hardware" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Activation quantization: kernel과 hardware 의존성이 더 크다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#kv-cache-quantization-long-context-concurrency" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        KV cache quantization: long context와 concurrency를 위한 도구
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#quantization-format-release-artifact" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Quantization format은 release artifact다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        측정 순서: baseline을 먼저 만든다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        어떤 지표가 좋아져야 성공인가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#model-tpot" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Model은 작아졌지만 TPOT가 나빠진다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#throughput-p95" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        평균 throughput은 좋아졌지만 p95가 나빠진다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#short-chat-long-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Short chat은 괜찮지만 long prompt가 나빠진다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#qa-tool-call-format" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        일반 QA는 괜찮지만 tool call format이 깨진다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#gpu-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        특정 GPU에서는 빠르고 다른 GPU에서는 느리다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#7-quantization-column" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: 7장의 표에 quantization column을 추가한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#quantization" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        언제 quantization을 선택하지 말아야 하는가
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        이 장의 결론
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#sources-checked-for-this-draft" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Sources checked for this draft
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="8-quantization">8장. Quantization은 언제 성능 최적화이고 언제 위험인가<a class="headerlink" href="#8-quantization" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>Draft v0.1</span>
+  <span>Updated: 2026-07-10</span>
+  <span>Part 3 - 단일 GPU에서 serving을 측정하기</span>
+</div>
+
+<p>7장에서 우리는 LLM server의 성능을 TTFT, TPOT, throughput, p95/p99, queue, KV cache usage로 나누어 읽었다. 이제 자연스럽게 다음 질문이 나온다.</p>
+<blockquote>
+<p>4-bit나 FP8로 줄이면 더 빠르고 싸지는가?</p>
+</blockquote>
+<p>답은 "그럴 수 있지만, 자동으로 그렇지는 않다"이다. Quantization은 precision을 낮춰 memory footprint와 memory traffic을 줄이는 기술이다. 하지만 낮은 precision은 accuracy, kernel support, dequantization overhead, calibration, runtime compatibility를 함께 끌고 온다.</p>
+<p>이 장의 독자 질문은 다음과 같다.</p>
+<blockquote>
+<p>Quantization은 언제 성능 최적화이고, 언제 production risk가 되는가?</p>
+</blockquote>
+<p>핵심은 하나다. Quantization은 "작게 만드는 버튼"이 아니라 serving system의 병목을 어느 축에서 줄일지 선택하는 운영 결정이다.</p>
+<h2 id="quantize">먼저 무엇을 quantize하는지 분리한다<a class="headerlink" href="#quantize" title="Permanent link">&para;</a></h2>
+<p>Quantization을 말할 때 가장 먼저 해야 할 일은 대상 분리다. Weight quantization, activation quantization, KV cache quantization은 서로 다른 문제다.</p>
+<table>
+<thead>
+<tr>
+<th>대상</th>
+<th>줄이는 것</th>
+<th>주로 영향 받는 지표</th>
+<th>대표 위험</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>weights</td>
+<td>model weight memory</td>
+<td>model load memory, throughput, TPOT</td>
+<td>kernel 미지원, accuracy 저하</td>
+</tr>
+<tr>
+<td>activations</td>
+<td>layer 중간 계산 값</td>
+<td>compute/memory traffic</td>
+<td>calibration 민감도, kernel path</td>
+</tr>
+<tr>
+<td>KV cache</td>
+<td>request별 context state</td>
+<td>max concurrency, long context, TTFT/p95</td>
+<td>long-context 품질, scale calibration</td>
+</tr>
+</tbody>
+</table>
+<p>이 세 가지를 섞어 말하면 판단이 틀어진다. 예를 들어 INT4 weight quantization은 model weight memory를 크게 줄일 수 있지만, 긴 context에서 KV cache가 병목이라면 동시성 문제를 충분히 해결하지 못할 수 있다. 반대로 FP8 KV cache는 long-context capacity에는 직접 도움이 되지만, weight memory가 이미 GPU를 거의 채운 상태라면 model 자체를 올리는 문제는 해결하지 못한다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/quantization-targets.svg" alt="Quantization targets separate weights, activations, and KV cache with different serving effects">
+  <figcaption><strong>Quantization 대상 분리.</strong> Weight, activation, KV cache는 서로 다른 memory와 latency 축을 건드린다. 어떤 병목을 줄이는지 먼저 정해야 한다.</figcaption>
+</figure>
+
+<h2 id="_1">"작아진다"와 "빨라진다"는 다르다<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Quantization이 memory를 줄이는 이유는 직관적이다. 같은 숫자 개수를 더 적은 bit로 저장하기 때문이다.</p>
+<p>대략적인 weight memory는 다음처럼 볼 수 있다.</p>
+<div class="arithmatex">\[
+Memory_{weights} \approx Parameters \times Bytes\ per\ parameter
+\]</div>
+<p>따라서 7B model을 단순화해서 보면 다음과 같은 감각을 얻을 수 있다.</p>
+<table>
+<thead>
+<tr>
+<th>dtype</th>
+<th style="text-align: right;">parameter당 bytes</th>
+<th style="text-align: right;">7B weight rough memory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FP32</td>
+<td style="text-align: right;">4</td>
+<td style="text-align: right;">약 28 GB</td>
+</tr>
+<tr>
+<td>FP16/BF16</td>
+<td style="text-align: right;">2</td>
+<td style="text-align: right;">약 14 GB</td>
+</tr>
+<tr>
+<td>INT8/FP8</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">약 7 GB</td>
+</tr>
+<tr>
+<td>INT4</td>
+<td style="text-align: right;">0.5</td>
+<td style="text-align: right;">약 3.5 GB</td>
+</tr>
+</tbody>
+</table>
+<p>이 표는 optimizer state, metadata, quantization scale, padding, runtime overhead를 뺀 rough estimate다. 실제 serving memory와는 다르다. 하지만 왜 quantization이 작은 GPU에서 큰 model을 올리는 데 도움이 되는지는 보여준다.</p>
+<p>문제는 속도다. Memory footprint가 줄었다고 latency가 자동으로 줄지는 않는다.</p>
+<p>속도가 좋아지려면 보통 다음 조건이 필요하다.</p>
+<ul>
+<li>quantized format을 직접 처리하는 kernel이 있다.</li>
+<li>dequantization overhead가 memory traffic 감소보다 작다.</li>
+<li>batch size와 sequence length가 해당 kernel이 잘 쓰이는 영역에 있다.</li>
+<li>GPU architecture가 그 precision을 빠르게 처리한다.</li>
+<li>runtime이 해당 model architecture와 quantization format을 안정적으로 지원한다.</li>
+</ul>
+<p>이 조건이 깨지면 model은 작아졌지만 느려질 수 있다. 또는 평균 throughput은 좋아졌지만 p95 latency가 악화될 수 있다.</p>
+<h2 id="weight-only-quantization-model">Weight-only quantization: model을 올리기 위한 첫 도구<a class="headerlink" href="#weight-only-quantization-model" title="Permanent link">&para;</a></h2>
+<p>Weight-only quantization은 model weights를 낮은 precision으로 저장하고 실행한다. AWQ, GPTQ, BitsAndBytes 4-bit 같은 이름을 여기서 자주 만난다.</p>
+<p>vLLM quantization 문서는 quantization이 model precision을 낮춰 memory footprint를 줄이고 더 다양한 장치에서 큰 model을 실행하게 한다고 설명한다. 또한 vLLM은 AutoAWQ, BitsAndBytes, GPTQModel, LLM Compressor, NVIDIA Model Optimizer, Quantized KV Cache 등 여러 quantization 경로를 지원한다.</p>
+<p>Weight-only quantization이 유용한 경우는 명확하다.</p>
+<ul>
+<li>BF16/FP16 weight가 GPU에 올라가지 않는다.</li>
+<li>더 작은 GPU에서 model serving baseline을 만들고 싶다.</li>
+<li>weight memory를 줄여 KV cache 여유를 조금이라도 확보하고 싶다.</li>
+<li>throughput보다 memory fit이 첫 번째 문제다.</li>
+</ul>
+<p>하지만 위험도 있다.</p>
+<ul>
+<li>특정 GPU에서는 해당 quantization kernel이 빠르지 않을 수 있다.</li>
+<li>일부 model architecture나 layer가 지원되지 않을 수 있다.</li>
+<li>calibration 또는 quantization 방식에 따라 답변 품질이 떨어질 수 있다.</li>
+<li>같은 "4-bit"라도 AWQ, GPTQ, NF4, GGUF quant type은 같은 것이 아니다.</li>
+</ul>
+<p>Hugging Face Transformers 문서도 quantization method마다 장단점이 있고, calibration이 필요한 방법과 on-the-fly 방식이 다르다고 설명한다. 따라서 "4-bit model"이라는 이름만으로 production 적합성을 판단하면 안 된다.</p>
+<h2 id="activation-quantization-kernel-hardware">Activation quantization: kernel과 hardware 의존성이 더 크다<a class="headerlink" href="#activation-quantization-kernel-hardware" title="Permanent link">&para;</a></h2>
+<p>Activation quantization은 layer 중간 계산 값을 낮은 precision으로 처리한다. FP8 W8A8처럼 weight와 activation을 함께 낮추는 방식이 여기에 가까운 운영 이슈를 만든다.</p>
+<p>Activation quantization은 memory traffic과 compute path를 줄일 수 있지만, hardware와 kernel support에 더 민감하다. vLLM의 supported hardware 표만 봐도 quantization implementation마다 Volta, Turing, Ampere, Ada, Hopper, AMD GPU, Intel GPU, CPU 지원 여부가 다르다. 예를 들어 FP8 계열은 GPU 세대와 backend에 강하게 묶인다.</p>
+<p>따라서 activation quantization은 다음 질문을 통과해야 한다.</p>
+<ul>
+<li>내 GPU architecture가 이 precision을 빠르게 처리하는가?</li>
+<li>runtime이 이 model architecture에서 해당 kernel을 쓰는가?</li>
+<li>batch/concurrency가 kernel 효율이 나오는 영역인가?</li>
+<li>accuracy regression을 볼 eval set이 있는가?</li>
+<li>fallback path로 조용히 느린 kernel을 타지 않는가?</li>
+</ul>
+<p>Activation quantization은 잘 맞으면 강력하지만, "옵션을 켰다"와 "빠른 kernel을 탔다"는 다른 말이다.</p>
+<h2 id="kv-cache-quantization-long-context-concurrency">KV cache quantization: long context와 concurrency를 위한 도구<a class="headerlink" href="#kv-cache-quantization-long-context-concurrency" title="Permanent link">&para;</a></h2>
+<p>5장에서 본 것처럼 KV cache는 active tokens에 따라 커진다. 6장에서 첫 server를 띄웠고, 7장에서 TTFT와 p95를 봤다면, 이제 KV cache quantization이 왜 중요한지 명확해진다.</p>
+<p>vLLM의 Quantized KV Cache 문서는 FP8 KV cache가 KV cache memory footprint를 줄여 더 많은 token을 memory에 저장하고, throughput과 longer context window 지원에 도움이 될 수 있다고 설명한다. 또한 vLLM은 FP8 KV cache에 대해 per-tensor와 per-attention-head quantization 전략을 설명하고, scale calibration 방식을 세 가지로 나눈다.</p>
+<p>KV cache quantization은 이런 상황에서 후보가 된다.</p>
+<ul>
+<li>긴 prompt나 긴 context workload에서 KV cache usage가 높다.</li>
+<li>concurrency를 올리면 p95 latency가 급격히 나빠진다.</li>
+<li>model weight는 올라가지만 active sequence 수가 부족하다.</li>
+<li>long RAG, agent, code assistant처럼 context가 길고 반복된다.</li>
+</ul>
+<p>하지만 위험도 분명하다.</p>
+<ul>
+<li>KV cache는 decode 중 attention 결과에 계속 영향을 준다.</li>
+<li>scale calibration이 부정확하면 long-context 품질이 흔들릴 수 있다.</li>
+<li>일부 backend에서는 quantized cache를 쓰더라도 attention compute path가 제한될 수 있다.</li>
+<li>FP8 cache가 memory는 줄여도 TPOT 또는 p95가 기대만큼 좋아지지 않을 수 있다.</li>
+</ul>
+<p>vLLM 문서는 FP8 KV cache scale을 기본값, random token calibration, dataset calibration 방식으로 계산할 수 있다고 설명하고, dataset 기반 calibration을 품질 관점에서 권장한다. 운영 관점에서는 이 말이 중요하다. KV cache quantization은 단순 runtime flag가 아니라 calibration artifact까지 포함한 release decision이다.</p>
+<h2 id="quantization-format-release-artifact">Quantization format은 release artifact다<a class="headerlink" href="#quantization-format-release-artifact" title="Permanent link">&para;</a></h2>
+<p>Quantized model은 원본 model과 같은 artifact가 아니다. 최소한 다음 정보가 release record에 들어가야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>기록해야 하는 이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>base model id와 revision</td>
+<td>원본 weight 추적</td>
+</tr>
+<tr>
+<td>quantization method</td>
+<td>AWQ, GPTQ, BitsAndBytes, FP8, GGUF 등</td>
+</tr>
+<tr>
+<td>bit width와 dtype</td>
+<td>INT4, INT8, FP8, BF16 등</td>
+</tr>
+<tr>
+<td>group size / scale strategy</td>
+<td>accuracy와 kernel compatibility 영향</td>
+</tr>
+<tr>
+<td>calibration dataset</td>
+<td>quantization 품질 재현</td>
+</tr>
+<tr>
+<td>runtime version</td>
+<td>kernel과 loader behavior 추적</td>
+</tr>
+<tr>
+<td>GPU architecture</td>
+<td>hardware support 차이</td>
+</tr>
+<tr>
+<td>eval result</td>
+<td>품질 회귀 확인</td>
+</tr>
+<tr>
+<td>serving benchmark</td>
+<td>latency/throughput/p95 확인</td>
+</tr>
+</tbody>
+</table>
+<p>이 기록이 없으면 나중에 "4-bit로 바꿨더니 좋아졌다" 또는 "FP8로 바꿨더니 품질이 떨어졌다"를 재현할 수 없다. Quantization은 model registry의 부가 정보가 아니라 release artifact의 핵심 필드다.</p>
+<h2 id="baseline">측정 순서: baseline을 먼저 만든다<a class="headerlink" href="#baseline" title="Permanent link">&para;</a></h2>
+<p>Quantization 실험은 항상 BF16/FP16 baseline에서 시작한다. 이미 6장과 7장에서 만든 측정 흐름을 그대로 쓴다.</p>
+<ol>
+<li>Baseline server를 띄운다.</li>
+<li>
+<p>model id, runtime version, GPU, dtype, max model length, command를 기록한다.</p>
+</li>
+<li>
+<p>Workload를 고정한다.</p>
+</li>
+<li>
+<p>short chat, long prompt, high concurrency를 분리한다.</p>
+</li>
+<li>
+<p>Baseline metrics를 저장한다.</p>
+</li>
+<li>
+<p>TTFT p50/p95, TPOT p50/p95, e2e p95, output tok/s, queue time, KV cache usage, GPU memory를 기록한다.</p>
+</li>
+<li>
+<p>Quantized variant를 하나만 바꾼다.</p>
+</li>
+<li>
+<p>weight quantization 또는 KV cache quantization 중 하나만 먼저 바꾼다.</p>
+</li>
+<li>
+<p>같은 workload를 다시 돌린다.</p>
+</li>
+<li>
+<p>request payload와 benchmark 조건을 바꾸지 않는다.</p>
+</li>
+<li>
+<p>Quality eval을 같이 본다.</p>
+</li>
+<li>
+<p>latency가 좋아져도 hallucination, instruction following, tool call format, retrieval grounding이 깨지면 실패다.</p>
+</li>
+<li>
+<p>운영 결정을 적는다.</p>
+</li>
+<li>채택, 보류, 특정 workload에만 사용, rollback 중 하나로 결론을 낸다.</li>
+</ol>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/quantization-evaluation-loop.svg" alt="Quantization evaluation loop compares baseline, quantized candidate, metrics, quality eval, and rollout decision">
+  <figcaption><strong>Quantization evaluation loop.</strong> Quantization은 memory, latency, throughput만 보지 않는다. 같은 workload에서 quality eval과 rollback 가능성까지 확인해야 한다.</figcaption>
+</figure>
+
+<h2 id="_2">어떤 지표가 좋아져야 성공인가<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Quantization 성공 기준은 병목에 따라 다르다.</p>
+<table>
+<thead>
+<tr>
+<th>병목</th>
+<th>기대하는 개선</th>
+<th>같이 봐야 할 위험</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>model이 GPU에 안 올라감</td>
+<td>load 성공, GPU memory 감소</td>
+<td>accuracy, unsupported layer</td>
+</tr>
+<tr>
+<td>weight memory가 큼</td>
+<td>memory 여유, throughput 개선</td>
+<td>TPOT 악화, fallback kernel</td>
+</tr>
+<tr>
+<td>decode memory bandwidth</td>
+<td>TPOT 개선, output tok/s 증가</td>
+<td>p95 tail, batch 조건</td>
+</tr>
+<tr>
+<td>KV cache pressure</td>
+<td>higher concurrency, longer context</td>
+<td>long-context 품질</td>
+</tr>
+<tr>
+<td>cost 압박</td>
+<td>cost per token 감소</td>
+<td>SLA 위반, eval regression</td>
+</tr>
+</tbody>
+</table>
+<p>성공 기준을 미리 정하지 않으면 숫자 해석이 흔들린다. 예를 들어 INT4 weight model이 BF16보다 throughput이 낮더라도, BF16 model이 아예 GPU에 올라가지 않는 환경이라면 INT4는 성공일 수 있다. 반대로 큰 GPU에서 BF16 baseline이 이미 빠르다면 INT4의 memory 절감보다 latency 악화가 더 큰 문제가 될 수 있다.</p>
+<h2 id="_3">실패 패턴<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>Quantization 실험은 다음 패턴으로 실패한다.</p>
+<h3 id="model-tpot">Model은 작아졌지만 TPOT가 나빠진다<a class="headerlink" href="#model-tpot" title="Permanent link">&para;</a></h3>
+<p>Dequantization overhead가 크거나, fast kernel을 타지 못했을 가능성이 있다. GPU architecture와 runtime log를 확인한다.</p>
+<h3 id="throughput-p95">평균 throughput은 좋아졌지만 p95가 나빠진다<a class="headerlink" href="#throughput-p95" title="Permanent link">&para;</a></h3>
+<p>Batching과 scheduler pressure가 바뀌었을 수 있다. 7장에서 본 것처럼 average와 tail을 분리해야 한다.</p>
+<h3 id="short-chat-long-prompt">Short chat은 괜찮지만 long prompt가 나빠진다<a class="headerlink" href="#short-chat-long-prompt" title="Permanent link">&para;</a></h3>
+<p>KV cache, long-context attention, calibration 문제가 섞일 수 있다. long prompt workload를 별도로 본다.</p>
+<h3 id="qa-tool-call-format">일반 QA는 괜찮지만 tool call format이 깨진다<a class="headerlink" href="#qa-tool-call-format" title="Permanent link">&para;</a></h3>
+<p>Accuracy eval 하나로는 부족하다. Production task별 eval이 필요하다. JSON format, function calling, citation, refusal behavior를 따로 확인한다.</p>
+<h3 id="gpu-gpu">특정 GPU에서는 빠르고 다른 GPU에서는 느리다<a class="headerlink" href="#gpu-gpu" title="Permanent link">&para;</a></h3>
+<p>Quantization kernel은 hardware 의존적이다. vLLM supported hardware 표처럼 implementation마다 지원 matrix가 다르다. Release note에는 GPU 세대까지 기록해야 한다.</p>
+<h2 id="7-quantization-column">실습: 7장의 표에 quantization column을 추가한다<a class="headerlink" href="#7-quantization-column" title="Permanent link">&para;</a></h2>
+<p>7장의 결과표를 다음처럼 확장한다.</p>
+<table>
+<thead>
+<tr>
+<th>run</th>
+<th>quantization</th>
+<th style="text-align: right;">input len</th>
+<th style="text-align: right;">output len</th>
+<th style="text-align: right;">concurrency</th>
+<th style="text-align: right;">TTFT p95</th>
+<th style="text-align: right;">TPOT p95</th>
+<th style="text-align: right;">e2e p95</th>
+<th style="text-align: right;">output tok/s</th>
+<th>quality</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>BF16 baseline</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">기준</td>
+<td style="text-align: right;">기준</td>
+<td style="text-align: right;">기준</td>
+<td style="text-align: right;">기준</td>
+<td>기준</td>
+</tr>
+<tr>
+<td>B</td>
+<td>INT4 weight</td>
+<td style="text-align: right;">512</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">비교</td>
+<td style="text-align: right;">비교</td>
+<td style="text-align: right;">비교</td>
+<td style="text-align: right;">비교</td>
+<td>eval 필요</td>
+</tr>
+<tr>
+<td>C</td>
+<td>BF16 baseline</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">기준</td>
+<td style="text-align: right;">기준</td>
+<td style="text-align: right;">기준</td>
+<td style="text-align: right;">기준</td>
+<td>기준</td>
+</tr>
+<tr>
+<td>D</td>
+<td>INT4 weight</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">비교</td>
+<td style="text-align: right;">비교</td>
+<td style="text-align: right;">비교</td>
+<td style="text-align: right;">비교</td>
+<td>eval 필요</td>
+</tr>
+<tr>
+<td>E</td>
+<td>FP8 KV cache</td>
+<td style="text-align: right;">4096</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;">비교</td>
+<td style="text-align: right;">비교</td>
+<td style="text-align: right;">비교</td>
+<td style="text-align: right;">비교</td>
+<td>long-context eval</td>
+</tr>
+</tbody>
+</table>
+<p>결론은 "B가 A보다 빠르다"가 아니다. 결론은 이런 형태여야 한다.</p>
+<ul>
+<li>INT4 weight는 A10에서 model load를 가능하게 했지만 TPOT p95가 BF16 대비 18% 나빠졌다.</li>
+<li>FP8 KV cache는 long prompt concurrency 8에서 OOM을 없앴지만 long-context retrieval eval을 추가로 봐야 한다.</li>
+<li>BF16 baseline은 A100에서 latency가 가장 안정적이므로 production interactive traffic에는 유지한다.</li>
+<li>Quantized variant는 offline summarization 또는 low-priority tenant에 먼저 적용한다.</li>
+</ul>
+<p>이 정도로 써야 운영 결정이 된다.</p>
+<h2 id="quantization">언제 quantization을 선택하지 말아야 하는가<a class="headerlink" href="#quantization" title="Permanent link">&para;</a></h2>
+<p>Quantization을 미루는 것이 맞는 경우도 있다.</p>
+<ul>
+<li>현재 병목이 network, application queue, retrieval, tool latency다.</li>
+<li>p95 악화 원인이 model compute가 아니라 queue policy다.</li>
+<li>eval set이 없어 품질 회귀를 볼 수 없다.</li>
+<li>target GPU에서 fast kernel support가 불명확하다.</li>
+<li>rollout과 rollback 경로가 없다.</li>
+<li>규제나 보안 때문에 model artifact 변경 검증이 필요하다.</li>
+</ul>
+<p>이런 상황에서 quantization을 먼저 하면 문제 원인을 흐린다. 7장의 metric reading을 먼저 하고, 병목이 model memory 또는 decode path에 있다는 근거가 있을 때 quantization을 실험한다.</p>
+<h2 id="_4">이 장의 결론<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>Quantization은 AI infrastructure engineer에게 중요한 도구지만, 항상 정답은 아니다.</p>
+<ul>
+<li>Weight, activation, KV cache quantization은 서로 다른 병목을 줄인다.</li>
+<li>Memory footprint 감소와 latency 개선은 같은 말이 아니다.</li>
+<li>Fast kernel, GPU architecture, runtime support가 맞아야 실제 성능 개선이 나온다.</li>
+<li>KV cache quantization은 long context와 concurrency에는 중요하지만 calibration과 quality risk가 있다.</li>
+<li>Quantized model은 base model과 다른 release artifact로 기록해야 한다.</li>
+<li>6-7장에서 만든 baseline과 metric table 없이 quantization 효과를 판단하면 안 된다.</li>
+</ul>
+<p>다음 장에서는 vLLM 자체를 더 깊게 본다. PagedAttention, scheduler, continuous batching, prefix caching, metrics를 하나의 general-purpose LLM serving baseline으로 묶어 이해한다.</p>
+<h2 id="sources-checked-for-this-draft">Sources checked for this draft<a class="headerlink" href="#sources-checked-for-this-draft" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://docs.vllm.ai/en/stable/features/quantization/">vLLM Quantization</a></li>
+<li><a href="https://docs.vllm.ai/en/stable/features/quantization/quantized_kvcache/">vLLM Quantized KV Cache</a></li>
+<li><a href="https://docs.vllm.ai/en/stable/features/quantization/auto_awq/">vLLM AutoAWQ</a></li>
+<li><a href="https://docs.vllm.ai/en/stable/features/quantization/gptqmodel/">vLLM GPTQModel</a></li>
+<li><a href="https://docs.vllm.ai/en/stable/features/quantization/bnb/">vLLM BitsAndBytes</a></li>
+<li><a href="https://huggingface.co/docs/transformers/main/en/quantization/overview">Hugging Face Transformers quantization overview</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../07-serving-metrics-ttft-tpot-throughput/" class="md-footer__link md-footer__link--prev" aria-label="이전: 7장. Serving metrics">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                7장. Serving metrics
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../../source-policy/" class="md-footer__link md-footer__link--next" aria-label="다음: 소스 정책">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                소스 정책
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+        <script src="../../javascripts/header-home-link.js"></script>
+
+
+  </body>
+</html>
