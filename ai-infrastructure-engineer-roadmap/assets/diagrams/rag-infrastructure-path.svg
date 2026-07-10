@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="560" viewBox="0 0 1240 560" role="img" aria-labelledby="title desc">
+  <title id="title">RAG infrastructure path</title>
+  <desc id="desc">RAG infrastructure path from sources through ingestion, chunking, embedding, vector database, retrieval, reranking, prompt assembly, generation, and evaluation.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      .bg{fill:#f8fafc}
+      .box{fill:#ffffff;stroke:#334155;stroke-width:2;rx:10}
+      .data{fill:#eef2ff;stroke:#4f46e5;stroke-width:2;rx:10}
+      .query{fill:#ecfdf5;stroke:#059669;stroke-width:2;rx:10}
+      .risk{fill:#fff7ed;stroke:#f97316;stroke-width:2;rx:10}
+      .text{font-family:Arial,Helvetica,sans-serif;fill:#111827;font-size:20px;font-weight:700}
+      .small{font-family:Arial,Helvetica,sans-serif;fill:#374151;font-size:15px}
+      .line{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+      .dash{stroke:#64748b;stroke-width:2;stroke-dasharray:7 7;fill:none;marker-end:url(#arrow)}
+    </style>
+  </defs>
+  <rect class="bg" width="1240" height="560"/>
+  <rect class="data" x="45" y="80" width="145" height="86"/>
+  <text class="text" x="118" y="115" text-anchor="middle">Sources</text>
+  <text class="small" x="118" y="143" text-anchor="middle">docs / wiki</text>
+  <rect class="box" x="240" y="80" width="145" height="86"/>
+  <text class="text" x="313" y="115" text-anchor="middle">Ingest</text>
+  <text class="small" x="313" y="143" text-anchor="middle">parse / clean</text>
+  <rect class="box" x="435" y="80" width="145" height="86"/>
+  <text class="text" x="508" y="115" text-anchor="middle">Chunk</text>
+  <text class="small" x="508" y="143" text-anchor="middle">metadata / ACL</text>
+  <rect class="box" x="630" y="80" width="145" height="86"/>
+  <text class="text" x="703" y="115" text-anchor="middle">Embed</text>
+  <text class="small" x="703" y="143" text-anchor="middle">model version</text>
+  <rect class="data" x="825" y="80" width="160" height="86"/>
+  <text class="text" x="905" y="115" text-anchor="middle">Vector DB</text>
+  <text class="small" x="905" y="143" text-anchor="middle">index + filters</text>
+  <path class="line" d="M190 123 H240"/>
+  <path class="line" d="M385 123 H435"/>
+  <path class="line" d="M580 123 H630"/>
+  <path class="line" d="M775 123 H825"/>
+
+  <rect class="query" x="45" y="315" width="145" height="86"/>
+  <text class="text" x="118" y="350" text-anchor="middle">Query</text>
+  <text class="small" x="118" y="378" text-anchor="middle">user intent</text>
+  <rect class="query" x="240" y="315" width="145" height="86"/>
+  <text class="text" x="313" y="350" text-anchor="middle">Retrieve</text>
+  <text class="small" x="313" y="378" text-anchor="middle">top_k + ACL</text>
+  <rect class="query" x="435" y="315" width="145" height="86"/>
+  <text class="text" x="508" y="350" text-anchor="middle">Rerank</text>
+  <text class="small" x="508" y="378" text-anchor="middle">top_n</text>
+  <rect class="query" x="630" y="315" width="145" height="86"/>
+  <text class="text" x="703" y="350" text-anchor="middle">Assemble</text>
+  <text class="small" x="703" y="378" text-anchor="middle">context budget</text>
+  <rect class="query" x="825" y="315" width="160" height="86"/>
+  <text class="text" x="905" y="350" text-anchor="middle">Generate</text>
+  <text class="small" x="905" y="378" text-anchor="middle">answer + cite</text>
+  <rect class="risk" x="1040" y="315" width="155" height="86"/>
+  <text class="text" x="1118" y="350" text-anchor="middle">Evaluate</text>
+  <text class="small" x="1118" y="378" text-anchor="middle">recall / faith</text>
+  <path class="line" d="M190 358 H240"/>
+  <path class="line" d="M385 358 H435"/>
+  <path class="line" d="M580 358 H630"/>
+  <path class="line" d="M775 358 H825"/>
+  <path class="line" d="M985 358 H1040"/>
+  <path class="dash" d="M905 166 V260 C905 295 375 295 313 315"/>
+  <text class="small" x="608" y="276" text-anchor="middle">index_version + embedding_model + filter policy</text>
+  <rect class="risk" x="300" y="465" width="650" height="52"/>
+  <text class="small" x="625" y="497" text-anchor="middle">Trace: query_id, selected_chunk_ids, source_doc_versions, retriever_config, reranker_version</text>
+</svg>

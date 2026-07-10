@@ -1,0 +1,2437 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/16-rag-infrastructure-retrieval-vector-db-reranker/">
+
+
+        <link rel="prev" href="../15-evaluation-release-gate/">
+
+
+        <link rel="next" href="../../source-policy/">
+
+
+
+
+
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>16장. RAG infrastructure - AI 인프라 엔지니어 로드맵</title>
+
+
+
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+      <link rel="stylesheet" href="../../stylesheets/site-navigation-v2.css">
+
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#16-rag-infrastructure-retrieval-vector-db-reranker" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              16장. RAG infrastructure
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    시작하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    책 구조
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    책 구조
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../outline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    전체 목차
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../sample-chapter-plan/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 챕터 계획
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 원고
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    샘플 원고
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-kv-cache-serving-bottleneck/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. KV cache 병목
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-first-llm-server-openai-endpoint/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. 첫 LLM server
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07-serving-metrics-ttft-tpot-throughput/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Serving metrics
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08-quantization-optimization-risk/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Quantization
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../09-vllm-serving-baseline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. vLLM baseline
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../10-runtime-selection-tensorrt-sglang-llamacpp/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. Runtime 선택
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../11-platform-layer-triton-kserve-rayserve/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    11장. Platform 계층
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../12-parallelism-nccl-multi-gpu/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    12장. Parallelism과 NCCL
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../13-kubernetes-gpu-operations/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    13장. Kubernetes GPU 운영
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../14-observability-gpu-runtime-request/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    14장. Observability
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../15-evaluation-release-gate/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    15장. Evaluation gate
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    16장. RAG infrastructure
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    16장. RAG infrastructure
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#rag-retrieval-pipeline-vector-db" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        RAG는 retrieval pipeline이지 vector DB가 아니다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#chunk" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        운영 단위는 chunk다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#ingestion-batch-job-data-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Ingestion은 batch job이 아니라 data pipeline이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#embedding-model-index-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Embedding model은 index schema의 일부다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#vector-db" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Vector DB 선택은 "빠른가"보다 "운영할 수 있는가"가 먼저다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#filter" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Filter는 보안 경계다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#hybrid-retrieval-dense-sparse" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Hybrid retrieval은 dense와 sparse의 약점을 보완한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#reranker-recall-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Reranker는 recall을 precision으로 바꾸는 단계다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#prompt-assembly-retrieval" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Prompt assembly는 retrieval 결과를 제품 동작으로 바꾼다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#rag-evaluation-retrieval-answer" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        RAG evaluation은 retrieval과 answer를 따로 본다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#rag-observability-trace-retrieval-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        RAG observability는 trace에 retrieval evidence를 남긴다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#freshness-deletion-production-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Freshness와 deletion은 production RAG의 핵심이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#release-record-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Release record에 RAG를 포함한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#failure-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Failure pattern
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="Failure pattern">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#vector-db-score" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Vector DB score를 절대값으로 믿는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#chunk_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Chunk를 크게 만들면 항상 좋아진다고 생각한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#acl-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        ACL을 prompt에서 처리한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#reranker-recall" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Reranker를 넣고 recall 문제를 해결했다고 생각한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#index-version" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Index version 없이 답변을 디버깅한다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#rag-release-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: RAG release checklist 만들기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    제작 노트
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    제작 노트
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../source-policy/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    소스 정책
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    다음 작업
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#rag-retrieval-pipeline-vector-db" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        RAG는 retrieval pipeline이지 vector DB가 아니다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#chunk" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        운영 단위는 chunk다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#ingestion-batch-job-data-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Ingestion은 batch job이 아니라 data pipeline이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#embedding-model-index-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Embedding model은 index schema의 일부다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#vector-db" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Vector DB 선택은 "빠른가"보다 "운영할 수 있는가"가 먼저다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#filter" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Filter는 보안 경계다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#hybrid-retrieval-dense-sparse" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Hybrid retrieval은 dense와 sparse의 약점을 보완한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#reranker-recall-precision" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Reranker는 recall을 precision으로 바꾸는 단계다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#prompt-assembly-retrieval" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Prompt assembly는 retrieval 결과를 제품 동작으로 바꾼다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#rag-evaluation-retrieval-answer" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        RAG evaluation은 retrieval과 answer를 따로 본다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#rag-observability-trace-retrieval-evidence" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        RAG observability는 trace에 retrieval evidence를 남긴다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#freshness-deletion-production-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Freshness와 deletion은 production RAG의 핵심이다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#release-record-rag" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Release record에 RAG를 포함한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#failure-pattern" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Failure pattern
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="Failure pattern">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#vector-db-score" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Vector DB score를 절대값으로 믿는다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#chunk_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Chunk를 크게 만들면 항상 좋아진다고 생각한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#acl-prompt" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        ACL을 prompt에서 처리한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#reranker-recall" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Reranker를 넣고 recall 문제를 해결했다고 생각한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#index-version" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Index version 없이 답변을 디버깅한다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#rag-release-checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실습: RAG release checklist 만들기
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="16-rag-infrastructure-retrieval-vector-db-reranker">16장. RAG infrastructure: retrieval, vector DB, reranker를 운영 관점에서 보기<a class="headerlink" href="#16-rag-infrastructure-retrieval-vector-db-reranker" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>Draft v0.1</span>
+  <span>Updated: 2026-07-10</span>
+  <span>Part 7 - Application infrastructure</span>
+</div>
+
+<p>15장에서는 release gate가 model, prompt, runtime, benchmark, canary를 함께 봐야 한다는 점을 다뤘다. 이제 LLM application에서 가장 흔한 production 구조인 RAG로 들어간다.</p>
+<p>RAG는 자주 "vector DB를 붙이면 된다"로 설명된다. 하지만 production에서는 vector DB보다 더 큰 질문이 있다.</p>
+<blockquote>
+<p>사용자가 받은 답변이 어떤 문서 version, 어떤 chunking, 어떤 embedding model, 어떤 retrieval 설정, 어떤 reranker, 어떤 permission filter를 거쳐 만들어졌는지 설명할 수 있는가?</p>
+</blockquote>
+<p>이 질문에 답하지 못하면 RAG는 지식 보강 장치가 아니라 추적 불가능한 release 위험이 된다.</p>
+<p>이 장의 독자 질문은 다음과 같다.</p>
+<blockquote>
+<p>RAG infrastructure는 retrieval 품질, latency, 비용, 권한, freshness를 운영하기 위해 어떤 구성요소를 versioning하고 관측해야 하는가?</p>
+</blockquote>
+<p>핵심은 RAG pipeline을 serving path와 release artifact 양쪽으로 보는 것이다.</p>
+<h2 id="rag-retrieval-pipeline-vector-db">RAG는 retrieval pipeline이지 vector DB가 아니다<a class="headerlink" href="#rag-retrieval-pipeline-vector-db" title="Permanent link">&para;</a></h2>
+<p>RAG request는 보통 다음 단계를 지난다.</p>
+<ol>
+<li>Source document를 수집한다.</li>
+<li>문서를 정제하고 chunk로 나눈다.</li>
+<li>chunk에 metadata와 permission 정보를 붙인다.</li>
+<li>embedding을 만들고 index에 넣는다.</li>
+<li>query를 embedding 또는 lexical query로 변환한다.</li>
+<li>vector search, keyword search, filter search로 candidate를 찾는다.</li>
+<li>reranker가 candidate 순서를 다시 매긴다.</li>
+<li>prompt assembly가 context를 모델 입력에 넣는다.</li>
+<li>generator가 답변과 citation을 만든다.</li>
+<li>evaluator가 retrieval과 answer 품질을 기록한다.</li>
+</ol>
+<p>이 중 하나만 바뀌어도 사용자가 받는 답변은 바뀐다. 따라서 RAG release는 model release와 비슷하게 다뤄야 한다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/rag-infrastructure-path.svg" alt="RAG infrastructure path from sources through ingestion, chunking, embedding, vector database, retrieval, reranking, prompt assembly, generation, and evaluation">
+  <figcaption><strong>RAG infrastructure path.</strong> RAG는 ingestion과 retrieval, generation을 잇는 pipeline이다. 각 단계의 version과 metric이 있어야 답변 품질과 latency를 설명할 수 있다.</figcaption>
+</figure>
+
+<h2 id="chunk">운영 단위는 chunk다<a class="headerlink" href="#chunk" title="Permanent link">&para;</a></h2>
+<p>Model serving의 운영 단위가 token shape였다면 RAG의 운영 단위는 chunk다. Chunk는 LLM에 들어가는 지식 단위이자 vector DB에 저장되는 검색 단위다.</p>
+<table>
+<thead>
+<tr>
+<th>결정</th>
+<th>운영 영향</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Chunk size</td>
+<td>recall, precision, embedding cost, context token cost</td>
+</tr>
+<tr>
+<td>Chunk overlap</td>
+<td>누락 감소, 중복 증가, index size 증가</td>
+</tr>
+<tr>
+<td>Splitter</td>
+<td>heading, paragraph, sentence, semantic boundary 유지 여부</td>
+</tr>
+<tr>
+<td>Metadata</td>
+<td>filter, permission, citation, freshness 추적</td>
+</tr>
+<tr>
+<td>Chunk ID</td>
+<td>update/delete/deduplication의 기준</td>
+</tr>
+<tr>
+<td>Parent document link</td>
+<td>citation과 원문 검증 경로</td>
+</tr>
+</tbody>
+</table>
+<p>LlamaIndex 문서는 document가 chunk로 나뉘고 metadata와 relationship을 추적하는 Node object로 파싱된다고 설명한다. 이 관점은 production RAG에서 중요하다. "문서를 넣었다"가 아니라 "어떤 node들이 어떤 metadata를 갖고 index에 들어갔는가"를 알아야 한다.</p>
+<p>Chunk에는 최소 다음 metadata를 붙인다.</p>
+<table>
+<thead>
+<tr>
+<th>Metadata</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>doc_id</code></td>
+<td>원문 문서 추적</td>
+</tr>
+<tr>
+<td><code>chunk_id</code></td>
+<td>update/delete/deduplication</td>
+</tr>
+<tr>
+<td><code>source_uri</code></td>
+<td>citation과 감사</td>
+</tr>
+<tr>
+<td><code>source_version</code></td>
+<td>문서 변경 추적</td>
+</tr>
+<tr>
+<td><code>chunker_version</code></td>
+<td>chunking 변경 회귀 분석</td>
+</tr>
+<tr>
+<td><code>embedding_model</code></td>
+<td>vector 호환성 확인</td>
+</tr>
+<tr>
+<td><code>tenant_id</code></td>
+<td>multi-tenant 격리</td>
+</tr>
+<tr>
+<td><code>acl_hash</code> 또는 <code>permission_group</code></td>
+<td>권한 필터</td>
+</tr>
+<tr>
+<td><code>created_at</code>, <code>updated_at</code>, <code>expires_at</code></td>
+<td>freshness와 stale data 관리</td>
+</tr>
+<tr>
+<td><code>content_hash</code></td>
+<td>중복 제거와 재색인 필요 여부</td>
+</tr>
+</tbody>
+</table>
+<p><code>chunk_id</code>를 매번 랜덤으로 만들면 incremental update가 어려워진다. 문서 경로, heading path, offset, content hash 등을 조합해 안정적인 ID를 만든다.</p>
+<h2 id="ingestion-batch-job-data-pipeline">Ingestion은 batch job이 아니라 data pipeline이다<a class="headerlink" href="#ingestion-batch-job-data-pipeline" title="Permanent link">&para;</a></h2>
+<p>RAG ingestion은 단순 ETL이 아니다. Search 품질과 보안이 ingestion에서 결정된다.</p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>실패하면 생기는 문제</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Connector</td>
+<td>일부 문서 누락, 중복 수집</td>
+</tr>
+<tr>
+<td>Parser</td>
+<td>표, 코드, PDF layout 손실</td>
+</tr>
+<tr>
+<td>Normalizer</td>
+<td>HTML noise, footer, navigation text 섞임</td>
+</tr>
+<tr>
+<td>Chunker</td>
+<td>근거 문장이 chunk 경계에서 잘림</td>
+</tr>
+<tr>
+<td>Metadata extractor</td>
+<td>권한, 날짜, 문서 유형 누락</td>
+</tr>
+<tr>
+<td>Embedder</td>
+<td>모델 변경으로 vector space가 달라짐</td>
+</tr>
+<tr>
+<td>Upsert/delete</td>
+<td>stale chunk가 계속 검색됨</td>
+</tr>
+<tr>
+<td>Index build</td>
+<td>recall/latency trade-off 변화</td>
+</tr>
+</tbody>
+</table>
+<p>Ingestion pipeline은 다음 metric을 가져야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>documents scanned</td>
+<td>source에서 몇 개를 봤는가</td>
+</tr>
+<tr>
+<td>documents changed</td>
+<td>새로 색인할 필요가 있는가</td>
+</tr>
+<tr>
+<td>chunks produced</td>
+<td>chunk 수가 갑자기 늘거나 줄었는가</td>
+</tr>
+<tr>
+<td>embedding tokens</td>
+<td>embedding 비용이 얼마나 드는가</td>
+</tr>
+<tr>
+<td>embedding latency/error</td>
+<td>provider 또는 local embedder가 병목인가</td>
+</tr>
+<tr>
+<td>upsert/delete count</td>
+<td>index가 source와 동기화되는가</td>
+</tr>
+<tr>
+<td>stale chunk count</td>
+<td>삭제/만료된 chunk가 남아 있는가</td>
+</tr>
+<tr>
+<td>permission missing count</td>
+<td>ACL 없는 chunk가 생겼는가</td>
+</tr>
+</tbody>
+</table>
+<p>Source system이 바뀌면 RAG 품질도 바뀐다. 따라서 ingestion run에는 <code>source_snapshot_id</code>, <code>connector_version</code>, <code>parser_version</code>, <code>chunker_version</code>, <code>embedding_model</code>, <code>index_name</code>을 남긴다.</p>
+<h2 id="embedding-model-index-schema">Embedding model은 index schema의 일부다<a class="headerlink" href="#embedding-model-index-schema" title="Permanent link">&para;</a></h2>
+<p>OpenAI embedding 문서는 embedding을 floating point vector라고 설명하고, 벡터 간 거리가 관련성을 나타낸다고 설명한다. 이 말은 embedding model이 바뀌면 vector space 자체가 바뀐다는 뜻이다.</p>
+<p>Embedding model 변경은 application code 변경보다 위험할 수 있다.</p>
+<table>
+<thead>
+<tr>
+<th>변경</th>
+<th>필요한 작업</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>embedding model 변경</td>
+<td>전체 재색인 또는 dual index</td>
+</tr>
+<tr>
+<td>embedding dimension 변경</td>
+<td>vector DB schema 변경</td>
+</tr>
+<tr>
+<td>distance metric 변경</td>
+<td>index 설정과 score 해석 변경</td>
+</tr>
+<tr>
+<td>multilingual model 변경</td>
+<td>언어별 retrieval eval</td>
+</tr>
+<tr>
+<td>embedding input normalization 변경</td>
+<td>기존 score threshold 재검토</td>
+</tr>
+</tbody>
+</table>
+<p>운영에서 피해야 할 실수는 새 embedding으로 query를 만들고 old embedding으로 만들어진 index를 검색하는 것이다. 검색은 동작할 수 있지만 점수와 ranking이 신뢰할 수 없어진다.</p>
+<p>따라서 query path와 index path 모두에 다음 label을 붙인다.</p>
+<div class="highlight"><pre><span></span><code>embedding_model
+embedding_dimension
+embedding_normalization
+distance_metric
+index_version
+</code></pre></div>
+<h2 id="vector-db">Vector DB 선택은 "빠른가"보다 "운영할 수 있는가"가 먼저다<a class="headerlink" href="#vector-db" title="Permanent link">&para;</a></h2>
+<p>Vector DB는 비슷해 보이지만 운영 특성이 다르다. 선택 기준은 다음이다.</p>
+<table>
+<thead>
+<tr>
+<th>기준</th>
+<th>확인할 질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Index type</td>
+<td>HNSW, IVF, DiskANN, flat search 중 무엇을 쓰는가</td>
+</tr>
+<tr>
+<td>Metric</td>
+<td>cosine, inner product, L2 중 무엇을 쓰는가</td>
+</tr>
+<tr>
+<td>Filter</td>
+<td>tenant, permission, time range filter가 빠른가</td>
+</tr>
+<tr>
+<td>Update/delete</td>
+<td>문서 변경과 삭제를 안전하게 반영할 수 있는가</td>
+</tr>
+<tr>
+<td>Consistency</td>
+<td>쓰기 직후 읽기, replica lag를 어떻게 다루는가</td>
+</tr>
+<tr>
+<td>Multi-tenancy</td>
+<td>collection, namespace, payload filter 중 어떤 격리 모델인가</td>
+</tr>
+<tr>
+<td>Backup/restore</td>
+<td>index와 metadata를 복구할 수 있는가</td>
+</tr>
+<tr>
+<td>Observability</td>
+<td>query latency, recall proxy, index size, compaction을 볼 수 있는가</td>
+</tr>
+<tr>
+<td>Cost</td>
+<td>vector count, dimension, replica, storage, read unit 비용</td>
+</tr>
+</tbody>
+</table>
+<p>Milvus 문서는 floating point vector에 대해 L2, inner product, cosine metric과 FLAT, IVF, HNSW, DISKANN 같은 index type을 지원한다고 설명한다. Qdrant 문서는 payload와 id 조건으로 검색/조회 조건을 줄 수 있고, 자주 필터링하는 field에는 payload index를 만들 것을 권장한다.</p>
+<p>이 두 문서가 말해 주는 운영 교훈은 분명하다. Vector DB는 "벡터만 저장하는 곳"이 아니라 search index, scalar metadata index, filter execution, consistency, update/delete semantics를 함께 운영하는 database다.</p>
+<h2 id="filter">Filter는 보안 경계다<a class="headerlink" href="#filter" title="Permanent link">&para;</a></h2>
+<p>RAG에서 metadata filter는 relevance 기능이기도 하지만 보안 경계이기도 하다. 특히 enterprise RAG에서는 사용자가 볼 수 없는 문서가 retrieval candidate에 들어오면 안 된다.</p>
+<p>권한 필터는 prompt에서 처리하지 않는다.</p>
+<p>나쁜 흐름:</p>
+<div class="highlight"><pre><span></span><code>retrieve all similar chunks -&gt; prompt says &quot;ignore unauthorized documents&quot;
+</code></pre></div>
+<p>좋은 흐름:</p>
+<div class="highlight"><pre><span></span><code>apply tenant/ACL filter -&gt; retrieve allowed chunks only -&gt; rerank -&gt; prompt assembly
+</code></pre></div>
+<p>Filter 설계에서 중요한 점은 다음이다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>설명</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pre-filter</td>
+<td>vector search 전에 tenant/ACL 후보를 제한</td>
+</tr>
+<tr>
+<td>Post-filter</td>
+<td>검색 후 결과에서 제외, recall과 latency가 흔들릴 수 있음</td>
+</tr>
+<tr>
+<td>ACL freshness</td>
+<td>권한 변경이 index에 반영되는 지연</td>
+</tr>
+<tr>
+<td>Deny-by-default</td>
+<td>metadata 누락 chunk는 검색 제외</td>
+</tr>
+<tr>
+<td>Audit</td>
+<td>어떤 filter가 적용됐는지 trace에 기록</td>
+</tr>
+</tbody>
+</table>
+<p>ACL이 복잡하면 <code>permission_group</code> 또는 <code>acl_hash</code>를 chunk metadata에 넣고 query 시점에 허용 group으로 filter한다. 다만 group 수가 많으면 filter cardinality와 index 성능을 함께 확인해야 한다.</p>
+<h2 id="hybrid-retrieval-dense-sparse">Hybrid retrieval은 dense와 sparse의 약점을 보완한다<a class="headerlink" href="#hybrid-retrieval-dense-sparse" title="Permanent link">&para;</a></h2>
+<p>Dense retrieval은 의미가 비슷한 문서를 잘 찾는다. 하지만 고유명사, 제품 코드, 에러 코드, 버전 번호, 짧은 키워드에는 lexical search가 더 강할 때가 많다.</p>
+<table>
+<thead>
+<tr>
+<th>Retrieval type</th>
+<th>강점</th>
+<th>약점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dense vector</td>
+<td>의미 유사성, paraphrase</td>
+<td>고유명사/코드/숫자 약함</td>
+</tr>
+<tr>
+<td>Sparse/BM25</td>
+<td>정확한 단어, identifier</td>
+<td>표현이 다른 문장 약함</td>
+</tr>
+<tr>
+<td>Metadata filter</td>
+<td>권한, 날짜, tenant</td>
+<td>relevance 자체는 아님</td>
+</tr>
+<tr>
+<td>Hybrid</td>
+<td>dense와 sparse 보완</td>
+<td>score fusion과 tuning 필요</td>
+</tr>
+</tbody>
+</table>
+<p>Pinecone의 hybrid search 설명은 dense retrieval이 fine-tuning된 domain에서는 강하지만 out-of-domain에서는 traditional search가 장점을 가질 수 있고, dense와 sparse를 함께 쓰는 접근을 설명한다.</p>
+<p>운영 관점에서 hybrid retrieval은 다음 값을 release artifact로 남긴다.</p>
+<table>
+<thead>
+<tr>
+<th>설정</th>
+<th>예</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>dense model</td>
+<td><code>text-embedding-3-large</code>, local embedding model</td>
+</tr>
+<tr>
+<td>sparse method</td>
+<td>BM25, SPLADE, keyword index</td>
+</tr>
+<tr>
+<td>fusion method</td>
+<td>weighted sum, RRF, vendor-specific alpha</td>
+</tr>
+<tr>
+<td>top_k before rerank</td>
+<td>20, 50, 100</td>
+</tr>
+<tr>
+<td>top_n after rerank</td>
+<td>3, 5, 8</td>
+</tr>
+<tr>
+<td>language policy</td>
+<td>Korean/English/multilingual split</td>
+</tr>
+</tbody>
+</table>
+<p>Hybrid 설정을 바꾸면 answer quality뿐 아니라 latency와 token cost도 바뀐다. top_k를 크게 잡으면 recall은 올라갈 수 있지만 reranker 비용과 prompt assembly 후보가 늘어난다.</p>
+<h2 id="reranker-recall-precision">Reranker는 recall을 precision으로 바꾸는 단계다<a class="headerlink" href="#reranker-recall-precision" title="Permanent link">&para;</a></h2>
+<p>Retriever는 넓게 후보를 찾고, reranker는 그 후보를 더 정확한 순서로 좁힌다. Cohere 문서는 semantic, lexical 등 여러 search system에서 온 결과가 최적으로 정렬되어 있지 않을 수 있고, rerank가 query, documents, top_n을 받아 상위 문서를 고르는 흐름을 설명한다. Sentence Transformers 문서는 reranker가 보통 query와 answer text pair를 받아 점수를 내는 CrossEncoder 모델이라고 설명한다.</p>
+<p>운영에서 reranker는 다음 trade-off를 만든다.</p>
+<table>
+<thead>
+<tr>
+<th>장점</th>
+<th>비용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>상위 context 품질 개선</td>
+<td>rerank latency 추가</td>
+</tr>
+<tr>
+<td>dense/sparse 결과 fusion 보정</td>
+<td>reranker model 비용</td>
+</tr>
+<tr>
+<td>semi-structured data ranking</td>
+<td>serialization 품질 의존</td>
+</tr>
+<tr>
+<td>domain-specific ranking 가능</td>
+<td>eval dataset과 tuning 필요</td>
+</tr>
+</tbody>
+</table>
+<p>Reranker를 넣을 때는 다음 metric을 본다.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rerank input count</td>
+<td>reranker에 몇 개 후보를 넣는가</td>
+</tr>
+<tr>
+<td>rerank latency p95</td>
+<td>user-facing latency에 얼마나 더해지는가</td>
+</tr>
+<tr>
+<td>top_n selected</td>
+<td>prompt에 몇 개 chunk가 들어가는가</td>
+</tr>
+<tr>
+<td>context precision</td>
+<td>상위 chunk가 질문에 관련 있는가</td>
+</tr>
+<tr>
+<td>answer faithfulness</td>
+<td>답변이 context에 근거하는가</td>
+</tr>
+<tr>
+<td>no-answer rate</td>
+<td>근거 부족을 제대로 감지하는가</td>
+</tr>
+</tbody>
+</table>
+<p>Reranker가 항상 답은 아니다. top_k가 작으면 reranker가 좋은 문서를 살릴 수 없다. Retriever recall이 먼저다. Reranker는 "못 찾은 문서"를 만들어 내지 못한다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/rag-retrieval-rerank-tradeoff.svg" alt="RAG retrieval tradeoff from broad candidate retrieval through metadata filtering and reranking to final prompt context">
+  <figcaption><strong>Retrieval and rerank trade-off.</strong> Retriever는 recall을 넓히고, filter는 허용 범위를 제한하며, reranker는 precision을 높인다. 각 단계의 top_k, latency, cost, failure mode를 따로 본다.</figcaption>
+</figure>
+
+<h2 id="prompt-assembly-retrieval">Prompt assembly는 retrieval 결과를 제품 동작으로 바꾼다<a class="headerlink" href="#prompt-assembly-retrieval" title="Permanent link">&para;</a></h2>
+<p>좋은 chunk를 찾았어도 prompt assembly가 나쁘면 답변은 나빠진다.</p>
+<p>Prompt assembly는 다음을 결정한다.</p>
+<table>
+<thead>
+<tr>
+<th>결정</th>
+<th>영향</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Context order</td>
+<td>모델이 어떤 근거를 먼저 보는가</td>
+</tr>
+<tr>
+<td>Deduplication</td>
+<td>같은 문장이 반복되어 context를 낭비하지 않는가</td>
+</tr>
+<tr>
+<td>Citation format</td>
+<td>답변 근거를 추적할 수 있는가</td>
+</tr>
+<tr>
+<td>Context budget</td>
+<td>retrieval context와 user query, conversation history의 token 배분</td>
+</tr>
+<tr>
+<td>Conflict handling</td>
+<td>서로 다른 문서가 충돌할 때 어떻게 답하는가</td>
+</tr>
+<tr>
+<td>No-answer policy</td>
+<td>근거가 부족하면 모른다고 말하는가</td>
+</tr>
+</tbody>
+</table>
+<p>RAG에서 hallucination을 줄이는 가장 현실적인 방법은 prompt에 "정확히 답하라"를 추가하는 것이 아니다. 근거 context의 품질을 높이고, context 밖 내용을 말하지 않는 정책을 명확히 하고, citation을 강제하고, no-answer case를 eval에 넣는 것이다.</p>
+<h2 id="rag-evaluation-retrieval-answer">RAG evaluation은 retrieval과 answer를 따로 본다<a class="headerlink" href="#rag-evaluation-retrieval-answer" title="Permanent link">&para;</a></h2>
+<p>15장에서 RAG eval은 retrieval과 generation을 분리해야 한다고 했다. 16장에서는 그 값을 운영 metric으로 사용한다.</p>
+<p>Ragas 문서는 RAG에 대해 context precision, context recall, noise sensitivity, response relevancy, faithfulness 같은 metric을 제공한다고 설명한다. 이 이름들은 production dashboard에서도 유용한 관측 축이다.</p>
+<table>
+<thead>
+<tr>
+<th>Eval axis</th>
+<th>질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Retrieval recall</td>
+<td>필요한 근거가 후보 안에 들어왔는가</td>
+</tr>
+<tr>
+<td>Context precision</td>
+<td>prompt에 들어간 context가 질문과 관련 있는가</td>
+</tr>
+<tr>
+<td>Faithfulness</td>
+<td>답변이 context에 근거하는가</td>
+</tr>
+<tr>
+<td>Answer correctness</td>
+<td>최종 답변이 기대 행동과 맞는가</td>
+</tr>
+<tr>
+<td>Citation accuracy</td>
+<td>citation이 실제 근거 위치를 가리키는가</td>
+</tr>
+<tr>
+<td>Freshness</td>
+<td>최신 문서를 검색했는가</td>
+</tr>
+<tr>
+<td>Authorization</td>
+<td>허용되지 않은 문서가 섞이지 않았는가</td>
+</tr>
+</tbody>
+</table>
+<p>RAG eval dataset은 일반 QA dataset보다 더 많은 정보를 가져야 한다.</p>
+<table>
+<thead>
+<tr>
+<th>필드</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>question</code></td>
+<td>사용자 query</td>
+</tr>
+<tr>
+<td><code>expected_answer</code></td>
+<td>답변 평가</td>
+</tr>
+<tr>
+<td><code>required_doc_ids</code></td>
+<td>retrieval recall 평가</td>
+</tr>
+<tr>
+<td><code>forbidden_doc_ids</code></td>
+<td>권한/오염 평가</td>
+</tr>
+<tr>
+<td><code>tenant_or_role</code></td>
+<td>ACL filter 평가</td>
+</tr>
+<tr>
+<td><code>time_context</code></td>
+<td>freshness 평가</td>
+</tr>
+<tr>
+<td><code>answer_policy</code></td>
+<td>no-answer, citation, style 규칙</td>
+</tr>
+</tbody>
+</table>
+<p>이 dataset 없이 embedding model이나 chunking을 바꾸면, "답변이 좋아진 것 같다"는 느낌만 남는다.</p>
+<h2 id="rag-observability-trace-retrieval-evidence">RAG observability는 trace에 retrieval evidence를 남긴다<a class="headerlink" href="#rag-observability-trace-retrieval-evidence" title="Permanent link">&para;</a></h2>
+<p>14장의 trace 구조에 RAG span을 추가한다.</p>
+<table>
+<thead>
+<tr>
+<th>Span</th>
+<th>남길 정보</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>rag.ingest</code></td>
+<td>source snapshot, parser, chunker, embedding model</td>
+</tr>
+<tr>
+<td><code>rag.retrieve</code></td>
+<td>query, index version, filter, top_k, latency</td>
+</tr>
+<tr>
+<td><code>rag.rerank</code></td>
+<td>reranker version, input count, top_n, latency</td>
+</tr>
+<tr>
+<td><code>rag.assemble</code></td>
+<td>selected chunk IDs, token budget, citation map</td>
+</tr>
+<tr>
+<td><code>llm.generate</code></td>
+<td>model version, prompt version, output token count</td>
+</tr>
+<tr>
+<td><code>rag.evaluate</code></td>
+<td>recall, precision, faithfulness, user feedback</td>
+</tr>
+</tbody>
+</table>
+<p>특히 trace에는 다음 정보를 반드시 남긴다.</p>
+<div class="highlight"><pre><span></span><code>query_id
+index_version
+embedding_model
+retriever_config_version
+reranker_version
+selected_chunk_ids
+source_doc_versions
+permission_filter
+</code></pre></div>
+<p>이 값이 있어야 사용자가 "답이 틀렸다"고 말했을 때 같은 retrieval 결과를 재현할 수 있다.</p>
+<h2 id="freshness-deletion-production-rag">Freshness와 deletion은 production RAG의 핵심이다<a class="headerlink" href="#freshness-deletion-production-rag" title="Permanent link">&para;</a></h2>
+<p>RAG system은 오래된 문서를 잘 검색할수록 위험해진다. 문서가 삭제되거나 권한이 바뀌었는데 index에는 남아 있으면 답변이 틀리거나 보안 사고가 난다.</p>
+<table>
+<thead>
+<tr>
+<th>문제</th>
+<th>대응</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Source document update</td>
+<td>content hash 비교 후 affected chunk 재색인</td>
+</tr>
+<tr>
+<td>Source document delete</td>
+<td>tombstone 이벤트와 index delete</td>
+</tr>
+<tr>
+<td>Permission change</td>
+<td>ACL metadata update 또는 재색인</td>
+</tr>
+<tr>
+<td>Time-sensitive policy</td>
+<td><code>expires_at</code> filter와 freshness scoring</td>
+</tr>
+<tr>
+<td>Connector lag</td>
+<td>ingestion lag metric과 alert</td>
+</tr>
+<tr>
+<td>Partial failure</td>
+<td>run manifest와 retry queue</td>
+</tr>
+</tbody>
+</table>
+<p>Deletion은 best-effort로 두면 안 된다. Delete event가 실패하면 stale chunk가 남는다. 최소한 tombstone log를 두고, index와 source snapshot을 주기적으로 reconcile한다.</p>
+<h2 id="release-record-rag">Release record에 RAG를 포함한다<a class="headerlink" href="#release-record-rag" title="Permanent link">&para;</a></h2>
+<p>15장의 release record에 RAG 항목을 추가한다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>예</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Corpus snapshot</td>
+<td><code>docs-2026-07-10T12:00Z</code></td>
+</tr>
+<tr>
+<td>Parser version</td>
+<td><code>pdf-parser-v3</code></td>
+</tr>
+<tr>
+<td>Chunker version</td>
+<td><code>heading-sentence-v2</code></td>
+</tr>
+<tr>
+<td>Embedding model</td>
+<td><code>text-embedding-3-large</code></td>
+</tr>
+<tr>
+<td>Vector index</td>
+<td><code>customer-help-v42</code></td>
+</tr>
+<tr>
+<td>Distance metric</td>
+<td>cosine</td>
+</tr>
+<tr>
+<td>Retriever config</td>
+<td>hybrid alpha, top_k, filters</td>
+</tr>
+<tr>
+<td>Reranker</td>
+<td>model/version/top_n</td>
+</tr>
+<tr>
+<td>Prompt template</td>
+<td><code>rag-answer-v8</code></td>
+</tr>
+<tr>
+<td>Eval set</td>
+<td><code>rag-golden-v5</code></td>
+</tr>
+<tr>
+<td>Rollback target</td>
+<td>previous index/prompt/retriever config</td>
+</tr>
+</tbody>
+</table>
+<p>RAG rollback은 model rollback보다 복잡하다. Prompt만 되돌릴 수도 있고, retriever config만 되돌릴 수도 있으며, index를 previous snapshot으로 pin해야 할 수도 있다. 따라서 release record는 "무엇을 되돌릴 것인가"를 명시해야 한다.</p>
+<h2 id="failure-pattern">Failure pattern<a class="headerlink" href="#failure-pattern" title="Permanent link">&para;</a></h2>
+<h3 id="vector-db-score">Vector DB score를 절대값으로 믿는다<a class="headerlink" href="#vector-db-score" title="Permanent link">&para;</a></h3>
+<p>Score는 embedding model, distance metric, normalization, index type에 따라 의미가 달라진다. Threshold는 release마다 eval로 보정해야 한다.</p>
+<h3 id="chunk_1">Chunk를 크게 만들면 항상 좋아진다고 생각한다<a class="headerlink" href="#chunk_1" title="Permanent link">&para;</a></h3>
+<p>큰 chunk는 context를 더 많이 담지만 precision과 token cost를 망칠 수 있다. 작은 chunk는 정확하지만 근거가 잘릴 수 있다. Chunk size는 eval로 결정한다.</p>
+<h3 id="acl-prompt">ACL을 prompt에서 처리한다<a class="headerlink" href="#acl-prompt" title="Permanent link">&para;</a></h3>
+<p>Prompt는 보안 경계가 아니다. 검색 후보 단계에서 권한 필터를 적용해야 한다.</p>
+<h3 id="reranker-recall">Reranker를 넣고 recall 문제를 해결했다고 생각한다<a class="headerlink" href="#reranker-recall" title="Permanent link">&para;</a></h3>
+<p>Reranker는 후보를 재정렬할 뿐이다. Retriever가 필요한 문서를 후보에 넣지 못하면 reranker는 살릴 수 없다.</p>
+<h3 id="index-version">Index version 없이 답변을 디버깅한다<a class="headerlink" href="#index-version" title="Permanent link">&para;</a></h3>
+<p>같은 질문이라도 index snapshot이 다르면 답변이 달라진다. Debug와 audit에는 index version이 필요하다.</p>
+<h2 id="rag-release-checklist">실습: RAG release checklist 만들기<a class="headerlink" href="#rag-release-checklist" title="Permanent link">&para;</a></h2>
+<p>첫 RAG release checklist는 다음 질문으로 시작한다.</p>
+<table>
+<thead>
+<tr>
+<th>질문</th>
+<th>기록값</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>어떤 corpus snapshot을 쓰는가</td>
+<td>source snapshot ID</td>
+</tr>
+<tr>
+<td>어떤 chunking 규칙인가</td>
+<td>chunker version, size, overlap</td>
+</tr>
+<tr>
+<td>어떤 embedding model인가</td>
+<td>model, dimension, metric</td>
+</tr>
+<tr>
+<td>어떤 vector DB/index인가</td>
+<td>collection, namespace, index type</td>
+</tr>
+<tr>
+<td>어떤 filter가 mandatory인가</td>
+<td>tenant, ACL, date</td>
+</tr>
+<tr>
+<td>어떤 retrieval 전략인가</td>
+<td>dense, sparse, hybrid, top_k</td>
+</tr>
+<tr>
+<td>reranker를 쓰는가</td>
+<td>model, top_n, latency budget</td>
+</tr>
+<tr>
+<td>prompt context budget은 얼마인가</td>
+<td>max context token</td>
+</tr>
+<tr>
+<td>retrieval eval은 통과했는가</td>
+<td>recall, precision, faithfulness</td>
+</tr>
+<tr>
+<td>rollback은 무엇을 되돌리는가</td>
+<td>index, prompt, retriever config</td>
+</tr>
+</tbody>
+</table>
+<p>이 표를 채우지 않은 RAG는 production release로 보기 어렵다.</p>
+<h2 id="_1">정리<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<ul>
+<li>RAG infrastructure는 vector DB 하나가 아니라 ingestion, chunking, embedding, index, filter, retrieval, rerank, prompt assembly, eval의 pipeline이다.</li>
+<li>Production RAG의 운영 단위는 chunk이며, chunk ID와 metadata가 update, citation, ACL, freshness를 결정한다.</li>
+<li>Embedding model, dimension, distance metric은 index schema의 일부이므로 변경 시 재색인과 eval이 필요하다.</li>
+<li>Vector DB는 vector index뿐 아니라 metadata filter, consistency, update/delete, backup, observability를 함께 봐야 한다.</li>
+<li>권한 필터는 prompt가 아니라 retrieval 이전 또는 retrieval 단계에서 적용해야 한다.</li>
+<li>Hybrid retrieval은 dense semantic search와 sparse lexical search의 약점을 보완하지만 fusion과 top_k를 eval해야 한다.</li>
+<li>Reranker는 candidate precision을 높이지만 retrieval recall을 대신하지 못한다.</li>
+<li>RAG release record에는 corpus snapshot, chunker, embedding model, index version, retriever config, reranker, prompt, eval set이 들어가야 한다.</li>
+</ul>
+<h2 id="source-anchors">Source anchors<a class="headerlink" href="#source-anchors" title="Permanent link">&para;</a></h2>
+<ul>
+<li>LlamaIndex VectorStoreIndex: <a href="https://docs.llamaindex.ai/en/stable/module_guides/indexing/vector_store_index/">https://docs.llamaindex.ai/en/stable/module_guides/indexing/vector_store_index/</a></li>
+<li>OpenAI embeddings guide: <a href="https://platform.openai.com/docs/guides/embeddings">https://platform.openai.com/docs/guides/embeddings</a></li>
+<li>Milvus vector index docs: <a href="https://milvus.io/docs/index-vector-fields.md">https://milvus.io/docs/index-vector-fields.md</a></li>
+<li>Qdrant filtering docs: <a href="https://qdrant.tech/documentation/concepts/filtering/">https://qdrant.tech/documentation/concepts/filtering/</a></li>
+<li>Pinecone hybrid search overview: <a href="https://www.pinecone.io/learn/hybrid-search-intro/">https://www.pinecone.io/learn/hybrid-search-intro/</a></li>
+<li>Cohere reranking guide: <a href="https://docs.cohere.com/docs/reranking-with-cohere">https://docs.cohere.com/docs/reranking-with-cohere</a></li>
+<li>Sentence Transformers rerankers: <a href="https://www.sbert.net/examples/cross_encoder/training/rerankers/README.html">https://www.sbert.net/examples/cross_encoder/training/rerankers/README.html</a></li>
+<li>Ragas available metrics: <a href="https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/">https://docs.ragas.io/en/stable/concepts/metrics/available_metrics/</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../15-evaluation-release-gate/" class="md-footer__link md-footer__link--prev" aria-label="이전: 15장. Evaluation gate">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                15장. Evaluation gate
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../../source-policy/" class="md-footer__link md-footer__link--next" aria-label="다음: 소스 정책">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                소스 정책
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+        <script src="../../javascripts/header-home-link.js"></script>
+
+
+  </body>
+</html>

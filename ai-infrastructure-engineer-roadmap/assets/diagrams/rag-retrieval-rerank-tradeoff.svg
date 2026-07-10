@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="560" viewBox="0 0 1240 560" role="img" aria-labelledby="title desc">
+  <title id="title">RAG retrieval rerank tradeoff</title>
+  <desc id="desc">Retrieval tradeoff from broad candidate retrieval through metadata filtering and reranking to final prompt context.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#334155"/>
+    </marker>
+    <style>
+      .bg{fill:#f8fafc}
+      .wide{fill:#eff6ff;stroke:#2563eb;stroke-width:2;rx:10}
+      .filter{fill:#fef3c7;stroke:#d97706;stroke-width:2;rx:10}
+      .rank{fill:#f0fdf4;stroke:#16a34a;stroke-width:2;rx:10}
+      .prompt{fill:#f5f3ff;stroke:#7c3aed;stroke-width:2;rx:10}
+      .bad{fill:#ffe4e6;stroke:#e11d48;stroke-width:2;rx:10}
+      .text{font-family:Arial,Helvetica,sans-serif;fill:#111827;font-size:20px;font-weight:700}
+      .small{font-family:Arial,Helvetica,sans-serif;fill:#374151;font-size:15px}
+      .line{stroke:#334155;stroke-width:2.5;fill:none;marker-end:url(#arrow)}
+      .thin{stroke:#94a3b8;stroke-width:1.5;fill:none}
+    </style>
+  </defs>
+  <rect class="bg" width="1240" height="560"/>
+  <rect class="wide" x="55" y="90" width="220" height="115"/>
+  <text class="text" x="165" y="130" text-anchor="middle">Broad retrieval</text>
+  <text class="small" x="165" y="160" text-anchor="middle">dense + sparse candidates</text>
+  <text class="small" x="165" y="184" text-anchor="middle">high recall, top_k=50</text>
+  <rect class="filter" x="335" y="90" width="220" height="115"/>
+  <text class="text" x="445" y="130" text-anchor="middle">Mandatory filter</text>
+  <text class="small" x="445" y="160" text-anchor="middle">tenant / ACL / time</text>
+  <text class="small" x="445" y="184" text-anchor="middle">deny by default</text>
+  <rect class="rank" x="615" y="90" width="220" height="115"/>
+  <text class="text" x="725" y="130" text-anchor="middle">Rerank</text>
+  <text class="small" x="725" y="160" text-anchor="middle">query-document scoring</text>
+  <text class="small" x="725" y="184" text-anchor="middle">precision, top_n=5</text>
+  <rect class="prompt" x="895" y="90" width="220" height="115"/>
+  <text class="text" x="1005" y="130" text-anchor="middle">Prompt context</text>
+  <text class="small" x="1005" y="160" text-anchor="middle">dedupe + citations</text>
+  <text class="small" x="1005" y="184" text-anchor="middle">token budget</text>
+  <path class="line" d="M275 148 H335"/>
+  <path class="line" d="M555 148 H615"/>
+  <path class="line" d="M835 148 H895"/>
+
+  <rect class="bad" x="70" y="315" width="250" height="120"/>
+  <text class="text" x="195" y="355" text-anchor="middle">Recall failure</text>
+  <text class="small" x="195" y="386" text-anchor="middle">needed chunk not in top_k</text>
+  <text class="small" x="195" y="410" text-anchor="middle">reranker cannot fix</text>
+  <rect class="bad" x="365" y="315" width="250" height="120"/>
+  <text class="text" x="490" y="355" text-anchor="middle">Filter failure</text>
+  <text class="small" x="490" y="386" text-anchor="middle">unauthorized candidate</text>
+  <text class="small" x="490" y="410" text-anchor="middle">security incident</text>
+  <rect class="bad" x="660" y="315" width="250" height="120"/>
+  <text class="text" x="785" y="355" text-anchor="middle">Rerank failure</text>
+  <text class="small" x="785" y="386" text-anchor="middle">wrong top context</text>
+  <text class="small" x="785" y="410" text-anchor="middle">answer grounded in noise</text>
+  <rect class="bad" x="955" y="315" width="220" height="120"/>
+  <text class="text" x="1065" y="355" text-anchor="middle">Assembly failure</text>
+  <text class="small" x="1065" y="386" text-anchor="middle">context overflow</text>
+  <text class="small" x="1065" y="410" text-anchor="middle">citation mismatch</text>
+  <path class="thin" d="M165 205 V315"/>
+  <path class="thin" d="M445 205 C445 255 490 270 490 315"/>
+  <path class="thin" d="M725 205 C725 255 785 270 785 315"/>
+  <path class="thin" d="M1005 205 C1005 255 1065 270 1065 315"/>
+  <text class="small" x="620" y="500" text-anchor="middle">Tune each stage separately: recall@k, ACL pass rate, rerank latency, context precision, faithfulness, token cost.</text>
+</svg>
