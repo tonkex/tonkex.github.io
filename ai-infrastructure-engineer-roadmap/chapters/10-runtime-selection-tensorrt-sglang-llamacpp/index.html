@@ -1,0 +1,1733 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="LLM serving, GPU, KV cache, Kubernetes, observability를 연결하는 AI infrastructure 입문 로드맵">
+
+
+
+        <link rel="canonical" href="https://tonkex.github.io/ai-infrastructure-engineer-roadmap/chapters/10-runtime-selection-tensorrt-sglang-llamacpp/">
+
+
+        <link rel="prev" href="../09-vllm-serving-baseline/">
+
+
+        <link rel="next" href="../../source-policy/">
+
+
+
+
+
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+
+
+
+        <title>10장. Runtime 선택 - AI 인프라 엔지니어 로드맵</title>
+
+
+
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+
+
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+
+
+
+      <link rel="stylesheet" href="../../stylesheets/site-navigation-v2.css">
+
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+
+
+
+
+
+  </head>
+
+
+
+
+
+
+
+
+
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#10-tensorrt-llm-sglang-llamacpp" class="md-skip">
+          콘텐츠로 이동
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+
+
+
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-header__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            AI 인프라 엔지니어 로드맵
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+
+              10장. Runtime 선택
+
+          </span>
+        </div>
+      </div>
+    </div>
+
+
+        <form class="md-header__option" data-md-component="palette">
+
+
+
+
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+
+
+</form>
+
+
+
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+
+
+
+
+
+        <label class="md-header__button md-icon" for="__search">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+  </nav>
+
+</header>
+
+    <div class="md-container" data-md-component="container">
+
+
+
+
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="AI 인프라 엔지니어 로드맵" class="md-nav__button md-logo" aria-label="AI 인프라 엔지니어 로드맵" data-md-component="logo">
+
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    AI 인프라 엔지니어 로드맵
+  </label>
+
+  <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    시작하기
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+
+
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    책 구조
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    책 구조
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../outline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    전체 목차
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../sample-chapter-plan/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 챕터 계획
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+
+
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    샘플 원고
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    샘플 원고
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../05-kv-cache-serving-bottleneck/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    5장. KV cache 병목
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../06-first-llm-server-openai-endpoint/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    6장. 첫 LLM server
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../07-serving-metrics-ttft-tpot-throughput/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    7장. Serving metrics
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../08-quantization-optimization-risk/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    8장. Quantization
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../09-vllm-serving-baseline/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    9장. vLLM baseline
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--active">
+
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+
+
+
+
+
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. Runtime 선택
+
+
+
+  </span>
+
+
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+
+      <a href="./" class="md-nav__link md-nav__link--active">
+
+
+
+  <span class="md-ellipsis">
+
+
+    10장. Runtime 선택
+
+
+
+  </span>
+
+
+
+      </a>
+
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        먼저 비교 축을 고정한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#tensorrt-llm-nvidia-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        TensorRT-LLM: NVIDIA stack을 깊게 쓰는 선택
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#sglang-structured-generation-agentic-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        SGLang: structured generation과 agentic workflow를 위한 선택
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#llamacpp-local-edge-gguf" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        llama.cpp: local, edge, GGUF 중심의 선택
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#openai-compatible-api" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        같은 OpenAI-compatible API라도 같은 시스템이 아니다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#vllm-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        선택 흐름: vLLM baseline 이후 무엇을 볼 것인가
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="선택 흐름: vLLM baseline 이후 무엇을 볼 것인가">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#vllm-baseline_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        vLLM baseline이 충분한가
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#nvidia-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        NVIDIA GPU에서 더 깊은 최적화가 필요한가
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#agent-tool-call-structured-output" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Agent, tool call, structured output이 병목인가
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#localedgeoffline" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Local/edge/offline이 핵심인가
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#runtime-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Runtime보다 platform 문제가 큰가
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#workload-success-metric" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        비교 실습: 같은 workload, 다른 success metric
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        API가 같으니 바로 교체할 수 있다고 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#benchmark-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        benchmark 한 개로 runtime을 고른다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#artifact-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        artifact lifecycle을 무시한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#hardware-portability" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        hardware portability를 과소평가한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#platform-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        platform 문제를 runtime 문제로 착각한다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+
+
+
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+
+
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+
+
+
+  <span class="md-ellipsis">
+
+
+    제작 노트
+
+
+
+  </span>
+
+
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+
+
+    제작 노트
+
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../source-policy/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    소스 정책
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+
+
+
+
+
+
+    <li class="md-nav__item">
+      <a href="../../next-steps/" class="md-nav__link">
+
+
+
+  <span class="md-ellipsis">
+
+
+    다음 작업
+
+
+
+  </span>
+
+
+
+      </a>
+    </li>
+
+
+
+
+          </ul>
+        </nav>
+
+    </li>
+
+
+
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+
+
+
+
+
+
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        먼저 비교 축을 고정한다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#tensorrt-llm-nvidia-stack" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        TensorRT-LLM: NVIDIA stack을 깊게 쓰는 선택
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#sglang-structured-generation-agentic-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        SGLang: structured generation과 agentic workflow를 위한 선택
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#llamacpp-local-edge-gguf" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        llama.cpp: local, edge, GGUF 중심의 선택
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#openai-compatible-api" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        같은 OpenAI-compatible API라도 같은 시스템이 아니다
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#vllm-baseline" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        선택 흐름: vLLM baseline 이후 무엇을 볼 것인가
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="선택 흐름: vLLM baseline 이후 무엇을 볼 것인가">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#vllm-baseline_1" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        vLLM baseline이 충분한가
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#nvidia-gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        NVIDIA GPU에서 더 깊은 최적화가 필요한가
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#agent-tool-call-structured-output" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Agent, tool call, structured output이 병목인가
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#localedgeoffline" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Local/edge/offline이 핵심인가
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#runtime-platform" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Runtime보다 platform 문제가 큰가
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#workload-success-metric" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        비교 실습: 같은 workload, 다른 success metric
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        실패 패턴
+
+    </span>
+  </a>
+
+    <nav class="md-nav" aria-label="실패 패턴">
+      <ul class="md-nav__list">
+
+          <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        API가 같으니 바로 교체할 수 있다고 본다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#benchmark-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        benchmark 한 개로 runtime을 고른다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#artifact-lifecycle" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        artifact lifecycle을 무시한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#hardware-portability" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        hardware portability를 과소평가한다
+
+    </span>
+  </a>
+
+</li>
+
+          <li class="md-nav__item">
+  <a href="#platform-runtime" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        platform 문제를 runtime 문제로 착각한다
+
+    </span>
+  </a>
+
+</li>
+
+      </ul>
+    </nav>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        정리
+
+    </span>
+  </a>
+
+</li>
+
+        <li class="md-nav__item">
+  <a href="#source-anchors" class="md-nav__link">
+    <span class="md-ellipsis">
+
+        Source anchors
+
+    </span>
+  </a>
+
+</li>
+
+    </ul>
+
+</nav>
+                  </div>
+                </div>
+              </div>
+
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+
+
+
+
+<h1 id="10-tensorrt-llm-sglang-llamacpp">10장. TensorRT-LLM, SGLang, llama.cpp는 무엇이 다른가<a class="headerlink" href="#10-tensorrt-llm-sglang-llamacpp" title="Permanent link">&para;</a></h1>
+<div class="page-meta">
+  <span>Draft v0.1</span>
+  <span>Updated: 2026-07-10</span>
+  <span>Part 4 - Serving runtime 선택</span>
+</div>
+
+<p>9장에서 vLLM을 baseline으로 세웠다. 이제 자연스러운 질문은 이것이다.</p>
+<blockquote>
+<p>vLLM 말고 TensorRT-LLM, SGLang, llama.cpp는 언제 검토해야 하는가?</p>
+</blockquote>
+<p>이 질문을 "어느 runtime이 제일 빠른가"로 바꾸면 답이 흐려진다. Runtime 선택은 순위표가 아니라 workload fit의 문제다. 같은 OpenAI-compatible endpoint를 제공하더라도 내부 목표가 다르다. 어떤 runtime은 NVIDIA data center GPU에서 throughput을 끝까지 밀어붙이는 데 강하고, 어떤 runtime은 structured generation과 agent loop를 다루기 좋고, 어떤 runtime은 로컬 노트북이나 edge device에서 모델을 직접 돌리는 데 강하다.</p>
+<p>이 장의 독자 질문은 다음과 같다.</p>
+<blockquote>
+<p>Serving runtime을 이름이 아니라 workload와 운영 제약으로 고르려면 어떤 질문을 해야 하는가?</p>
+</blockquote>
+<p>핵심은 하나다. Runtime은 "모델 실행기"가 아니라 hardware, model artifact, scheduler, cache, API, deployment workflow를 묶은 운영 선택지다.</p>
+<h2 id="_1">먼저 비교 축을 고정한다<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>Runtime 비교표를 만들 때 기능 이름만 나열하면 판단이 어렵다. AI 인프라 엔지니어가 먼저 고정해야 할 축은 다음 다섯 가지다.</p>
+<table>
+<thead>
+<tr>
+<th>비교 축</th>
+<th>질문</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>target hardware</td>
+<td>NVIDIA H100/B200 같은 data center GPU인가, Apple Silicon/CPU/edge인가?</td>
+</tr>
+<tr>
+<td>workload shape</td>
+<td>short chat, long context, batch inference, agent loop, structured output 중 무엇이 주인가?</td>
+</tr>
+<tr>
+<td>model artifact</td>
+<td>Hugging Face checkpoint, TensorRT engine, GGUF, quantized artifact 중 무엇을 release 단위로 쓸 것인가?</td>
+</tr>
+<tr>
+<td>운영 인터페이스</td>
+<td>OpenAI-compatible API만 필요한가, native API나 engine build pipeline이 필요한가?</td>
+</tr>
+<tr>
+<td>최적화 목표</td>
+<td>TTFT, TPOT, throughput, cost, local privacy, deployment simplicity 중 무엇이 우선인가?</td>
+</tr>
+</tbody>
+</table>
+<p>이 축이 정해져야 vLLM baseline과 다른 runtime을 비교할 수 있다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/runtime-selection-matrix.svg" alt="Runtime selection matrix comparing vLLM, TensorRT-LLM, SGLang, and llama.cpp by hardware, workload, artifact, and operational fit">
+  <figcaption><strong>Runtime selection matrix.</strong> Runtime은 이름이 아니라 target hardware, workload, artifact, 운영 인터페이스, 최적화 목표로 비교한다.</figcaption>
+</figure>
+
+<h2 id="tensorrt-llm-nvidia-stack">TensorRT-LLM: NVIDIA stack을 깊게 쓰는 선택<a class="headerlink" href="#tensorrt-llm-nvidia-stack" title="Permanent link">&para;</a></h2>
+<p>TensorRT-LLM은 NVIDIA GPU에서 LLM inference를 최적화하기 위한 open-source library다. NVIDIA 문서는 TensorRT-LLM을 PyTorch 기반 LLM API, TensorRT engine, Python/C++ runtime, multi-GPU/multi-node deployment, quantization, paged attention, in-flight batching 같은 기능을 묶은 inference stack으로 설명한다.</p>
+<p>이 runtime을 검토할 만한 상황은 명확하다.</p>
+<ul>
+<li>target hardware가 NVIDIA data center GPU이고, hardware generation까지 통제할 수 있다.</li>
+<li>특정 모델과 특정 GPU에서 latency 또는 throughput을 깊게 최적화해야 한다.</li>
+<li>FP8, FP4, INT4 같은 low precision path를 NVIDIA kernel과 함께 검증하려 한다.</li>
+<li>tensor parallel, pipeline parallel, expert parallel 같은 multi-GPU 전략이 필요하다.</li>
+<li><code>trtllm-serve</code>, <code>trtllm-bench</code>, Triton Inference Server, NVIDIA Dynamo 같은 주변 stack과 연결하려 한다.</li>
+</ul>
+<p>TensorRT-LLM의 강점은 "일반적인 편의성"보다 "NVIDIA stack 안에서 최적화 깊이를 가져가는 것"에 있다. 공식 문서도 FP8/FP4, in-flight batching, paged attention, chunked prefill, speculative decoding, KV cache management, disaggregated serving 같은 production-oriented optimization을 강조한다.</p>
+<p>하지만 비용도 있다.</p>
+<table>
+<thead>
+<tr>
+<th>장점</th>
+<th>비용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NVIDIA GPU 최적화 깊이가 크다</td>
+<td>hardware와 software version 의존성이 커진다</td>
+</tr>
+<tr>
+<td>engine build와 quantization path를 세밀하게 통제할 수 있다</td>
+<td>artifact lifecycle이 복잡해진다</td>
+</tr>
+<tr>
+<td>multi-GPU/multi-node inference 기능이 강하다</td>
+<td>benchmark와 release 재현 기록이 더 중요해진다</td>
+</tr>
+<tr>
+<td>Triton/NVIDIA ecosystem과 연결하기 좋다</td>
+<td>non-NVIDIA 환경으로 옮기기 어렵다</td>
+</tr>
+</tbody>
+</table>
+<p>따라서 TensorRT-LLM은 "vLLM보다 빠르냐"가 아니라 "우리 production target이 NVIDIA GPU이고, 이 workload에 대해 engine build와 release engineering을 감당할 만큼 성능 이득이 필요한가"로 판단해야 한다.</p>
+<h2 id="sglang-structured-generation-agentic-workflow">SGLang: structured generation과 agentic workflow를 위한 선택<a class="headerlink" href="#sglang-structured-generation-agentic-workflow" title="Permanent link">&para;</a></h2>
+<p>SGLang은 large language model과 multimodal model을 위한 high-performance serving framework다. 공식 문서는 SGLang을 low-latency, high-throughput inference를 목표로 하며 RadixAttention, prefix caching, multi-GPU parallelism을 제공하고, Hugging Face와 OpenAI API와 호환된다고 설명한다. SGLang paper는 frontend language와 runtime을 함께 제안하고, 복잡한 language model program, structured input/output, multiple generation call, control flow를 중요한 대상으로 둔다.</p>
+<p>SGLang을 검토할 만한 상황은 다음과 같다.</p>
+<ul>
+<li>단일 chat completion보다 agent loop, multi-call workflow, structured output이 중요하다.</li>
+<li>JSON, tool call, constrained decoding, reasoning parser 같은 output control이 운영 품질에 직접 연결된다.</li>
+<li>prefix reuse와 KV cache reuse가 agent workload에서 큰 비중을 차지한다.</li>
+<li>OpenAI-compatible API도 쓰지만 native <code>/generate</code> 같은 더 유연한 API도 필요하다.</li>
+<li>NVIDIA뿐 아니라 AMD, Intel, TPU, Ascend, Apple Silicon 등 다양한 hardware target을 검토한다.</li>
+</ul>
+<p>SGLang의 핵심 차이는 "LLM request 하나"보다 "LLM program 실행"에 더 가깝다는 점이다. 예를 들어 일반 chat API 서버에서는 tool call이 application loop 밖에서 관리될 수 있다. SGLang 관점에서는 여러 generation call, selection, parallel control flow, structured decoding이 runtime 최적화 대상이 된다.</p>
+<p>운영 관점에서 SGLang은 특히 다음 지점에서 vLLM baseline과 비교하면 좋다.</p>
+<table>
+<thead>
+<tr>
+<th>비교 질문</th>
+<th>SGLang에서 볼 포인트</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tool call JSON이 안정적인가</td>
+<td>structured outputs, guided/constrained decoding</td>
+</tr>
+<tr>
+<td>agent loop가 prefix를 반복하는가</td>
+<td>RadixAttention, prefix caching, KV reuse</td>
+</tr>
+<tr>
+<td>multimodal/large MoE model을 다루는가</td>
+<td>model cookbook, hardware-specific recipes</td>
+</tr>
+<tr>
+<td>OpenAI API 외 native API가 필요한가</td>
+<td><code>/v1/chat/completions</code>, <code>/generate</code>, offline/native APIs</td>
+</tr>
+<tr>
+<td>다양한 accelerator를 검토하는가</td>
+<td>hardware platform guides</td>
+</tr>
+</tbody>
+</table>
+<p>SGLang을 선택할 때도 과신은 금물이다. Structured generation이 중요하지 않은 단순 chat serving이라면 vLLM baseline이 더 단순할 수 있다. NVIDIA GPU에서 특정 model throughput을 극한까지 밀어야 한다면 TensorRT-LLM이 더 맞을 수 있다. SGLang은 agentic/structured workload fit을 먼저 확인해야 한다.</p>
+<h2 id="llamacpp-local-edge-gguf">llama.cpp: local, edge, GGUF 중심의 선택<a class="headerlink" href="#llamacpp-local-edge-gguf" title="Permanent link">&para;</a></h2>
+<p>llama.cpp는 C/C++ 기반 LLM inference project다. 공식 README는 llama.cpp를 "LLM inference in C/C++"로 설명하고, Metal, CUDA, HIP, Vulkan, SYCL, BLAS, OpenVINO, WebGPU 등 여러 backend를 나열한다. 또한 model은 GGUF format을 요구하며, <code>llama-cli</code>와 OpenAI API compatible <code>llama-server</code>를 제공한다.</p>
+<p>llama.cpp를 검토할 만한 상황은 다음과 같다.</p>
+<ul>
+<li>개발자 workstation, 노트북, Apple Silicon, CPU-only server, edge device에서 local inference가 필요하다.</li>
+<li>privacy나 offline requirement 때문에 외부 model serving cluster를 쓰기 어렵다.</li>
+<li>GGUF quantized model artifact를 배포 단위로 쓰고 싶다.</li>
+<li>최대 throughput보다 설치 단순성, portability, local debugging이 중요하다.</li>
+<li>application 안에 inference를 가볍게 붙이거나 local tool로 제공하려 한다.</li>
+</ul>
+<p>llama.cpp의 중심 artifact는 GGUF다. GGUF는 model tensor와 metadata를 담는 파일 format이고, quantized weight를 포함할 수 있다. 그래서 llama.cpp를 선택한다는 것은 runtime만 고르는 것이 아니라 GGUF 변환, quantization type, local hardware backend, context size, parallel decoding 설정까지 함께 고르는 것이다.</p>
+<p>운영 관점의 장단점은 다음처럼 정리할 수 있다.</p>
+<table>
+<thead>
+<tr>
+<th>장점</th>
+<th>비용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU, Apple Silicon, consumer GPU, edge 등 portability가 좋다</td>
+<td>data center GPU serving benchmark와 직접 비교하기 어렵다</td>
+</tr>
+<tr>
+<td>GGUF artifact 배포가 단순하다</td>
+<td>artifact 변환과 quantization 선택 책임이 생긴다</td>
+</tr>
+<tr>
+<td>local privacy/offline UX에 강하다</td>
+<td>centralized autoscaling, multi-tenant 운영은 별도 layer가 필요하다</td>
+</tr>
+<tr>
+<td><code>llama-server</code>로 OpenAI-compatible endpoint를 제공할 수 있다</td>
+<td>high-concurrency production serving은 별도 검증이 필요하다</td>
+</tr>
+</tbody>
+</table>
+<p>따라서 llama.cpp는 "느린 vLLM 대체제"가 아니다. Target 자체가 다르다. Data center GPU pool에서 높은 throughput을 내는 것보다, 사용자 기기나 작은 서버에서 모델을 직접 실행하는 문제가 중심일 때 비교해야 한다.</p>
+<h2 id="openai-compatible-api">같은 OpenAI-compatible API라도 같은 시스템이 아니다<a class="headerlink" href="#openai-compatible-api" title="Permanent link">&para;</a></h2>
+<p>vLLM, TensorRT-LLM, SGLang, llama.cpp 모두 어떤 형태로든 OpenAI-compatible API를 제공하거나 연결할 수 있다. 하지만 endpoint 모양이 같다고 운영 성격이 같지는 않다.</p>
+<table>
+<thead>
+<tr>
+<th>Runtime</th>
+<th>API 관점</th>
+<th>내부 차이</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>vLLM</td>
+<td>OpenAI-compatible baseline</td>
+<td>scheduler, PagedAttention, metrics 중심</td>
+</tr>
+<tr>
+<td>TensorRT-LLM</td>
+<td><code>trtllm-serve</code>와 OpenAI-style serving 경로</td>
+<td>NVIDIA engine, kernel, quantization, multi-GPU optimization 중심</td>
+</tr>
+<tr>
+<td>SGLang</td>
+<td>OpenAI-compatible API와 native <code>/generate</code> API</td>
+<td>structured generation, RadixAttention, agent workflow 중심</td>
+</tr>
+<tr>
+<td>llama.cpp</td>
+<td><code>llama-server</code>의 OpenAI-compatible HTTP server</td>
+<td>GGUF, local backend, quantized local inference 중심</td>
+</tr>
+</tbody>
+</table>
+<p>Application code만 보면 모두 <code>base_url</code>을 바꾸는 문제처럼 보일 수 있다. 하지만 인프라 입장에서는 release artifact, metric, scaling policy, failure mode가 다르다.</p>
+<p>예를 들어 같은 <code>/v1/chat/completions</code> 요청이라도 다음이 달라진다.</p>
+<ul>
+<li>model artifact가 HF checkpoint인지 TensorRT engine인지 GGUF인지</li>
+<li>quantization이 runtime flag인지 offline artifact인지</li>
+<li>KV cache가 어떤 block/cache policy로 관리되는지</li>
+<li>structured output이 runtime feature인지 application retry loop인지</li>
+<li>benchmark 도구와 metric name이 무엇인지</li>
+<li>GPU autoscaling이 가능한 deployment unit이 무엇인지</li>
+</ul>
+<p>API compatibility는 migration의 시작점일 뿐, 운영 호환성을 보장하지 않는다.</p>
+<h2 id="vllm-baseline">선택 흐름: vLLM baseline 이후 무엇을 볼 것인가<a class="headerlink" href="#vllm-baseline" title="Permanent link">&para;</a></h2>
+<p>9장의 vLLM baseline을 돌린 뒤 다음 질문으로 갈라진다.</p>
+<figure class="book-figure book-figure-wide">
+  <img src="../../assets/diagrams/runtime-selection-flow.svg" alt="Runtime selection flow after a vLLM baseline: keep vLLM, compare TensorRT-LLM, SGLang, llama.cpp, or move to platform layer">
+  <figcaption><strong>Runtime selection flow.</strong> vLLM baseline 이후에는 병목과 제약에 따라 TensorRT-LLM, SGLang, llama.cpp, platform layer 중 무엇을 비교할지 결정한다.</figcaption>
+</figure>
+
+<h3 id="vllm-baseline_1">vLLM baseline이 충분한가<a class="headerlink" href="#vllm-baseline_1" title="Permanent link">&para;</a></h3>
+<p>Latency, throughput, p95, KV cache usage가 목표 범위에 들어오고 운영 복잡도를 줄이고 싶다면 vLLM을 유지한다. Runtime을 바꾸기 전에 deployment, monitoring, rate limit, canary rollout을 갖추는 것이 더 중요할 수 있다.</p>
+<h3 id="nvidia-gpu">NVIDIA GPU에서 더 깊은 최적화가 필요한가<a class="headerlink" href="#nvidia-gpu" title="Permanent link">&para;</a></h3>
+<p>같은 workload를 vLLM으로 측정했는데 target SLA나 cost target에 닿지 못하고, NVIDIA GPU 세대와 model artifact를 통제할 수 있다면 TensorRT-LLM을 비교한다. 이때 비교 대상은 "기본 실행"이 아니라 TensorRT-LLM의 권장 recipe, quantization, engine/runtime config를 포함한 artifact여야 한다.</p>
+<h3 id="agent-tool-call-structured-output">Agent, tool call, structured output이 병목인가<a class="headerlink" href="#agent-tool-call-structured-output" title="Permanent link">&para;</a></h3>
+<p>Latency보다 structured output failure, tool call retry, agent loop overhead가 더 크다면 SGLang을 비교한다. 단순 tokens/sec보다 valid JSON rate, tool call success rate, retry count, multi-call e2e latency를 같이 봐야 한다.</p>
+<h3 id="localedgeoffline">Local/edge/offline이 핵심인가<a class="headerlink" href="#localedgeoffline" title="Permanent link">&para;</a></h3>
+<p>서버 GPU cluster가 아니라 developer laptop, on-device assistant, edge gateway, offline environment가 목표라면 llama.cpp를 비교한다. 이때 지표는 GPU throughput보다 model file size, RAM/VRAM usage, startup time, local token latency, battery/thermal behavior가 될 수 있다.</p>
+<h3 id="runtime-platform">Runtime보다 platform 문제가 큰가<a class="headerlink" href="#runtime-platform" title="Permanent link">&para;</a></h3>
+<p>어떤 runtime을 쓰든 auth, routing, quota, rollout, model registry, autoscaling, incident response가 부족하다면 11장으로 넘어가야 한다. Runtime 선택은 platform 책임을 대체하지 못한다.</p>
+<h2 id="workload-success-metric">비교 실습: 같은 workload, 다른 success metric<a class="headerlink" href="#workload-success-metric" title="Permanent link">&para;</a></h2>
+<p>Runtime 비교 실습은 같은 payload를 던지는 것에서 끝나면 안 된다. Runtime마다 성공 기준이 다르기 때문이다.</p>
+<table>
+<thead>
+<tr>
+<th>후보</th>
+<th>같은 workload</th>
+<th>추가 success metric</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>vLLM</td>
+<td>short/long/concurrency baseline</td>
+<td>TTFT, TPOT, queue, KV usage, prefix hit</td>
+</tr>
+<tr>
+<td>TensorRT-LLM</td>
+<td>같은 model과 SLA target</td>
+<td>engine build time, GPU-specific throughput, quantization eval, recipe reproducibility</td>
+</tr>
+<tr>
+<td>SGLang</td>
+<td>agent/tool/structured output workload</td>
+<td>valid output rate, retry count, multi-call latency, prefix reuse</td>
+</tr>
+<tr>
+<td>llama.cpp</td>
+<td>local prompt set</td>
+<td>file size, RAM/VRAM usage, startup time, local TPOT, thermal stability</td>
+</tr>
+</tbody>
+</table>
+<p>비교표에는 반드시 다음 metadata를 넣는다.</p>
+<table>
+<thead>
+<tr>
+<th>항목</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>runtime version</td>
+<td>behavior와 metric 이름이 바뀔 수 있다</td>
+</tr>
+<tr>
+<td>model artifact</td>
+<td>HF checkpoint, engine, GGUF는 같은 artifact가 아니다</td>
+</tr>
+<tr>
+<td>hardware</td>
+<td>GPU 세대, CPU, memory bandwidth가 결과를 바꾼다</td>
+</tr>
+<tr>
+<td>precision/quantization</td>
+<td>품질과 speed가 함께 바뀐다</td>
+</tr>
+<tr>
+<td>command/config</td>
+<td>재현 가능성의 핵심</td>
+</tr>
+<tr>
+<td>workload shape</td>
+<td>token shape 없이 benchmark는 의미가 없다</td>
+</tr>
+<tr>
+<td>quality eval</td>
+<td>fast but wrong을 막기 위한 최소 조건</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_2">실패 패턴<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Runtime 비교에서 자주 나오는 실패는 다음과 같다.</p>
+<h3 id="api">API가 같으니 바로 교체할 수 있다고 본다<a class="headerlink" href="#api" title="Permanent link">&para;</a></h3>
+<p>OpenAI-compatible API는 client migration을 줄일 뿐이다. Tokenizer behavior, chat template, sampling parameter, stop condition, tool call format, streaming chunk shape, metric name이 달라질 수 있다.</p>
+<h3 id="benchmark-runtime">benchmark 한 개로 runtime을 고른다<a class="headerlink" href="#benchmark-runtime" title="Permanent link">&para;</a></h3>
+<p>Short prompt throughput이 좋은 runtime이 long context p95에서도 좋은 것은 아니다. Agent workflow에서 retry가 늘면 raw tokens/sec가 좋아도 e2e latency가 악화될 수 있다.</p>
+<h3 id="artifact-lifecycle">artifact lifecycle을 무시한다<a class="headerlink" href="#artifact-lifecycle" title="Permanent link">&para;</a></h3>
+<p>TensorRT engine, GGUF quantized file, HF checkpoint, LoRA adapter, tokenizer revision은 모두 release artifact다. Runtime 비교표에는 artifact build path와 rollback path가 있어야 한다.</p>
+<h3 id="hardware-portability">hardware portability를 과소평가한다<a class="headerlink" href="#hardware-portability" title="Permanent link">&para;</a></h3>
+<p>TensorRT-LLM 최적화는 NVIDIA GPU generation과 깊게 연결된다. llama.cpp는 다양한 backend가 장점이지만 backend별 성능 차이가 크다. SGLang도 hardware guide를 따라 검증해야 한다.</p>
+<h3 id="platform-runtime">platform 문제를 runtime 문제로 착각한다<a class="headerlink" href="#platform-runtime" title="Permanent link">&para;</a></h3>
+<p>Routing, rate limiting, autoscaling, canary rollout, auth, tenant isolation이 없으면 runtime을 바꿔도 production 문제는 남는다.</p>
+<h2 id="_3">정리<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Runtime 선택은 순위표가 아니라 workload fit의 문제다.</li>
+<li>TensorRT-LLM은 NVIDIA GPU와 engine/runtime optimization을 깊게 쓰는 선택이다.</li>
+<li>SGLang은 structured generation, agent workflow, RadixAttention 계열 cache reuse를 중심으로 비교한다.</li>
+<li>llama.cpp는 GGUF, local/edge/offline inference, portability가 중심이다.</li>
+<li>OpenAI-compatible API가 같아도 artifact, scheduler, cache, metrics, failure mode는 다르다.</li>
+<li>vLLM baseline 이후에는 병목이 runtime 최적화인지, structured workflow인지, local deployment인지, platform layer 부족인지 먼저 나눈다.</li>
+</ul>
+<h2 id="source-anchors">Source anchors<a class="headerlink" href="#source-anchors" title="Permanent link">&para;</a></h2>
+<ul>
+<li>NVIDIA TensorRT-LLM documentation: <a href="https://docs.nvidia.com/tensorrt-llm/index.html">https://docs.nvidia.com/tensorrt-llm/index.html</a></li>
+<li>TensorRT-LLM Overview: <a href="https://nvidia.github.io/TensorRT-LLM/overview.html">https://nvidia.github.io/TensorRT-LLM/overview.html</a></li>
+<li>TensorRT-LLM Paged Attention, IFB, and Request Scheduling: <a href="https://nvidia.github.io/TensorRT-LLM/features/paged-attention-ifb-scheduler.html">https://nvidia.github.io/TensorRT-LLM/features/paged-attention-ifb-scheduler.html</a></li>
+<li>SGLang documentation: <a href="https://docs.sglang.io/">https://docs.sglang.io/</a></li>
+<li>SGLang Quickstart: <a href="https://docs.sglang.io/docs/get-started/quickstart">https://docs.sglang.io/docs/get-started/quickstart</a></li>
+<li>SGLang paper: <a href="https://arxiv.org/abs/2312.07104">https://arxiv.org/abs/2312.07104</a></li>
+<li>llama.cpp repository: <a href="https://github.com/ggml-org/llama.cpp">https://github.com/ggml-org/llama.cpp</a></li>
+<li>llama.cpp README: <a href="https://github.com/ggml-org/llama.cpp/blob/master/README.md">https://github.com/ggml-org/llama.cpp/blob/master/README.md</a></li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+
+      </main>
+
+        <footer class="md-footer">
+
+
+
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+
+
+          <a href="../09-vllm-serving-baseline/" class="md-footer__link md-footer__link--prev" aria-label="이전: 9장. vLLM baseline">
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                9장. vLLM baseline
+              </div>
+            </div>
+          </a>
+
+
+
+          <a href="../../source-policy/" class="md-footer__link md-footer__link--next" aria-label="다음: 소스 정책">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                소스 정책
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+
+      </nav>
+
+
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+
+
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+
+</div>
+
+    </div>
+  </div>
+</footer>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.indexes", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+
+
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+        <script src="../../javascripts/header-home-link.js"></script>
+
+
+  </body>
+</html>

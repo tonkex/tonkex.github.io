@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="650" viewBox="0 0 1180 650" role="img" aria-labelledby="title desc">
+  <title id="title">Runtime selection flow</title>
+  <desc id="desc">A decision flow for choosing between vLLM, TensorRT-LLM, SGLang, llama.cpp, and platform layer work after a vLLM baseline.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+  <rect width="1180" height="650" fill="#ffffff"/>
+  <g font-family="Arial, sans-serif">
+    <text x="590" y="48" text-anchor="middle" font-size="29" font-weight="800" fill="#111827">vLLM baseline 이후의 runtime 선택 흐름</text>
+    <text x="590" y="82" text-anchor="middle" font-size="16" fill="#4b5563">병목과 제약을 먼저 나누고, 그 다음 후보 runtime을 비교한다</text>
+
+    <rect x="415" y="125" width="350" height="82" rx="12" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+    <text x="590" y="158" text-anchor="middle" font-size="20" font-weight="800" fill="#3730a3">Start: vLLM baseline</text>
+    <text x="590" y="184" text-anchor="middle" font-size="14" fill="#475569">TTFT, TPOT, p95, queue, KV usage, prefix hit</text>
+
+    <rect x="80" y="285" width="230" height="118" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="195" y="320" text-anchor="middle" font-size="18" font-weight="800" fill="#047857">SLA already met?</text>
+    <text x="195" y="350" text-anchor="middle" font-size="14" fill="#374151">keep vLLM</text>
+    <text x="195" y="374" text-anchor="middle" font-size="14" fill="#374151">build rollout + monitoring</text>
+
+    <rect x="350" y="285" width="230" height="118" rx="12" fill="#f0fdfa" stroke="#14b8a6" stroke-width="2"/>
+    <text x="465" y="320" text-anchor="middle" font-size="18" font-weight="800" fill="#0f766e">NVIDIA perf gap?</text>
+    <text x="465" y="350" text-anchor="middle" font-size="14" fill="#374151">compare TensorRT-LLM</text>
+    <text x="465" y="374" text-anchor="middle" font-size="14" fill="#374151">engine + quantization recipe</text>
+
+    <rect x="620" y="285" width="230" height="118" rx="12" fill="#fff7ed" stroke="#fb923c" stroke-width="2"/>
+    <text x="735" y="320" text-anchor="middle" font-size="18" font-weight="800" fill="#c2410c">Agent / JSON pain?</text>
+    <text x="735" y="350" text-anchor="middle" font-size="14" fill="#374151">compare SGLang</text>
+    <text x="735" y="374" text-anchor="middle" font-size="14" fill="#374151">valid output + retries</text>
+
+    <rect x="890" y="285" width="230" height="118" rx="12" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+    <text x="1005" y="320" text-anchor="middle" font-size="18" font-weight="800" fill="#334155">Local / edge target?</text>
+    <text x="1005" y="350" text-anchor="middle" font-size="14" fill="#374151">compare llama.cpp</text>
+    <text x="1005" y="374" text-anchor="middle" font-size="14" fill="#374151">GGUF + device metrics</text>
+
+    <rect x="415" y="500" width="350" height="82" rx="12" fill="#fff1f2" stroke="#fb7185" stroke-width="2"/>
+    <text x="590" y="533" text-anchor="middle" font-size="20" font-weight="800" fill="#9f1239">Platform issue?</text>
+    <text x="590" y="559" text-anchor="middle" font-size="14" fill="#475569">routing, auth, rate limit, autoscaling, rollout, observability</text>
+
+    <g stroke="#2563eb" stroke-width="3" fill="none" marker-end="url(#arrow)">
+      <path d="M590 207 V245 H195 V277"/>
+      <path d="M590 207 V277"/>
+      <path d="M590 245 H735 V277"/>
+      <path d="M590 245 H1005 V277"/>
+      <path d="M195 403 C250 472 360 530 407 540"/>
+      <path d="M465 403 V492"/>
+      <path d="M735 403 C700 455 660 488 627 500"/>
+      <path d="M1005 403 C910 480 810 530 773 540"/>
+    </g>
+
+    <text x="590" y="622" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Runtime 교체 전에 병목이 runtime인지 platform인지 먼저 확인한다</text>
+  </g>
+</svg>

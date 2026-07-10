@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="620" viewBox="0 0 1180 620" role="img" aria-labelledby="title desc">
+  <title id="title">Runtime selection matrix</title>
+  <desc id="desc">A matrix comparing vLLM, TensorRT-LLM, SGLang, and llama.cpp by hardware, workload, artifact, and operational fit.</desc>
+  <rect width="1180" height="620" fill="#ffffff"/>
+  <g font-family="Arial, sans-serif">
+    <text x="590" y="48" text-anchor="middle" font-size="29" font-weight="800" fill="#111827">Runtime은 이름이 아니라 workload fit으로 고른다</text>
+    <text x="590" y="82" text-anchor="middle" font-size="16" fill="#4b5563">hardware, workload, artifact, API, optimization target을 같은 표에 놓는다</text>
+
+    <rect x="50" y="125" width="250" height="390" rx="12" fill="#eef2ff" stroke="#6366f1" stroke-width="2"/>
+    <text x="175" y="164" text-anchor="middle" font-size="24" font-weight="800" fill="#3730a3">vLLM</text>
+    <text x="175" y="205" text-anchor="middle" font-size="15" fill="#374151">general serving baseline</text>
+    <text x="175" y="250" text-anchor="middle" font-size="15" fill="#374151">Paged KV cache</text>
+    <text x="175" y="282" text-anchor="middle" font-size="15" fill="#374151">continuous batching</text>
+    <text x="175" y="314" text-anchor="middle" font-size="15" fill="#374151">OpenAI-compatible API</text>
+    <text x="175" y="346" text-anchor="middle" font-size="15" fill="#374151">good metrics baseline</text>
+    <text x="175" y="410" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Use when</text>
+    <text x="175" y="442" text-anchor="middle" font-size="14" fill="#374151">you need first production</text>
+    <text x="175" y="466" text-anchor="middle" font-size="14" fill="#374151">serving comparison point</text>
+
+    <rect x="330" y="125" width="250" height="390" rx="12" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+    <text x="455" y="164" text-anchor="middle" font-size="24" font-weight="800" fill="#047857">TensorRT-LLM</text>
+    <text x="455" y="205" text-anchor="middle" font-size="15" fill="#374151">NVIDIA optimization path</text>
+    <text x="455" y="250" text-anchor="middle" font-size="15" fill="#374151">engine / runtime config</text>
+    <text x="455" y="282" text-anchor="middle" font-size="15" fill="#374151">FP8 / FP4 / INT4</text>
+    <text x="455" y="314" text-anchor="middle" font-size="15" fill="#374151">multi-GPU, multi-node</text>
+    <text x="455" y="346" text-anchor="middle" font-size="15" fill="#374151">Triton / NVIDIA ecosystem</text>
+    <text x="455" y="410" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Use when</text>
+    <text x="455" y="442" text-anchor="middle" font-size="14" fill="#374151">NVIDIA GPU performance</text>
+    <text x="455" y="466" text-anchor="middle" font-size="14" fill="#374151">is the main constraint</text>
+
+    <rect x="610" y="125" width="250" height="390" rx="12" fill="#fff7ed" stroke="#f97316" stroke-width="2"/>
+    <text x="735" y="164" text-anchor="middle" font-size="24" font-weight="800" fill="#c2410c">SGLang</text>
+    <text x="735" y="205" text-anchor="middle" font-size="15" fill="#374151">structured generation runtime</text>
+    <text x="735" y="250" text-anchor="middle" font-size="15" fill="#374151">RadixAttention</text>
+    <text x="735" y="282" text-anchor="middle" font-size="15" fill="#374151">tool / JSON / agent loops</text>
+    <text x="735" y="314" text-anchor="middle" font-size="15" fill="#374151">OpenAI + native APIs</text>
+    <text x="735" y="346" text-anchor="middle" font-size="15" fill="#374151">multi-hardware guides</text>
+    <text x="735" y="410" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Use when</text>
+    <text x="735" y="442" text-anchor="middle" font-size="14" fill="#374151">agentic structured output</text>
+    <text x="735" y="466" text-anchor="middle" font-size="14" fill="#374151">drives production quality</text>
+
+    <rect x="890" y="125" width="240" height="390" rx="12" fill="#f8fafc" stroke="#64748b" stroke-width="2"/>
+    <text x="1010" y="164" text-anchor="middle" font-size="24" font-weight="800" fill="#334155">llama.cpp</text>
+    <text x="1010" y="205" text-anchor="middle" font-size="15" fill="#374151">local and edge inference</text>
+    <text x="1010" y="250" text-anchor="middle" font-size="15" fill="#374151">GGUF artifacts</text>
+    <text x="1010" y="282" text-anchor="middle" font-size="15" fill="#374151">CPU / Metal / CUDA / Vulkan</text>
+    <text x="1010" y="314" text-anchor="middle" font-size="15" fill="#374151">llama-cli / llama-server</text>
+    <text x="1010" y="346" text-anchor="middle" font-size="15" fill="#374151">offline portability</text>
+    <text x="1010" y="410" text-anchor="middle" font-size="16" font-weight="700" fill="#111827">Use when</text>
+    <text x="1010" y="442" text-anchor="middle" font-size="14" fill="#374151">local privacy or edge</text>
+    <text x="1010" y="466" text-anchor="middle" font-size="14" fill="#374151">deployment is the target</text>
+
+    <text x="590" y="570" text-anchor="middle" font-size="17" font-weight="700" fill="#111827">같은 /v1/chat/completions endpoint라도 artifact, scheduler, cache, metrics, failure mode는 다르다</text>
+  </g>
+</svg>
