@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="560" viewBox="0 0 1240 560" role="img" aria-labelledby="title desc">
+  <title id="title">Agent observability and budget</title>
+  <desc id="desc">Agent observability and budget model showing trajectory-level metrics, nested spans, tool calls, memory, guardrails, and approvals.</desc>
+  <defs>
+    <style>
+      .bg{fill:#f8fafc}
+      .outer{fill:#ffffff;stroke:#334155;stroke-width:2.5;rx:12}
+      .span{fill:#eef2ff;stroke:#4f46e5;stroke-width:2;rx:8}
+      .tool{fill:#ecfdf5;stroke:#059669;stroke-width:2;rx:8}
+      .risk{fill:#fff1f2;stroke:#e11d48;stroke-width:2;rx:8}
+      .state{fill:#fff7ed;stroke:#f97316;stroke-width:2;rx:8}
+      .metric{fill:#f1f5f9;stroke:#64748b;stroke-width:1.5;rx:8}
+      .text{font-family:Arial,Helvetica,sans-serif;fill:#111827;font-size:20px;font-weight:700}
+      .small{font-family:Arial,Helvetica,sans-serif;fill:#374151;font-size:15px}
+      .tiny{font-family:Arial,Helvetica,sans-serif;fill:#475569;font-size:13px}
+    </style>
+  </defs>
+  <rect class="bg" width="1240" height="560"/>
+  <rect class="outer" x="55" y="55" width="1130" height="360"/>
+  <text class="text" x="620" y="90" text-anchor="middle">agent.run trajectory span</text>
+  <text class="small" x="620" y="118" text-anchor="middle">trajectory_id, workflow, tenant, budget, final status, total cost</text>
+
+  <rect class="span" x="95" y="155" width="155" height="86"/>
+  <text class="text" x="173" y="188" text-anchor="middle">plan</text>
+  <text class="tiny" x="173" y="214" text-anchor="middle">model call</text>
+  <rect class="tool" x="290" y="155" width="155" height="86"/>
+  <text class="text" x="368" y="188" text-anchor="middle">tool.call</text>
+  <text class="tiny" x="368" y="214" text-anchor="middle">latency / status</text>
+  <rect class="state" x="485" y="155" width="155" height="86"/>
+  <text class="text" x="563" y="188" text-anchor="middle">memory</text>
+  <text class="tiny" x="563" y="214" text-anchor="middle">read / write</text>
+  <rect class="risk" x="680" y="155" width="155" height="86"/>
+  <text class="text" x="758" y="188" text-anchor="middle">guardrail</text>
+  <text class="tiny" x="758" y="214" text-anchor="middle">tripwire</text>
+  <rect class="risk" x="875" y="155" width="155" height="86"/>
+  <text class="text" x="953" y="188" text-anchor="middle">approval</text>
+  <text class="tiny" x="953" y="214" text-anchor="middle">wait / decision</text>
+  <rect class="span" x="485" y="280" width="155" height="86"/>
+  <text class="text" x="563" y="313" text-anchor="middle">finish</text>
+  <text class="tiny" x="563" y="339" text-anchor="middle">success / failure</text>
+
+  <rect class="metric" x="95" y="455" width="165" height="62"/>
+  <text class="small" x="178" y="483" text-anchor="middle">tokens / trajectory</text>
+  <text class="tiny" x="178" y="504" text-anchor="middle">input + output</text>
+  <rect class="metric" x="290" y="455" width="165" height="62"/>
+  <text class="small" x="373" y="483" text-anchor="middle">model calls</text>
+  <text class="tiny" x="373" y="504" text-anchor="middle">count + p95</text>
+  <rect class="metric" x="485" y="455" width="165" height="62"/>
+  <text class="small" x="568" y="483" text-anchor="middle">tool calls</text>
+  <text class="tiny" x="568" y="504" text-anchor="middle">error + retry</text>
+  <rect class="metric" x="680" y="455" width="165" height="62"/>
+  <text class="small" x="763" y="483" text-anchor="middle">budget hit</text>
+  <text class="tiny" x="763" y="504" text-anchor="middle">turn / cost / time</text>
+  <rect class="metric" x="875" y="455" width="165" height="62"/>
+  <text class="small" x="958" y="483" text-anchor="middle">side effects</text>
+  <text class="tiny" x="958" y="504" text-anchor="middle">idempotency IDs</text>
+</svg>
