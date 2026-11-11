@@ -65,6 +65,8 @@
     
       <link rel="stylesheet" href="../stylesheets/paged-lab-v1.css">
     
+      <link rel="stylesheet" href="../stylesheets/lifecycle-lab-v1.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -284,7 +286,7 @@
   <span class="md-ellipsis">
     
   
-    핵심 장
+    추론의 기초
   
 
     
@@ -300,11 +302,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    핵심 장
+    추론의 기초
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    기초 영역 소개
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -321,6 +351,34 @@
     
   
     LLM 추론이란 무엇인가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapters/training-inference-differences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    학습과 추론의 차이
   
 
     
@@ -369,6 +427,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../chapters/cpu-vs-gpu-vs-tpu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론은 어디에서 실행할까
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../chapters/llm-inference-metrics/" class="md-nav__link">
         
   
@@ -389,6 +475,65 @@
   
 
               
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배포 계획
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    배포 계획
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -417,6 +562,65 @@
   
 
               
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 최적화
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    추론 최적화
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -669,6 +873,38 @@
 <td>PagedAttention</td>
 <td>KV 캐시를 블록 단위로 배치하고 조회표로 위치를 찾는 attention 및 메모리 관리 방식</td>
 </tr>
+<tr>
+<td>학습(training)</td>
+<td>데이터와 목표를 이용해 모델의 가중치를 조정하는 과정</td>
+</tr>
+<tr>
+<td>파인튜닝(fine-tuning)</td>
+<td>이미 학습된 모델의 가중치를 특정 작업이나 영역에 맞게 더 조정하는 학습</td>
+</tr>
+<tr>
+<td>손실(loss)</td>
+<td>모델의 예측이 목표와 얼마나 다른지 나타내는 학습용 값</td>
+</tr>
+<tr>
+<td>역전파(backpropagation)</td>
+<td>손실을 줄이기 위해 각 가중치를 어떻게 바꿀지 계산하는 과정</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>범용 계산 장치. 작은 모델 추론과 요청 처리 등에 쓸 수 있다.</td>
+</tr>
+<tr>
+<td>GPU</td>
+<td>많은 숫자 연산을 병렬로 실행하는 가속기. LLM 학습·서빙에 널리 쓰인다.</td>
+</tr>
+<tr>
+<td>TPU</td>
+<td>Google이 기계학습의 텐서 연산을 위해 설계한 가속기</td>
+</tr>
+<tr>
+<td>BYOC</td>
+<td>외부 공급자의 소프트웨어를 사용자 자신의 클라우드 계정에서 실행하는 방식</td>
+</tr>
 </tbody>
 </table>
 
@@ -786,6 +1022,8 @@
         <script src="../javascripts/batching-lab-v1.js"></script>
       
         <script src="../javascripts/paged-lab-v1.js"></script>
+      
+        <script src="../javascripts/lifecycle-lab-v1.js"></script>
       
     
   </body>

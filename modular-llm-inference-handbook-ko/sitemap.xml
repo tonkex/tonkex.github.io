@@ -9,11 +9,19 @@
          <lastmod>2026-11-11</lastmod>
     </url>
     <url>
+         <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/foundations/</loc>
+         <lastmod>2026-11-11</lastmod>
+    </url>
+    <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/glossary/</loc>
          <lastmod>2026-11-11</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/calculating-gpu-memory-for-llms/</loc>
+         <lastmod>2026-11-11</lastmod>
+    </url>
+    <url>
+         <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/cpu-vs-gpu-vs-tpu/</loc>
          <lastmod>2026-11-11</lastmod>
     </url>
     <url>
@@ -30,6 +38,10 @@
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/static-dynamic-continuous-batching/</loc>
+         <lastmod>2026-11-11</lastmod>
+    </url>
+    <url>
+         <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/training-inference-differences/</loc>
          <lastmod>2026-11-11</lastmod>
     </url>
     <url>

@@ -16,7 +16,7 @@
       
       
       
-        <link rel="next" href="chapters/what-is-llm-inference/">
+        <link rel="next" href="foundations/">
       
       
         
@@ -62,6 +62,8 @@
       <link rel="stylesheet" href="stylesheets/batching-lab-v1.css">
     
       <link rel="stylesheet" href="stylesheets/paged-lab-v1.css">
+    
+      <link rel="stylesheet" href="stylesheets/lifecycle-lab-v1.css">
     
     <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
@@ -292,7 +294,7 @@
   <span class="md-ellipsis">
     
   
-    핵심 장
+    추론의 기초
   
 
     
@@ -308,11 +310,39 @@
             <span class="md-nav__icon md-icon"></span>
             
   
-    핵심 장
+    추론의 기초
   
 
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    기초 영역 소개
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
             
               
                 
@@ -329,6 +359,34 @@
     
   
     LLM 추론이란 무엇인가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chapters/training-inference-differences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    학습과 추론의 차이
   
 
     
@@ -377,6 +435,34 @@
   
   
     <li class="md-nav__item">
+      <a href="chapters/cpu-vs-gpu-vs-tpu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론은 어디에서 실행할까
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="chapters/llm-inference-metrics/" class="md-nav__link">
         
   
@@ -397,6 +483,65 @@
   
 
               
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배포 계획
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    배포 계획
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -425,6 +570,65 @@
   
 
               
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 최적화
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    추론 최적화
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
             
               
                 
@@ -580,7 +784,7 @@
 
 <h1 id="llm">LLM 추론 핸드북 한국어판<a class="headerlink" href="#llm" title="Permanent link">&para;</a></h1>
 <p>LLM API의 응답이 느리거나 GPU 비용이 높을 때, 어느 숫자부터 확인해야 할까요? 이 책은 <a href="https://handbook.modular.com/">Modular의 LLM Inference Handbook</a>을 한국어로 읽을 수 있도록 옮기고, 필요한 배경 설명과 실습을 보탭니다.</p>
-<p>현재는 <strong>첫 6개 핵심 장</strong>을 읽을 수 있습니다. <a href="chapters/what-is-llm-inference/">LLM 추론이란 무엇인가</a>에서 요청 흐름을 살펴보고, <a href="chapters/how-llm-inference-works/">LLM은 어떻게 답을 만드는가</a>에서 토큰·prefill·decode를 읽은 뒤, <a href="chapters/llm-inference-metrics/">추론 성능 지표</a>를 살펴보세요. 이어서 <a href="chapters/calculating-gpu-memory-for-llms/">GPU 메모리 계산</a>, <a href="chapters/static-dynamic-continuous-batching/">배칭</a>, <a href="chapters/pagedattention/">PagedAttention</a>을 읽으면 여러 요청을 처리할 때 필요한 자원과 스케줄링을 연결할 수 있습니다. 원문의 나머지 문서는 영역별로 추가합니다.</p>
+<p>먼저 <a href="foundations/">추론의 기초</a>에서 학습과 추론, 토큰 생성 과정, CPU·GPU·TPU, 성능 지표를 순서대로 읽어 보세요. 이어서 <a href="chapters/calculating-gpu-memory-for-llms/">GPU 메모리 계산</a>, <a href="chapters/static-dynamic-continuous-batching/">배칭</a>, <a href="chapters/pagedattention/">PagedAttention</a>을 읽으면 여러 요청을 처리할 때 필요한 자원과 스케줄링을 연결할 수 있습니다. 원문의 나머지 문서는 영역별로 추가합니다.</p>
 <p>처음 읽는다면 <a href="glossary/">용어집</a>을 옆에 열어 두세요. 원저작자, 원문 기준 시점, 번역·보충 설명의 구분은 <a href="attribution/">원문과 저작자 표시</a>에 적었습니다.</p>
 <p><a href="https://tonkex.github.io/">GitHub Pages 홈으로 돌아가기</a></p>
 
@@ -619,13 +823,13 @@
         
         
           
-          <a href="chapters/what-is-llm-inference/" class="md-footer__link md-footer__link--next" aria-label="다음: LLM 추론이란 무엇인가">
+          <a href="foundations/" class="md-footer__link md-footer__link--next" aria-label="다음: 기초 영역 소개">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 다음
               </span>
               <div class="md-ellipsis">
-                LLM 추론이란 무엇인가
+                기초 영역 소개
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -682,6 +886,8 @@
         <script src="javascripts/batching-lab-v1.js"></script>
       
         <script src="javascripts/paged-lab-v1.js"></script>
+      
+        <script src="javascripts/lifecycle-lab-v1.js"></script>
       
     
   </body>
