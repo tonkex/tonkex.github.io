@@ -1,0 +1,1358 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Modular LLM Inference Handbook의 한국어 번역과 쉬운 보충 설명">
+      
+      
+        <meta name="author" content="Modular 원저작 · 한국어 번역 및 해설">
+      
+      
+        <link rel="canonical" href="https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/choosing-the-right-model/">
+      
+      
+        <link rel="prev" href="../serverless-vs-self-hosted-llm-inference/">
+      
+      
+        <link rel="next" href="../choosing-the-right-gpu/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>모델 선택 - LLM 추론 핸드북 한국어판</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/metric-lab-v2.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/request-flow-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/gpu-memory-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/batching-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/paged-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/lifecycle-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/hosting-cost-lab-v1.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#llm" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-header__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LLM 추론 핸드북 한국어판
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              모델 선택
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-nav__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LLM 추론 핸드북 한국어판
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    시작하기
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론의 기초
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    추론의 기초
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    기초 영역 소개
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../what-is-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 추론이란 무엇인가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../training-inference-differences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    학습과 추론의 차이
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-llm-inference-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM은 어떻게 답을 만드는가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cpu-vs-gpu-vs-tpu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론은 어디에서 실행할까
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-inference-metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 성능 지표
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배포 계획
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    배포 계획
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../serverless-vs-self-hosted-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    서버리스와 자체 호스팅
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    모델 선택
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    모델 선택
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        기본 모델은 왜 바로 챗봇처럼 답하지 않을까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        지시형 모델과 채팅 모델은 어떻게 다를까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dense-moe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dense와 MoE는 무엇을 다르게 계산할까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLM 하나로 모든 작업을 처리해야 할까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        모델은 어디에서 얻고 무엇을 확인할까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        가중치 파일 형식은 왜 중요한가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        모델 이름과 평가 결과를 어떻게 읽을까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="모델 이름과 평가 결과를 어떻게 읽을까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../choosing-the-right-gpu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU 선택
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calculating-gpu-memory-for-llms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU 메모리 계산
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 최적화
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    추론 최적화
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../static-dynamic-continuous-batching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배칭
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pagedattention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PagedAttention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    용어집
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../attribution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    원문과 저작자 표시
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        기본 모델은 왜 바로 챗봇처럼 답하지 않을까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        지시형 모델과 채팅 모델은 어떻게 다를까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dense-moe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dense와 MoE는 무엇을 다르게 계산할까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LLM 하나로 모든 작업을 처리해야 할까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        모델은 어디에서 얻고 무엇을 확인할까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        가중치 파일 형식은 왜 중요한가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        모델 이름과 평가 결과를 어떻게 읽을까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="모델 이름과 평가 결과를 어떻게 읽을까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="llm">어떤 LLM을 먼저 시험해야 할까?<a class="headerlink" href="#llm" title="Permanent link">&para;</a></h1>
+<p>모델 목록에 <code>Base</code>, <code>Instruct</code>, <code>Chat</code>, <code>MoE</code>, <code>Q4</code>가 함께 보이면 무엇부터 골라야 할까요? 이름만 보고 가장 큰 모델을 선택하면 품질과 비용을 모두 잘못 예상할 수 있습니다. 이 장은 <strong>수행할 작업을 먼저 정하고</strong>, 모델 유형·접근 경로·파일 형식을 차례로 확인하는 방법을 설명합니다.</p>
+<p>이 장은 Modular의 <a href="https://handbook.modular.com/getting-started/choosing-the-right-model/">모델 선택 원문</a>을 번역·재구성했습니다. <a href="https://github.com/modular/llm-inference-handbook/blob/07e93d6948c508b34bc7154a1400e025b0033ca3/docs/getting-started/choosing-the-right-model.md">기준 원고</a>는 커밋 <code>07e93d6</code>입니다. 보충 설명은 따로 표시했습니다.</p>
+<h2 id="_1">기본 모델은 왜 바로 챗봇처럼 답하지 않을까?<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><strong>기본 모델(base model)</strong>은 대규모 자료에서 다음 토큰을 예측하도록 사전 학습한 모델입니다. 문장의 패턴과 일반 지식을 익히지만, 사용자의 명령을 안전하고 일관되게 따르도록 특별히 다듬어진 상태는 아닙니다. 예를 들어 “다음 문장을 요약해 줘”라는 요청 뒤에 요약 대신 비슷한 문장을 이어 쓸 수 있습니다.</p>
+<p>기본 모델을 출발점으로 명령 데이터에 추가 학습하면 지시형 모델을 만들 수 있습니다. 대화 데이터와 선호도 학습 등을 더해 대화에 맞춘 모델을 만들 수도 있습니다. 다만 실제 모델 제작 경로는 제품마다 다르므로 <strong>이름의 접미사만으로 학습 절차 전체를 알 수는 없습니다.</strong></p>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/getting-started/choosing-the-right-model/#what-are-base-models">Modular 원문: 기본 모델</a> — 사전 학습과 후속 조정.</li>
+<li><a href="https://huggingface.co/docs/hub/model-cards">Hugging Face: 모델 카드</a> — 모델의 용도와 제한을 확인하는 방법.</li>
+</ul>
+<h2 id="_2">지시형 모델과 채팅 모델은 어떻게 다를까?<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p><strong>지시형 모델(instruction-tuned model)</strong>은 “이 문서를 요약해 줘”처럼 명령과 기대 답변의 예시로 조정한 모델입니다. <strong>채팅 모델(chat model)</strong>은 대화 차례와 여러 화자의 문맥을 다루는 데 맞춰 추가 조정되거나, 그런 사용 방식을 목표로 배포됩니다. 원문은 이 차이를 설명하지만, 업계의 이름 사용은 일관되지 않습니다. 많은 지시형 모델도 채팅에 쓸 수 있습니다.</p>
+<p>실제로는 모델 카드에서 <strong>채팅 템플릿</strong>, 시스템 메시지 지원, 도구 호출 지원, 문맥 길이, 권장 추론 설정을 확인해야 합니다. 같은 가중치라도 템플릿을 잘못 적용하면 응답 품질이 떨어질 수 있습니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 용도에서 후보를 고르기</p>
+<p>짧은 분류·추출에는 작은 지시형 모델부터, 여러 차례 대화에는 대화 형식과 템플릿이 검증된 모델부터 시험하세요. 법률·의료·금융처럼 오류 비용이 큰 분야에서는 모델 이름보다 실제 사례에 대한 평가와 사람의 검토 절차가 중요합니다.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/getting-started/choosing-the-right-model/#instruction-tuned-vs-chat-models">Modular 원문: 지시형과 채팅</a> — 학습 목적의 차이.</li>
+<li><a href="https://huggingface.co/docs/transformers/chat_templating">Hugging Face Transformers: 채팅 템플릿</a> — 메시지를 모델 입력으로 바꾸는 형식.</li>
+</ul>
+<h2 id="dense-moe">Dense와 MoE는 무엇을 다르게 계산할까?<a class="headerlink" href="#dense-moe" title="Permanent link">&para;</a></h2>
+<p><strong>Dense 모델</strong>은 생성 단계에서 각 층의 매개변수를 사용합니다. <strong>MoE(Mixture of Experts)</strong> 모델은 일부 층에 여러 <strong>전문가 네트워크</strong>를 두고 토큰마다 그중 일부를 선택합니다. 따라서 MoE에서 “전체 매개변수 35B, 활성 매개변수 3B”처럼 두 숫자가 표시될 수 있습니다. 이는 전체 가중치가 3B 크기만큼만 저장된다는 뜻이 아닙니다. 선택되지 않은 전문가의 가중치도 배포 방식에 따라 메모리와 저장 공간을 차지합니다.</p>
+<table>
+<thead>
+<tr>
+<th>구조</th>
+<th>한 토큰의 계산</th>
+<th>배포에서 확인할 점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dense</td>
+<td>해당 층의 전체 가중치를 사용</td>
+<td>모델 크기·정밀도·KV 캐시</td>
+</tr>
+<tr>
+<td>MoE</td>
+<td>라우터가 선택한 전문가를 사용</td>
+<td>전체 가중치 용량·전문가 배치·통신 비용</td>
+</tr>
+</tbody>
+</table>
+<p>원문은 MoE가 계산을 선택적으로 써서 확장 효율을 높일 수 있다고 설명합니다. 그러나 지연과 비용은 전문가의 수, 배치 크기, GPU 간 이동, 서빙 엔진 지원에 따라 달라집니다. <strong>활성 매개변수 수만으로 GPU 크기를 결정하지 마세요.</strong></p>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/getting-started/choosing-the-right-model/#dense-models-vs-mixture-of-experts-moe-models">Modular 원문: Dense와 MoE</a> — 두 구조의 비교.</li>
+<li><a href="https://handbook.modular.com/getting-started/calculating-gpu-memory-for-llms/">Modular 원문: GPU 메모리 계산</a> — 가중치와 KV 캐시의 별도 예산.</li>
+</ul>
+<h2 id="llm_1">LLM 하나로 모든 작업을 처리해야 할까?<a class="headerlink" href="#llm_1" title="Permanent link">&para;</a></h2>
+<p>원문은 작은 언어 모델, <strong>임베딩 모델</strong>, 이미지 생성 모델, 비전 언어 모델, 음성 합성 모델을 함께 소개합니다. 임베딩 모델은 문서나 질문을 검색에 쓸 숫자 벡터로 바꿉니다. 비전 언어 모델은 이미지와 텍스트를 함께 처리합니다. 음성 합성 모델은 텍스트를 소리로 만듭니다. 이들 작업을 일반적인 텍스트 LLM 하나에 모두 맡길 필요는 없습니다.</p>
+<p>예를 들어 사내 문서 질의응답에서는 임베딩 모델로 관련 문서를 찾고, LLM은 찾은 문서를 바탕으로 답을 작성할 수 있습니다. 간단한 분류는 작은 모델로 처리하고 어려운 요청만 큰 모델로 보낼 수도 있습니다. 이렇게 여러 모델을 연결하면 각 단계의 품질, 지연, 오류 전파를 따로 평가해야 합니다.</p>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/getting-started/choosing-the-right-model/#combining-llms-with-other-models">Modular 원문: 여러 모델 결합</a> — 작업별 모델 유형.</li>
+<li><a href="https://handbook.modular.com/infrastructure-and-operations/multi-model-inference-pipelines/">Modular 원문: 다중 모델 파이프라인</a> — 모델을 연결하는 운영 구조.</li>
+</ul>
+<h2 id="_3">모델은 어디에서 얻고 무엇을 확인할까?<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p><a href="https://huggingface.co/models">Hugging Face 모델 허브</a>와 <a href="https://www.modelscope.cn/models">ModelScope</a>는 모델 가중치와 모델 카드를 찾는 곳입니다. <a href="https://openrouter.ai/">OpenRouter</a>는 여러 모델을 API로 호출하는 접근 계층이며, 일반적으로 가중치를 내려받아 직접 운영하는 경로와 다릅니다. 먼저 <strong>가중치를 직접 실행할지 API로 평가할지</strong> 정하세요.</p>
+<p>공개된 모델이라고 모두 자유로운 상업 이용이 허용되는 것은 아닙니다. 모델 카드에서 라이선스, 사용 제한, 출처, 지원 언어, 권장 프롬프트 형식, 평가 방법, 문맥 길이를 확인하세요. 일부 모델은 로그인·약관 동의·접근 토큰이 필요합니다. 이를 <strong>게이트 모델</strong>이라고 합니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 재현 가능한 후보 목록</p>
+<p>평가 기록에는 모델 이름뿐 아니라 정확한 버전 또는 리비전, 가중치 형식, 토크나이저, 채팅 템플릿, 서빙 엔진 버전을 함께 적으세요. 같은 제품 이름의 새 릴리스가 나와도 이전 측정 결과를 재현할 수 있습니다.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/getting-started/choosing-the-right-model/#where-to-get-models">Modular 원문: 모델을 얻는 곳</a> — 세 접근 경로의 차이.</li>
+<li><a href="https://huggingface.co/docs/hub/model-cards">Hugging Face: 모델 카드</a> — 라이선스·용도·한계 기록.</li>
+<li><a href="https://huggingface.co/docs/hub/models-gated">Hugging Face: 게이트 모델</a> — 접근 승인 방식.</li>
+</ul>
+<h2 id="_4">가중치 파일 형식은 왜 중요한가?<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p><strong>가중치</strong>는 학습으로 얻은 모델의 숫자 값이며, 배포할 때 파일에서 읽어 메모리에 적재합니다. 원문은 다음 형식을 소개합니다.</p>
+<table>
+<thead>
+<tr>
+<th>형식</th>
+<th>주로 쓰는 곳</th>
+<th>확인할 점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PyTorch 체크포인트 (<code>.bin</code>, <code>.pt</code>)</td>
+<td>원래 학습 환경과 기존 배포</td>
+<td>역직렬화 방식과 신뢰할 수 있는 파일인지 확인</td>
+</tr>
+<tr>
+<td>Safetensors (<code>.safetensors</code>)</td>
+<td>공개 모델 배포와 서빙</td>
+<td>샤드 파일과 <code>model.safetensors.index.json</code>의 완전성</td>
+</tr>
+<tr>
+<td>GGUF (<code>.gguf</code>)</td>
+<td><code>llama.cpp</code> 계열의 로컬 실행</td>
+<td>양자화 종류와 실행 도구의 호환성</td>
+</tr>
+</tbody>
+</table>
+<p>큰 모델의 Safetensors 파일은 여러 <strong>샤드(shard)</strong>로 나뉠 수 있습니다. 인덱스 파일은 각 텐서가 어느 샤드에 있는지 알려 줍니다. 파일 하나가 빠지면 모델 로드가 실패할 수 있습니다. GGUF 파일명에 들어간 <code>Q4</code> 같은 표시는 대체로 양자화 방식을 나타내지만, 형식 이름만으로 실제 품질이나 메모리를 확정할 수는 없습니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 파일 형식과 실행 안전성</p>
+<p>Safetensors는 텐서 데이터 로딩에서 임의 코드 실행을 피하도록 설계됐습니다. 그러나 모델 저장소에 있는 설정 파일이나 별도 사용자 코드까지 자동으로 안전하게 만드는 것은 아닙니다. 신뢰하지 않는 저장소의 실행 옵션은 별도로 검토하세요.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/getting-started/choosing-the-right-model/#model-weight-formats">Modular 원문: 가중치 형식</a> — 체크포인트·Safetensors·GGUF.</li>
+<li><a href="https://huggingface.co/docs/safetensors/index">Hugging Face: Safetensors</a> — 형식 설계와 로딩.</li>
+<li><a href="https://github.com/ggml-org/llama.cpp">llama.cpp 공식 저장소</a> — GGUF 기반 로컬 실행.</li>
+</ul>
+<h2 id="_5">모델 이름과 평가 결과를 어떻게 읽을까?<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>원문 도해는 이름의 숫자, <code>B</code>, <code>Instruct</code>, <code>Chat</code>, 양자화 표기와 릴리스 날짜를 해석합니다. <code>B</code>는 보통 <strong>십억 개의 매개변수</strong>를 뜻합니다. <code>Instruct</code>는 지시 조정을 암시하고 <code>Q4</code>는 대개 4비트 계열 양자화를 뜻하지만, 이름만으로 정확한 저장 형식과 지원 기능을 알 수 없습니다. MoE 이름에 <code>35B-A3B</code>처럼 두 수가 있다면 대개 전체·활성 매개변수 수를 나타냅니다. <strong>전체 전문가 수와 활성 전문가 수를 뜻한다고 일반화하면 안 됩니다.</strong></p>
+<p>선택 과정은 다음처럼 진행할 수 있습니다. ① 실제 사용 사례 20~50개를 모으고 ② 필요한 품질·지연·비용 상한을 정하고 ③ 작은 후보부터 같은 입력으로 평가하고 ④ 모델 카드·라이선스·서빙 호환성을 확인하고 ⑤ 최종 후보를 실제 트래픽 패턴으로 부하 시험합니다. 모델 순위표는 후보를 좁히는 자료이지 제품의 합격 판정이 아닙니다.</p>
+<h3 id="_6">핵심 정리<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li>기본 모델과 지시형·채팅 모델은 학습 목적과 입력 형식이 다릅니다.</li>
+<li>MoE는 일부 전문가만 계산해도 전체 가중치의 메모리 요구를 고려해야 합니다.</li>
+<li>검색·시각·음성 등 작업에는 별도 전문 모델을 조합할 수 있습니다.</li>
+<li>모델 카드의 라이선스, 접근 조건, 템플릿과 파일 형식을 확인합니다.</li>
+<li>이름과 공개 순위보다 내 작업의 품질·지연·비용 측정이 중요합니다.</li>
+</ul>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/getting-started/choosing-the-right-model/#faqs">Modular 원문: 모델 이름과 FAQ</a> — 이름을 읽는 기본 요소.</li>
+<li><a href="https://huggingface.co/docs/hub/model-cards">Hugging Face: 모델 카드</a> — 후보 검증 기록의 출발점.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+        
+          
+          <a href="../serverless-vs-self-hosted-llm-inference/" class="md-footer__link md-footer__link--prev" aria-label="이전: 서버리스와 자체 호스팅">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                서버리스와 자체 호스팅
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../choosing-the-right-gpu/" class="md-footer__link md-footer__link--next" aria-label="다음: GPU 선택">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                GPU 선택
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <a href="https://tonkex.github.io/">GitHub Pages 홈으로 돌아가기</a> · 원저작 Modular
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/metric-lab-v1.js"></script>
+      
+        <script src="../../javascripts/request-flow-v1.js"></script>
+      
+        <script src="../../javascripts/gpu-memory-lab-v1.js"></script>
+      
+        <script src="../../javascripts/batching-lab-v1.js"></script>
+      
+        <script src="../../javascripts/paged-lab-v1.js"></script>
+      
+        <script src="../../javascripts/lifecycle-lab-v1.js"></script>
+      
+        <script src="../../javascripts/hosting-cost-lab-v1.js"></script>
+      
+    
+  </body>
+</html>

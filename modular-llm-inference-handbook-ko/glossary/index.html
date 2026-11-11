@@ -67,6 +67,8 @@
     
       <link rel="stylesheet" href="../stylesheets/lifecycle-lab-v1.css">
     
+      <link rel="stylesheet" href="../stylesheets/hosting-cost-lab-v1.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -542,6 +544,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../chapters/serverless-vs-self-hosted-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    서버리스와 자체 호스팅
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapters/choosing-the-right-model/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    모델 선택
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapters/choosing-the-right-gpu/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU 선택
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../chapters/calculating-gpu-memory-for-llms/" class="md-nav__link">
         
   
@@ -905,6 +991,34 @@
 <td>BYOC</td>
 <td>외부 공급자의 소프트웨어를 사용자 자신의 클라우드 계정에서 실행하는 방식</td>
 </tr>
+<tr>
+<td>서버리스 추론</td>
+<td>공급자가 모델 서버와 가속기 운영을 맡고 사용자가 API로 요청하는 방식</td>
+</tr>
+<tr>
+<td>자체 호스팅</td>
+<td>모델 서빙 환경을 자신의 클라우드나 데이터센터에서 직접 구성·운영하는 방식</td>
+</tr>
+<tr>
+<td>기본 모델(base model)</td>
+<td>주로 다음 토큰 예측으로 사전 학습한, 지시 수행용 후속 조정 이전의 모델</td>
+</tr>
+<tr>
+<td>지시형 모델(instruct model)</td>
+<td>명령과 답변 예시로 조정해 사용자의 지시를 더 잘 따르게 한 모델</td>
+</tr>
+<tr>
+<td>MoE</td>
+<td>여러 전문가 네트워크 중 일부를 토큰마다 선택해 계산하는 모델 구조</td>
+</tr>
+<tr>
+<td>샤드(shard)</td>
+<td>큰 가중치 파일을 나눠 저장한 조각</td>
+</tr>
+<tr>
+<td>메모리 대역폭</td>
+<td>GPU 메모리와 연산 장치 사이에서 단위 시간에 옮길 수 있는 데이터 양</td>
+</tr>
 </tbody>
 </table>
 
@@ -1024,6 +1138,8 @@
         <script src="../javascripts/paged-lab-v1.js"></script>
       
         <script src="../javascripts/lifecycle-lab-v1.js"></script>
+      
+        <script src="../javascripts/hosting-cost-lab-v1.js"></script>
       
     
   </body>

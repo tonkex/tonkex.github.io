@@ -1,0 +1,8 @@
+.hosting-cost-lab { border: 1px solid var(--md-default-fg-color--lighter); border-radius: .65rem; padding: 1rem; margin: 1.2rem 0; background: var(--md-code-bg-color); }
+.hosting-cost-lab h3 { margin-top: 0; }
+.hosting-cost-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: .8rem; }
+.hosting-cost-inputs label { display: flex; flex-direction: column; gap: .25rem; font-size: .78rem; }
+.hosting-cost-inputs input { width: 100%; padding: .4rem .5rem; border: 1px solid var(--md-default-fg-color--lighter); border-radius: .3rem; color: var(--md-default-fg-color); background: var(--md-default-bg-color); font: inherit; }
+.hosting-cost-inputs input:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
+.hosting-cost-lab [data-hosting-cost-result] { font-weight: 700; margin-bottom: .3rem; }
+.hosting-cost-lab [data-hosting-cost-crossover] { margin: 0; font-size: .78rem; }

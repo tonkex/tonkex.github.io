@@ -21,6 +21,14 @@
          <lastmod>2026-11-11</lastmod>
     </url>
     <url>
+         <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/choosing-the-right-gpu/</loc>
+         <lastmod>2026-11-11</lastmod>
+    </url>
+    <url>
+         <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/choosing-the-right-model/</loc>
+         <lastmod>2026-11-11</lastmod>
+    </url>
+    <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/cpu-vs-gpu-vs-tpu/</loc>
          <lastmod>2026-11-11</lastmod>
     </url>
@@ -34,6 +42,10 @@
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/pagedattention/</loc>
+         <lastmod>2026-11-11</lastmod>
+    </url>
+    <url>
+         <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/serverless-vs-self-hosted-llm-inference/</loc>
          <lastmod>2026-11-11</lastmod>
     </url>
     <url>
