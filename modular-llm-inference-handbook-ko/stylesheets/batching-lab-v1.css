@@ -1,0 +1,8 @@
+.batching-lab { border: 1px solid var(--md-default-fg-color--lightest); border-radius: .6rem; padding: 1rem; margin: 1.2rem 0; }
+.batching-lab h3 { margin-top: 0; }
+.batching-controls { display: flex; gap: .5rem; flex-wrap: wrap; }
+.batching-controls button { cursor: pointer; background: var(--md-default-bg-color); color: var(--md-default-fg-color); border: 1px solid var(--md-default-fg-color--lightest); border-radius: .3rem; padding: .35rem .65rem; font: inherit; }
+.batching-controls button[aria-pressed="true"] { background: #165a9b; color: white; }
+.batching-controls button:disabled { opacity: .5; cursor: default; }
+.batching-slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: .5rem; margin: .7rem 0; }
+.batching-slots div { padding: .65rem; border-radius: .3rem; background: var(--md-code-bg-color); }

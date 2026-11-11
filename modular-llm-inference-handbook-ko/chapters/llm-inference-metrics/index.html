@@ -1,0 +1,1022 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Modular LLM Inference Handbook의 한국어 번역과 쉬운 보충 설명">
+      
+      
+        <meta name="author" content="Modular 원저작 · 한국어 번역 및 해설">
+      
+      
+        <link rel="canonical" href="https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/llm-inference-metrics/">
+      
+      
+        <link rel="prev" href="../how-llm-inference-works/">
+      
+      
+        <link rel="next" href="../calculating-gpu-memory-for-llms/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>추론 성능 지표 - LLM 추론 핸드북 한국어판</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/metric-lab-v2.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/request-flow-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/gpu-memory-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/batching-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/paged-lab-v1.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-header__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LLM 추론 핸드북 한국어판
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              추론 성능 지표
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-nav__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LLM 추론 핸드북 한국어판
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    시작하기
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    핵심 장
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    핵심 장
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../what-is-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 추론이란 무엇인가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-llm-inference-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM은 어떻게 답을 만드는가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 성능 지표
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 성능 지표
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        지연 시간: 한 요청에서 어디를 기다리는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        처리량: 서버가 얼마나 많은 일을 끝내는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#goodput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goodput: 목표를 지키며 얼마나 처리하는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        지연 시간과 처리량 중 무엇을 먼저 볼까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="지연 시간과 처리량 중 무엇을 먼저 볼까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calculating-gpu-memory-for-llms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU 메모리 계산
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../static-dynamic-continuous-batching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배칭
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pagedattention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PagedAttention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    용어집
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../attribution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    원문과 저작자 표시
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        지연 시간: 한 요청에서 어디를 기다리는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        처리량: 서버가 얼마나 많은 일을 끝내는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#goodput" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Goodput: 목표를 지키며 얼마나 처리하는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        지연 시간과 처리량 중 무엇을 먼저 볼까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="지연 시간과 처리량 중 무엇을 먼저 볼까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="_1">추론 성능 지표: 사용자가 느끼는 속도를 어떻게 읽을까?<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>채팅 서비스가 초당 토큰을 많이 만들어도, 사용자가 첫 문장을 오래 기다리면 빠른 서비스라고 느끼기 어렵습니다. 반대로 첫 단어는 즉시 보여 주지만 뒤의 문장이 느리게 나오거나 요청이 자주 실패한다면 숫자 하나로는 문제를 찾을 수 없습니다. 이 장에서는 <strong>한 요청의 기다림</strong>, <strong>서버 전체의 처리량</strong>, <strong>목표를 지킨 처리량</strong>을 차례로 구분합니다.</p>
+<p>이 장은 Modular의 <a href="https://handbook.modular.com/llm-inference-basics/llm-inference-metrics/">Key metrics for LLM inference</a>를 번역·재구성했습니다. 기준 원문은 <a href="https://github.com/modular/llm-inference-handbook/blob/07e93d6948c508b34bc7154a1400e025b0033ca3/docs/llm-inference-basics/llm-inference-metrics.md">저장소 커밋 <code>07e93d6</code></a>입니다. 별도로 더한 설명은 <code>한국어판 보충 설명</code>으로 표시합니다.</p>
+<h2 id="_2">지연 시간: 한 요청에서 어디를 기다리는가?<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p><strong>지연 시간(latency)</strong>은 요청을 보낸 뒤 응답을 받기까지 걸린 시간입니다. LLM은 답을 한꺼번에 보내기도 하고, 생성되는 토큰을 순서대로 보내기도 합니다. 스트리밍 응답에서는 첫 토큰과 마지막 토큰의 도착 시간을 따로 재면 원인을 더 잘 찾을 수 있습니다.</p>
+<ul>
+<li><strong>TTFT(Time to First Token)</strong>: 요청을 보낸 시점부터 첫 출력 토큰을 받을 때까지의 시간입니다. 대기열, 입력 처리, 첫 토큰 생성, 네트워크 시간이 포함될 수 있습니다.</li>
+<li><strong>E2EL(End-to-End Latency)</strong>: 요청부터 마지막 출력 토큰을 받을 때까지의 전체 시간입니다.</li>
+<li><strong>생성 구간 시간</strong>: 첫 토큰 이후 마지막 토큰까지의 시간입니다. <code>E2EL − TTFT</code>로 계산합니다.</li>
+<li><strong>TPOT(Time per Output Token)</strong>: 생성 구간에서 토큰 사이의 평균 간격입니다. 출력 토큰이 <span class="arithmatex">\(N\)</span>개라면 토큰 사이 간격은 <span class="arithmatex">\(N-1\)</span>개입니다.</li>
+<li><strong>ITL(Inter-Token Latency)</strong>: 연속된 두 토큰 사이의 개별 간격입니다. 한 요청의 ITL을 평균하면 TPOT가 됩니다.</li>
+</ul>
+<div class="arithmatex">\[
+\text{TPOT} = \frac{\text{E2EL}-\text{TTFT}}{N-1},\qquad N\ge2
+\]</div>
+<p>예를 들어 첫 토큰이 <strong>80 ms</strong>에 도착하고 마지막 토큰이 <strong>2,200 ms</strong>에 도착했으며 출력이 <strong>220개</strong>라면, 생성 구간은 2,120 ms이고 간격은 219개입니다. TPOT는 약 <strong>9.68 ms/토큰</strong>입니다. TTFT와 TPOT는 각각 첫 반응과 그 뒤의 흐름을 보여 줍니다.</p>
+<div class="metric-lab" data-metric-lab>
+  <h3>직접 바꿔 보기: 지연 시간과 목표 달성</h3>
+  <p>아래 값은 실제 서버 측정치가 아닌 학습용 예시입니다. 숫자를 바꾸면 시간축과 TPOT가 갱신됩니다.</p>
+  <div class="metric-lab-inputs">
+    <label>TTFT <span>(ms)</span><input type="number" min="0" step="10" value="80" data-ttft></label>
+    <label>E2EL <span>(ms)</span><input type="number" min="0" step="50" value="2200" data-e2el></label>
+    <label>출력 토큰 수<input type="number" min="2" step="1" value="220" data-tokens></label>
+  </div>
+  <p class="metric-lab-error" data-error role="alert"></p>
+  <div class="metric-lab-timeline" aria-hidden="true"><span data-wait-bar></span><span data-generation-bar></span></div>
+  <p class="metric-lab-legend"><span><i class="metric-lab-wait-key"></i> 첫 토큰 대기(TTFT)</span><span><i class="metric-lab-generation-key"></i> 이후 생성(E2EL − TTFT)</span></p>
+  <p class="metric-lab-result" data-result aria-live="polite"></p>
+  <p class="metric-lab-caption">시간축은 두 구간의 길이 비율을 표시합니다. 정확한 값은 바로 위 결과 문장을 읽어 주세요.</p>
+  <div class="metric-lab-slo">
+    <p><strong>같은 기준으로 네 요청을 평가하기</strong></p>
+    <div class="metric-lab-inputs">
+      <label>TTFT 목표 상한 <span>(ms)</span><input type="number" min="0" step="10" value="200" data-slo-ttft></label>
+      <label>E2EL 목표 상한 <span>(ms)</span><input type="number" min="0" step="100" value="3000" data-slo-e2el></label>
+    </div>
+    <div class="metric-lab-table-wrap"><table><thead><tr><th>요청</th><th>TTFT</th><th>E2EL</th><th>목표 충족</th></tr></thead><tbody>
+      <tr data-sample-row data-ttft="80" data-e2el="2200"><td data-label="요청">A</td><td data-label="TTFT">80 ms</td><td data-label="E2EL">2,200 ms</td><td data-label="목표" data-status></td></tr>
+      <tr data-sample-row data-ttft="250" data-e2el="1800"><td data-label="요청">B</td><td data-label="TTFT">250 ms</td><td data-label="E2EL">1,800 ms</td><td data-label="목표" data-status></td></tr>
+      <tr data-sample-row data-ttft="100" data-e2el="3500"><td data-label="요청">C</td><td data-label="TTFT">100 ms</td><td data-label="E2EL">3,500 ms</td><td data-label="목표" data-status></td></tr>
+      <tr data-sample-row data-ttft="150" data-e2el="2400"><td data-label="요청">D</td><td data-label="TTFT">150 ms</td><td data-label="E2EL">2,400 ms</td><td data-label="목표" data-status></td></tr>
+    </tbody></table></div>
+    <p data-slo-result aria-live="polite"></p>
+  </div>
+</div>
+
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 여러 요청의 평균</p>
+<p>요청마다 출력 길이가 다르면 <code>평균 TPOT</code>와 <code>전체 ITL 평균</code>은 같지 않을 수 있습니다. 요청별 TPOT를 평균하면 <strong>요청마다 같은 가중치</strong>를 줍니다. 전체 ITL을 합쳐 평균하면 <strong>토큰 간격마다 같은 가중치</strong>를 줍니다. 첫 토큰은 간격을 만들지 않으므로, 여러 요청의 전체 ITL 평균에서 분모는 각 요청의 <span class="arithmatex">\((N_i-1)\)</span>을 더한 값입니다. 지표를 비교할 때 측정 도구가 어느 방식을 쓰는지 확인하세요.</p>
+</div>
+<p>평균값만 보면 느린 일부 요청을 놓치기도 합니다. <strong>중앙값(P50)</strong>은 절반의 요청이 그 시간 안에 끝난다는 뜻이고, <strong>P99</strong>는 99%의 요청이 그 시간 안에 끝난다는 뜻입니다. 예를 들어 P50 TTFT가 80 ms인데 P99 TTFT가 2초라면 대부분은 빠르지만 일부 사용자는 첫 토큰을 오래 기다립니다. P90·P95도 같은 방식으로 읽습니다.</p>
+<p><strong>산술평균(mean)</strong>은 관측값을 모두 더해 요청 수로 나눈 값이라 매우 느린 요청 하나에도 크게 움직일 수 있습니다. 중앙값은 전형적인 사용자의 경험을, P99는 느린 끝부분의 경험을 보여 줍니다. 성능 표를 읽을 때는 평균 TTFT와 P99 TTFT처럼 <strong>같은 지표의 다른 분위수</strong>를 함께 보세요.</p>
+<p>지연 목표는 작업에 따라 달라집니다. 대화형 채팅은 첫 반응이 중요하고, 밤새 만드는 보고서는 전체 완료 시간과 비용이 더 중요할 수 있습니다. 특정 밀리초 숫자를 모든 서비스의 정답으로 삼지 마세요.</p>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/llm-inference-metrics/">Modular 원문: 추론 성능 지표</a> — 이 절의 번역 기준.</li>
+<li><a href="https://docs.nvidia.com/nim/benchmarking/llm/metrics">NVIDIA NIM 지표 정의</a> — TTFT, E2EL, ITL의 측정 구간과 수식.</li>
+</ul>
+<h2 id="_3">처리량: 서버가 얼마나 많은 일을 끝내는가?<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p><strong>처리량(throughput)</strong>은 일정 시간 동안 끝낸 일의 양입니다. 대기 시간을 재는 지연 시간과 달리, 여러 사용자의 요청을 함께 처리하는 서버의 용량을 봅니다.</p>
+<ul>
+<li><strong>RPS(Requests per Second)</strong>는 초당 완료한 요청 수입니다. 10초 동안 요청 40개를 끝냈다면 4 RPS입니다.</li>
+<li><strong>TPS(Tokens per Second)</strong>는 초당 처리한 토큰 수입니다. 입력 토큰을 읽는 속도인 <strong>입력 TPS</strong>와 출력 토큰을 생성하는 <strong>출력 TPS</strong>를 구분해야 합니다.</li>
+</ul>
+<p>긴 문서를 요약하는 요청은 입력 토큰이 많아 입력 TPS가 중요하고, 짧은 질문에 긴 답을 쓰는 챗봇은 출력 TPS가 더 중요할 수 있습니다. 벤치마크가 입력·출력을 합친 숫자만 제시한다면 어느 단계가 빨라졌는지 알아보기 어렵습니다.</p>
+<div class="arithmatex">\[
+\text{RPS} = \frac{\text{측정 구간에 완료한 요청 수}}{\text{측정 구간의 초}},\qquad
+\text{TPS} = \frac{\text{측정 구간에 처리한 토큰 수}}{\text{측정 구간의 초}}
+\]</div>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 같은 RPS, 다른 부하</p>
+<p>짧은 인사말 100개와 긴 문서 요약 100개는 요청 수가 같아도 입력·출력 토큰 수가 크게 다릅니다. RPS만 비교하면 서버가 수행한 일을 오해할 수 있습니다. 모델, 입력 길이, 출력 길이, 동시 요청 수, 하드웨어를 함께 적어야 의미 있는 비교가 됩니다.</p>
+</div>
+<p>배치를 키우면 여러 요청에서 모델 가중치를 함께 활용해 총 TPS가 오를 수 있습니다. 하지만 요청이 배치를 기다리는 시간이 늘거나 각 사용자의 토큰 간격이 길어질 수도 있습니다. <strong>총 TPS가 좋아졌는지</strong>와 <strong>사용자가 더 기다리는지</strong>를 함께 봐야 합니다.</p>
+<p>TPS는 배치 크기, KV 캐시 메모리, 입력·출력 길이, GPU 계산량과 메모리 대역폭에도 좌우됩니다. 서로 다른 모델이나 하드웨어의 TPS를 비교할 때는 이 조건을 맞춰야 합니다. 동시 요청을 늘리면 총 TPS가 오르다가 자원 한계에 이르면 대기와 지연이 급증하거나 처리량이 떨어질 수 있습니다.</p>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/llm-inference-metrics/">Modular 원문: 추론 성능 지표</a> — RPS와 TPS의 설명.</li>
+<li><a href="https://docs.nvidia.com/nim/benchmarking/llm/metrics">NVIDIA NIM 지표 정의</a> — 처리량 측정 방식.</li>
+</ul>
+<h2 id="goodput">Goodput: 목표를 지키며 얼마나 처리하는가?<a class="headerlink" href="#goodput" title="Permanent link">&para;</a></h2>
+<p>처리량이 높아도 사용자가 기다리기로 한 한도를 자주 넘기면 서비스 품질이 좋다고 할 수 없습니다. <strong>SLO(Service-Level Objective)</strong>는 서비스를 평가할 때 정한 목표입니다. 예를 들어 <code>TTFT ≤ 200 ms</code>와 <code>E2EL ≤ 3,000 ms</code>를 동시에 만족해야 한 요청이 목표를 지킨 것으로 셀 수 있습니다.</p>
+<p><strong>Goodput</strong>은 이런 조건을 지키며 완료한 요청의 처리량입니다. 전체 처리량에서 목표를 어긴 요청을 제외합니다.</p>
+<p>원문의 예처럼 <code>전체 요청의 95%가 TTFT 200 ms 미만</code>이라는 목표는 <strong>측정 구간 전체의 SLO</strong>입니다. 아래 실습은 각 요청의 TTFT와 E2EL이 지정한 상한을 모두 만족하는지 판정한 뒤, 그 요청들의 처리량을 계산합니다. 서비스의 SLO 달성률과 요청 단위 Goodput은 관련되지만 같은 지표는 아닙니다.</p>
+<div class="arithmatex">\[
+\text{Goodput (요청/초)} =
+\frac{\text{측정 구간에 모든 SLO를 만족한 완료 요청 수}}
+{\text{측정 구간의 초}}
+\]</div>
+<p>위 실습의 기본값에서 요청 네 개 중 두 개가 두 목표를 모두 만족합니다. 이때 <strong>목표 달성률은 50%</strong>입니다. 네 요청을 10초 동안 처리했다고 가정하면 <strong>Goodput은 0.2 요청/초</strong>입니다. 달성률과 Goodput은 단위부터 다릅니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 측정 구간을 명시하기</p>
+<p>목표를 지킨 요청 수만 알면 달성률은 계산할 수 있지만 Goodput의 단위인 요청/초는 계산할 수 없습니다. 반드시 같은 관측 구간의 길이를 함께 기록해야 합니다. 목표의 부등호, 측정 시작·종료 시점, 스트리밍 여부도 함께 고정하세요.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/llm-inference-metrics/">Modular 원문: 추론 성능 지표</a> — Goodput과 SLO의 설명.</li>
+<li><a href="https://arxiv.org/abs/2401.09670">DistServe 논문</a> — TTFT와 TPOT 목표를 함께 만족하는 처리량을 최적화하는 사례.</li>
+</ul>
+<h2 id="_4">지연 시간과 처리량 중 무엇을 먼저 볼까?<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>대화형 채팅에서는 첫 반응과 토큰이 이어지는 속도가 중요합니다. 긴 문서를 한꺼번에 만드는 작업에서는 전체 완료 시간과 비용이 더 중요합니다. 요청별 목표를 정한 온라인 서비스라면 Goodput이 핵심입니다.</p>
+<p>원문은 목표를 세 가지 관점으로 비교합니다. <strong>총 처리량</strong>을 높이면 큰 배치와 공유 자원으로 GPU당 또는 전력당 처리 토큰 수를 늘릴 수 있지만 개별 사용자가 기다릴 수 있습니다. <strong>개별 지연</strong>을 줄이려 작은 배치와 충분한 여유 자원을 두면 GPU 효율이 낮아질 수 있습니다. 실제 서비스는 요청의 우선순위와 SLO를 보며 둘 사이를 조정합니다. <code>TPS/MW</code>처럼 전력당 성능을 볼 때도 하드웨어와 측정 조건을 함께 적어야 합니다.</p>
+<table>
+<thead>
+<tr>
+<th>상황</th>
+<th>먼저 볼 지표</th>
+<th>이유</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>대화형 채팅</td>
+<td>TTFT, 이어서 TPOT·ITL</td>
+<td>첫 반응과 글이 나타나는 흐름이 보인다.</td>
+</tr>
+<tr>
+<td>긴 스트리밍 답변</td>
+<td>TPOT·ITL, E2EL</td>
+<td>첫 토큰 이후의 생성 시간이 길다.</td>
+</tr>
+<tr>
+<td>여러 단계를 거치는 에이전트</td>
+<td>E2EL</td>
+<td>다음 단계는 대개 이전 결과가 끝나야 시작한다.</td>
+</tr>
+<tr>
+<td>대량 오프라인 처리</td>
+<td>입력·출력 TPS, 비용</td>
+<td>개별 요청의 즉각적인 응답보다 총 처리량이 중요하다.</td>
+</tr>
+<tr>
+<td>지연 목표가 있는 서비스</td>
+<td>Goodput, P95·P99</td>
+<td>많은 요청을 처리하면서 느린 사용자도 줄여야 한다.</td>
+</tr>
+</tbody>
+</table>
+<p>배칭, GPU 자원, 모델 정밀도, 병렬화 방법을 바꾸면 이 지표 중 하나는 좋아지고 다른 하나는 나빠질 수 있습니다. 실험 전 <strong>같은 입력·출력 길이와 동시 요청 수</strong>를 고정하고, 어떤 목표를 지킬지 먼저 적어 두세요.</p>
+<p>조정할 수 있는 수단에는 배치 크기, 데이터·텐서·전문가 병렬화, FP8·FP4 같은 정밀도, prefill과 decode를 다른 작업자로 나누는 방식이 있습니다. 관리형 API에서는 이런 내부 설정을 직접 바꾸기 어렵지만, 자체 서빙에서는 실제 작업 부하에 맞춰 조정하고 그 비용도 직접 감당합니다.</p>
+<h3 id="_5">핵심 정리<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>TTFT는 첫 토큰까지, E2EL은 마지막 토큰까지의 시간을 잽니다.</li>
+<li>TPOT는 첫 토큰 이후의 평균 토큰 간격이며, 출력 토큰이 <span class="arithmatex">\(N\)</span>개면 간격은 <span class="arithmatex">\(N-1\)</span>개입니다.</li>
+<li>RPS는 요청 수, TPS는 토큰 수를 시간으로 나눈 값입니다. 입력·출력 TPS를 구분합니다.</li>
+<li>Goodput은 정한 SLO를 지키며 완료한 요청의 <strong>초당 처리량</strong>입니다.</li>
+<li>평균만 보지 말고 P95·P99와 요청 길이, 동시 요청 수도 함께 확인합니다.</li>
+</ul>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/llm-inference-metrics/">Modular 원문: 추론 성능 지표</a> — 상황별 지표 선택의 원문.</li>
+<li><a href="https://arxiv.org/abs/2401.09670">DistServe 논문</a> — 지연 목표와 처리량의 균형을 다룬 연구.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+        
+          
+          <a href="../how-llm-inference-works/" class="md-footer__link md-footer__link--prev" aria-label="이전: LLM은 어떻게 답을 만드는가">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                LLM은 어떻게 답을 만드는가
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../calculating-gpu-memory-for-llms/" class="md-footer__link md-footer__link--next" aria-label="다음: GPU 메모리 계산">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                GPU 메모리 계산
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <a href="https://tonkex.github.io/">GitHub Pages 홈으로 돌아가기</a> · 원저작 Modular
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/metric-lab-v1.js"></script>
+      
+        <script src="../../javascripts/request-flow-v1.js"></script>
+      
+        <script src="../../javascripts/gpu-memory-lab-v1.js"></script>
+      
+        <script src="../../javascripts/batching-lab-v1.js"></script>
+      
+        <script src="../../javascripts/paged-lab-v1.js"></script>
+      
+    
+  </body>
+</html>

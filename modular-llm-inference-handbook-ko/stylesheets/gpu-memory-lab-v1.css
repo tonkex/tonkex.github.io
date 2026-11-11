@@ -1,0 +1,12 @@
+.gpu-memory-lab { border: 1px solid var(--md-default-fg-color--lightest); border-radius: .6rem; padding: 1rem; margin: 1.2rem 0; }
+.gpu-memory-lab h3 { margin-top: 0; }
+.gpu-memory-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: .8rem; }
+.gpu-memory-inputs label { display: flex; flex-direction: column; gap: .3rem; font-size: .8rem; font-weight: 600; }
+.gpu-memory-inputs input, .gpu-memory-inputs select { width: 100%; padding: .4rem; border: 1px solid var(--md-default-fg-color--lightest); border-radius: .25rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); font: inherit; }
+.gpu-memory-bar { display: flex; height: 1.5rem; margin: .8rem 0; background: var(--md-default-fg-color--lightest); border-radius: .3rem; overflow: hidden; }
+.gpu-memory-bar span { display: block; flex: none; }
+.gpu-memory-bar [data-weight-bar] { background: #4169a8; }
+.gpu-memory-bar [data-kv-bar] { background: #00a68b; }
+.gpu-memory-bar [data-reserve-bar] { background: #e2a236; }
+.gpu-memory-lab [data-memory-error] { color: #a52a2a; }
+.gpu-memory-lab [data-memory-result] { font-weight: 600; }

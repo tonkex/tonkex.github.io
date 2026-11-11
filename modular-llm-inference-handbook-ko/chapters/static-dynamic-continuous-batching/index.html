@@ -1,0 +1,980 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Modular LLM Inference Handbook의 한국어 번역과 쉬운 보충 설명">
+      
+      
+        <meta name="author" content="Modular 원저작 · 한국어 번역 및 해설">
+      
+      
+        <link rel="canonical" href="https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/static-dynamic-continuous-batching/">
+      
+      
+        <link rel="prev" href="../calculating-gpu-memory-for-llms/">
+      
+      
+        <link rel="next" href="../pagedattention/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>배칭 - LLM 추론 핸드북 한국어판</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/metric-lab-v2.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/request-flow-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/gpu-memory-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/batching-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/paged-lab-v1.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-header__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LLM 추론 핸드북 한국어판
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              배칭
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-nav__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LLM 추론 핸드북 한국어판
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    시작하기
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    핵심 장
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    핵심 장
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../what-is-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 추론이란 무엇인가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-llm-inference-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM은 어떻게 답을 만드는가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-inference-metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 성능 지표
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calculating-gpu-memory-for-llms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU 메모리 계산
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배칭
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배칭
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        정적 배칭: 정해진 수가 모일 때까지 기다리기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        동적 배칭: 인원 제한과 출발 시각 함께 두기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        연속 배칭: 끝난 요청의 자리를 다시 쓰기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        긴 입력이 끼어들면: 청크 단위 prefill
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        길이가 다른 입력은 어떻게 한 묶음에 넣을까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="길이가 다른 입력은 어떻게 한 묶음에 넣을까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pagedattention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PagedAttention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    용어집
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../attribution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    원문과 저작자 표시
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        정적 배칭: 정해진 수가 모일 때까지 기다리기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        동적 배칭: 인원 제한과 출발 시각 함께 두기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        연속 배칭: 끝난 요청의 자리를 다시 쓰기
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        긴 입력이 끼어들면: 청크 단위 prefill
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        길이가 다른 입력은 어떻게 한 묶음에 넣을까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="길이가 다른 입력은 어떻게 한 묶음에 넣을까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="_1">요청을 묶으면 왜 더 빨리 처리할 수 있을까?<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>서버에 질문이 세 개 들어왔습니다. 하나씩 순서대로 처리할까요, 잠시 모아 함께 처리할까요? <strong>배칭(batching)</strong>은 여러 요청을 GPU의 한 번의 작업 묶음에 넣는 방법입니다. 모델 가중치를 읽는 비용을 여러 요청이 나눌 수 있지만, 묶음을 기다리는 시간이나 짧은 요청의 완료 시점도 달라집니다.</p>
+<p>이 장은 Modular의 <a href="https://handbook.modular.com/inference-optimization/static-dynamic-continuous-batching/">정적·동적·연속 배칭 원문</a>을 번역·재구성했습니다. <a href="https://github.com/modular/llm-inference-handbook/blob/07e93d6948c508b34bc7154a1400e025b0033ca3/docs/inference-optimization/static-dynamic-continuous-batching.md">기준 원고</a>는 커밋 <code>07e93d6</code>입니다. 예시와 주의점 중 별도 설명은 <code>한국어판 보충 설명</code>으로 표시합니다.</p>
+<h2 id="_2">정적 배칭: 정해진 수가 모일 때까지 기다리기<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p><strong>정적 배칭</strong>은 요청이 정해진 수만큼 모이면 한 묶음으로 시작합니다. 크기가 3이라면 첫 요청은 세 번째 요청이 올 때까지 기다립니다. 트래픽이 드문 시간에는 그 대기가 길어질 수 있습니다.</p>
+<p>한 묶음 안에서도 답변 길이는 다릅니다. 요청 A가 2토큰, B가 6토큰을 만들면 A는 일찍 끝나도 묶음 전체가 B의 여섯 번째 토큰까지 유지될 수 있습니다. 원문이 지적하는 문제는 <strong>시작 전 대기</strong>와 <strong>긴 요청 때문에 묶음이 오래 유지되는 현상</strong>입니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 구현마다 반환 시점은 다릅니다</p>
+<p>정적 배칭을 쓴다는 사실만으로 짧은 요청의 결과를 무조건 마지막 요청과 동시에 반환한다고 단정할 수는 없습니다. 여기서는 원문이 비교하는 단순한 고정 묶음 모델을 설명합니다. 실제 엔진의 스트리밍·완료 처리 방식은 따로 확인하세요.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/inference-optimization/static-dynamic-continuous-batching/">Modular 원문: 정적·동적·연속 배칭</a> — 세 방식의 기준 설명과 시뮬레이터.</li>
+<li><a href="https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/batcher.html">NVIDIA Triton 동적 배처 문서</a> — 배치 크기와 대기 시간 설정 사례.</li>
+</ul>
+<h2 id="_3">동적 배칭: 인원 제한과 출발 시각 함께 두기<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p><strong>동적 배칭</strong>은 최대 크기와 짧은 대기 창을 함께 둡니다. 묶음이 가득 차면 즉시 시작하고, 가득 차지 않아도 정해진 시간이 지나면 모인 요청으로 시작합니다. 버스가 정원에 차거나 출발 시각이 되면 떠나는 모습과 비슷합니다.</p>
+<p>요청이 드문 시간에도 끝없이 기다리지 않는다는 장점이 있습니다. 대기 창을 길게 잡으면 GPU 작업을 더 많이 묶을 기회가 생기지만 첫 응답은 늦어질 수 있습니다. 너무 짧으면 배치를 거의 만들지 못합니다. 동적 배칭도 <strong>묶음을 언제 만들지</strong>에 관한 방식이므로, 생성 도중 빈 자리에 새 요청을 넣는 연속 배칭과는 다릅니다.</p>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/inference-optimization/static-dynamic-continuous-batching/#dynamic-batching">Modular 원문: 동적 배칭</a> — 대기 창과 묶음 크기의 관계.</li>
+<li><a href="https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/user_guide/batcher.html">NVIDIA Triton 동적 배처 문서</a> — 동적 배처의 설정 개념.</li>
+</ul>
+<h2 id="_4">연속 배칭: 끝난 요청의 자리를 다시 쓰기<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>LLM은 출력 토큰을 하나씩 생성합니다. <strong>연속 배칭(continuous batching)</strong>은 토큰 생성 반복마다 실행 중인 요청을 살피고, 끝난 요청의 자리에 대기 중인 새 요청을 넣습니다. 원문에서는 이를 <strong>in-flight batching</strong>이라고도 부릅니다.</p>
+<p>예를 들어 GPU가 요청 두 개를 함께 처리하고 A가 먼저 끝났다면, B가 계속 생성하는 동안 C가 다음 반복부터 합류할 수 있습니다. GPU는 B가 모두 끝날 때까지 C를 기다리게 할 필요가 없습니다. 다만 새 요청의 입력을 처리할 메모리와 연산 예산이 있어야 하며, 실제 스케줄러는 우선순위와 토큰 예산도 고려합니다.</p>
+<div class="batching-lab" data-batching-lab>
+  <h3>요청 자리 바뀌는 모습</h3>
+  <p>동시에 실행할 수 있는 자리는 2개, A와 B가 먼저 도착하고 C는 기다린다고 가정합니다. 버튼을 눌러 출력 토큰 생성 단계를 진행하세요.</p>
+  <div class="batching-controls"><button type="button" data-batch-mode="fixed" aria-pressed="true">고정 묶음</button><button type="button" data-batch-mode="continuous" aria-pressed="false">연속 배칭</button><button type="button" data-batch-next>다음 단계</button><button type="button" data-batch-reset>처음부터</button></div>
+  <p data-batch-stage aria-live="polite"></p>
+  <div class="batching-slots" data-batch-slots aria-hidden="true"></div>
+  <p data-batch-explanation aria-live="polite"></p>
+</div>
+
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 단순화된 도해</p>
+<p>위 도해는 A가 두 단계, B가 네 단계, C가 두 단계 걸린다는 <strong>학습용 시나리오</strong>입니다. 실제 엔진에서는 prefill과 decode의 비용이 다르고, 요청의 길이와 메모리 상태도 수시로 달라집니다. 이 그림은 완료한 요청의 자리를 언제 다시 쓰는지만 보여 줍니다.</p>
+</div>
+<p>연속 배칭이 처리량을 높일 가능성은 크지만, 동시 요청을 무조건 많이 넣으면 각 요청의 토큰 간격(ITL)이 늘 수 있습니다. 배치 방식의 평가는 <a href="../llm-inference-metrics/">지연 시간과 Goodput</a>을 함께 봐야 합니다.</p>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/inference-optimization/static-dynamic-continuous-batching/#continuous-batching">Modular 원문: 연속 배칭</a> — 반복 단계별 스케줄링의 원리.</li>
+<li><a href="https://arxiv.org/abs/2309.06180">vLLM PagedAttention 논문</a> — 동시 요청과 KV 캐시 관리의 관계.</li>
+</ul>
+<h2 id="prefill">긴 입력이 끼어들면: 청크 단위 prefill<a class="headerlink" href="#prefill" title="Permanent link">&para;</a></h2>
+<p>새 요청의 긴 입력을 처리하는 <strong>prefill</strong>은 한 번에 많은 계산을 합니다. 그동안 이미 답을 출력 중인 요청의 <strong>decode</strong>가 멈추면 사용자는 글자가 한동안 나오지 않는다고 느낄 수 있습니다.</p>
+<p><strong>청크 단위 prefill(chunked prefill)</strong>은 긴 입력을 여러 토큰 묶음으로 나눕니다. 스케줄러는 일부 입력 청크와 기존 요청의 다음 토큰 생성을 번갈아 또는 함께 배치할 수 있습니다. 앞부분의 KV 캐시를 이어 쓰므로 각 입력 토큰은 이전 토큰 정보를 계속 참조합니다. 첫 출력 토큰은 마지막 입력 청크까지 처리한 뒤에 나옵니다.</p>
+<p>청크가 작으면 기존 요청의 decode를 끼워 넣을 기회가 늘지만, 새 요청의 첫 토큰까지 시간이 늘거나 오버헤드가 커질 수 있습니다. 청크가 크면 새 요청의 입력을 효율적으로 처리할 수 있지만 기존 스트리밍 요청이 더 오래 기다릴 수 있습니다. 모델, GPU, 입력 길이 분포, SLO에 맞춰 값을 정해야 합니다.</p>
+<p>원문은 엔진마다 청크 크기를 표현하는 설정이 다르다는 점도 보여 줍니다. 아래는 <strong>기준 원문 시점의 명령 예</strong>이며, 실제 실행 전에는 설치한 버전의 도움말과 모델 사용 조건을 확인해야 합니다.</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># MAX: 배치의 입력 토큰 예산과 최소 청크 크기</span>
+max<span class="w"> </span>serve<span class="w"> </span>--model<span class="w"> </span>meta-llama/Llama-3.1-8B-Instruct<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-chunked-prefill<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--max-batch-input-tokens<span class="w"> </span><span class="m">8192</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--chunked-prefill-min-chunk-size<span class="w"> </span><span class="m">512</span>
+
+<span class="c1"># vLLM: 한 스케줄링 반복의 토큰 예산</span>
+vllm<span class="w"> </span>serve<span class="w"> </span>--model<span class="w"> </span>meta-llama/Llama-3.1-8B-Instruct<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--enable-chunked-prefill<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--max-num-batched-tokens<span class="w"> </span><span class="m">8192</span>
+
+<span class="c1"># SGLang: 한 prefill 청크의 최대 토큰 수</span>
+sglang<span class="w"> </span>serve<span class="w"> </span>--model-path<span class="w"> </span>meta-llama/Llama-3.1-8B-Instruct<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--chunked-prefill-size<span class="w"> </span><span class="m">8192</span>
+</code></pre></div>
+<p>같은 <code>8192</code>라도 <strong>배치 전체의 토큰 예산</strong>인지 <strong>개별 청크의 상한</strong>인지 다릅니다. 옵션 이름을 숫자만 보고 옮기지 마세요.</p>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/inference-optimization/static-dynamic-continuous-batching/#chunked-prefill">Modular 원문: 청크 단위 prefill</a> — 청크 크기의 장단점과 엔진별 설정 예.</li>
+<li><a href="https://arxiv.org/abs/2308.16369">SARATHI 논문</a> — prefill 청크와 decode를 함께 배치하는 연구.</li>
+</ul>
+<h2 id="_5">길이가 다른 입력은 어떻게 한 묶음에 넣을까?<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
+<p>입력 길이가 <code>[1024, 1000, 50, 20]</code>토큰이라면 모두 1024칸짜리 사각형으로 맞추는 <strong>패딩(padding)</strong>이 간단합니다. 빈 칸은 attention mask로 가리지만, 구현에 따라 불필요한 계산이나 메모리 사용이 생길 수 있습니다.</p>
+<p><strong>Ragged tensor</strong>는 실제 토큰들을 붙여 저장하고 각 요청의 길이·시작 위치를 별도 메타데이터로 기록하는 방식입니다. 패딩을 줄일 수 있지만 커널과 스케줄러가 가변 길이를 다룰 수 있어야 합니다. <a href="../pagedattention/">PagedAttention</a>은 KV 캐시를 블록 단위로 관리하여 이런 길이 차이가 큰 요청을 함께 처리하는 데 도움을 줍니다.</p>
+<p>원문의 FAQ에서 등장하는 <code>PAD</code>, <code>&lt;pad&gt;</code>, 또는 정수 <code>0</code> 같은 표기는 <strong>토크나이저마다 다릅니다</strong>. 실제 0번 토큰이 항상 패딩이라는 뜻은 아닙니다. 패딩을 넣은 위치는 attention mask 등으로 알려 주어 모델이 유효한 입력과 구별하도록 합니다.</p>
+<h3 id="_6">핵심 정리<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h3>
+<ul>
+<li>배칭은 여러 요청이 모델 가중치 읽기 비용을 나눠 쓰게 합니다.</li>
+<li>정적 배칭은 정해진 수를 기다리고, 동적 배칭은 크기 또는 대기 시간으로 출발합니다.</li>
+<li>연속 배칭은 토큰 생성 중 끝난 요청의 자리를 새 요청에 넘깁니다.</li>
+<li>청크 단위 prefill은 긴 입력이 기존 출력 흐름을 오래 막지 않도록 돕습니다.</li>
+<li>처리량만 보지 말고 TTFT, ITL, Goodput을 함께 비교합니다.</li>
+</ul>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/inference-optimization/static-dynamic-continuous-batching/#faqs">Modular 원문: 배칭 FAQ</a> — 패딩과 ragged tensor 설명.</li>
+<li><a href="https://handbook.modular.com/inference-optimization/pagedattention/">Modular 원문: PagedAttention</a> — 가변 길이 요청의 KV 캐시 블록 관리.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+        
+          
+          <a href="../calculating-gpu-memory-for-llms/" class="md-footer__link md-footer__link--prev" aria-label="이전: GPU 메모리 계산">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                GPU 메모리 계산
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../pagedattention/" class="md-footer__link md-footer__link--next" aria-label="다음: PagedAttention">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                PagedAttention
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <a href="https://tonkex.github.io/">GitHub Pages 홈으로 돌아가기</a> · 원저작 Modular
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/metric-lab-v1.js"></script>
+      
+        <script src="../../javascripts/request-flow-v1.js"></script>
+      
+        <script src="../../javascripts/gpu-memory-lab-v1.js"></script>
+      
+        <script src="../../javascripts/batching-lab-v1.js"></script>
+      
+        <script src="../../javascripts/paged-lab-v1.js"></script>
+      
+    
+  </body>
+</html>

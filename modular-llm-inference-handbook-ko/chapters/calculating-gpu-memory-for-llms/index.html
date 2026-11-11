@@ -1,0 +1,982 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Modular LLM Inference Handbook의 한국어 번역과 쉬운 보충 설명">
+      
+      
+        <meta name="author" content="Modular 원저작 · 한국어 번역 및 해설">
+      
+      
+        <link rel="canonical" href="https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/calculating-gpu-memory-for-llms/">
+      
+      
+        <link rel="prev" href="../llm-inference-metrics/">
+      
+      
+        <link rel="next" href="../static-dynamic-continuous-batching/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>GPU 메모리 계산 - LLM 추론 핸드북 한국어판</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/metric-lab-v2.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/request-flow-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/gpu-memory-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/batching-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/paged-lab-v1.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#llm-gpu" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-header__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LLM 추론 핸드북 한국어판
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              GPU 메모리 계산
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-nav__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LLM 추론 핸드북 한국어판
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    시작하기
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    핵심 장
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    핵심 장
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../what-is-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 추론이란 무엇인가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-llm-inference-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM은 어떻게 답을 만드는가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-inference-metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 성능 지표
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU 메모리 계산
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU 메모리 계산
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        가중치는 얼마나 차지할까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        실행 중 메모리는 왜 더 필요할까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        직접 계산해 보기: 어떤 값이 한계를 바꿀까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        메모리가 부족하면 무엇을 조정할까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="메모리가 부족하면 무엇을 조정할까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../static-dynamic-continuous-batching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배칭
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pagedattention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PagedAttention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    용어집
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../attribution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    원문과 저작자 표시
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        가중치는 얼마나 차지할까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        실행 중 메모리는 왜 더 필요할까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        직접 계산해 보기: 어떤 값이 한계를 바꿀까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        메모리가 부족하면 무엇을 조정할까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="메모리가 부족하면 무엇을 조정할까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="llm-gpu">LLM 서빙에 필요한 GPU 메모리는 어떻게 계산할까?<a class="headerlink" href="#llm-gpu" title="Permanent link">&para;</a></h1>
+<p>7B 모델의 가중치가 14 GB라면 16 GB GPU에서 서비스를 운영할 수 있을까요? 모델을 한 번 불러오는 것과 여러 사용자의 긴 요청을 안정적으로 처리하는 것은 다릅니다. 이 장에서는 GPU 메모리(VRAM)를 <strong>가중치</strong>, <strong>KV 캐시</strong>, <strong>실행 여유분</strong>으로 나눠 예산을 세웁니다.</p>
+<p>이 장은 Modular의 <a href="https://handbook.modular.com/getting-started/calculating-gpu-memory-for-llms/">GPU 메모리 계산 원문</a>을 번역·재구성했습니다. <a href="https://github.com/modular/llm-inference-handbook/blob/07e93d6948c508b34bc7154a1400e025b0033ca3/docs/getting-started/calculating-gpu-memory-for-llms.md">기준 원고</a>는 커밋 <code>07e93d6</code>입니다. 별도로 더한 계산법은 <code>한국어판 보충 설명</code>으로 표시합니다.</p>
+<h2 id="_1">가중치는 얼마나 차지할까?<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><strong>매개변수(parameter)</strong>는 모델이 학습한 숫자입니다. 8B 모델은 대략 80억 개의 매개변수를 가집니다. 숫자 하나를 16비트로 저장하면 2바이트, 8비트로 저장하면 1바이트가 필요합니다. 따라서 가장 단순한 추정은 다음과 같습니다.</p>
+<div class="arithmatex">\[\text{가중치 바이트} \approx \text{매개변수 수}\times\frac{\text{가중치 비트 수}}{8}\]</div>
+<p>예를 들어 7B 모델의 FP16 가중치는 약 <strong>14 GB</strong>입니다. 여기서 GB는 <span class="arithmatex">\(10^9\)</span>바이트이고, 운영체제와 GPU 도구에서 흔히 쓰는 GiB는 <span class="arithmatex">\(2^{30}\)</span>바이트입니다. 같은 14 GB는 약 <strong>13.0 GiB</strong>입니다. 단위를 섞으면 작은 GPU에서 용량 판단이 달라집니다.</p>
+<p>정밀도를 낮추는 <strong>양자화</strong>는 가중치 용량을 줄일 수 있습니다. 하지만 실제 파일에는 스케일, 제로 포인트 같은 보조 정보가 붙고, 연산용 버퍼가 추가될 수 있습니다. 4비트라고 해서 실제 서빙 메모리가 FP16의 정확히 4분의 1이라고 가정하면 안 됩니다. 지원하는 데이터 형식과 커널도 GPU·서빙 엔진에 따라 다릅니다.</p>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/getting-started/calculating-gpu-memory-for-llms/">Modular 원문: GPU 메모리 계산</a> — 모델 크기와 정밀도의 기본 관계.</li>
+<li><a href="https://handbook.modular.com/model-preparation/llm-quantization/">Modular 원문: LLM 양자화</a> — 가중치 정밀도를 낮출 때의 고려 사항.</li>
+</ul>
+<h2 id="_2">실행 중 메모리는 왜 더 필요할까?<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>모델은 답을 만들면서 이전 토큰의 attention 정보를 <strong>KV 캐시</strong>에 저장합니다. 이는 다음 토큰을 만들 때 이전 내용을 매번 다시 계산하지 않도록 돕습니다. 입력이 길고 동시에 실행 중인 요청이 많을수록 캐시는 커집니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: KV 캐시의 상한 추정</p>
+<p>한 요청이 길이 <span class="arithmatex">\(T\)</span>인 시퀀스를 처리한다고 가정하면, 보통의 자기회귀 Transformer에서 KV 캐시의 대략적인 크기는 다음과 같습니다. <span class="arithmatex">\(L\)</span>은 층 수, <span class="arithmatex">\(H_{kv}\)</span>는 KV 헤드 수, <span class="arithmatex">\(D\)</span>는 헤드 차원, <span class="arithmatex">\(B\)</span>는 KV 원소의 바이트 수입니다.</p>
+<div class="arithmatex">\[\text{KV 캐시 바이트} \approx 2\times L\times H_{kv}\times D\times T\times B\]</div>
+<p>앞의 2는 Key와 Value를 각각 저장하기 때문입니다. 동시 요청이 <span class="arithmatex">\(C\)</span>개이고 길이가 모두 같다면 결과에 <span class="arithmatex">\(C\)</span>를 곱합니다. 실제 길이가 다르면 요청별 길이의 합을 쓰는 편이 낫습니다. 모델 구조, KV 양자화, 캐시 공유·블록 할당에 따라 실제 점유량은 달라집니다.</p>
+</div>
+<p>이 밖에 임시 활성값, 연산 작업 공간, 프레임워크 할당량, CUDA graph 등이 메모리를 씁니다. 원문의 <code>가중치 × (1 + 오버헤드 비율)</code>은 빠른 초기 추정에는 편하지만, 긴 문맥과 많은 동시 요청을 평가할 때는 KV 캐시를 별도로 계산하는 편이 안전합니다.</p>
+<p>원문의 간편식은 매개변수 수를 십억 개 단위로 <span class="arithmatex">\(P\)</span>, 가중치 비트 수를 <span class="arithmatex">\(Q\)</span>, 추가 메모리 비율을 <span class="arithmatex">\(O\)</span>라고 둘 때 다음과 같습니다. 결과의 단위는 대략 <strong>GB</strong>입니다. <span class="arithmatex">\(O\)</span>는 고정된 자연 상수가 아니라 요청 길이·동시성에 따라 바뀌는 가정값입니다.</p>
+<div class="arithmatex">\[\text{서빙 메모리(GB)}\approx P\times\frac{Q}{8}\times(1+O)\]</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/getting-started/calculating-gpu-memory-for-llms/">Modular 원문: GPU 메모리 계산</a> — 가중치 외 메모리와 간단한 오버헤드 추정.</li>
+<li><a href="https://handbook.modular.com/inference-optimization/kv-cache-offloading/">Modular 원문: KV 캐시 오프로딩</a> — KV 캐시 크기와 메모리 계층.</li>
+</ul>
+<h2 id="_3">직접 계산해 보기: 어떤 값이 한계를 바꿀까?<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>아래 계산기는 <strong>단일 GPU에서 모델 전체와 각 요청의 KV 캐시를 함께 보관</strong>하는 단순한 상황을 가정합니다. 입력한 문맥 길이는 각 동시 요청이 사용할 수 있는 길이의 상한으로 취급하므로, 결과는 실제 평균 점유량보다 높을 수 있습니다. 반대로 실행 여유분을 작게 넣으면 실제 필요량보다 낮게 나옵니다.</p>
+<div class="gpu-memory-lab" data-gpu-memory-lab>
+  <h3>GPU 메모리 예산 계산기</h3>
+  <div class="gpu-memory-inputs">
+    <label>매개변수 수 (십억 개)<input type="number" min="0.1" step="0.1" value="8" data-parameters></label>
+    <label>가중치 정밀도 (비트)<select data-weight-bits><option value="16">16 (FP16/BF16)</option><option value="8">8</option><option value="4">4</option></select></label>
+    <label>Transformer 층 수<input type="number" min="1" step="1" value="32" data-layers></label>
+    <label>KV 헤드 수<input type="number" min="1" step="1" value="8" data-kv-heads></label>
+    <label>헤드 차원<input type="number" min="1" step="1" value="128" data-head-dim></label>
+    <label>요청당 최대 토큰 수<input type="number" min="1" step="256" value="8192" data-context></label>
+    <label>동시 요청 수<input type="number" min="1" step="1" value="1" data-concurrency></label>
+    <label>KV 정밀도 (비트)<select data-kv-bits><option value="16">16</option><option value="8">8</option></select></label>
+    <label>실행 여유분 (GiB)<input type="number" min="0" step="0.5" value="3" data-reserve></label>
+    <label>GPU 용량 (GiB)<input type="number" min="1" step="1" value="24" data-capacity></label>
+  </div>
+  <p data-memory-error role="alert"></p>
+  <div class="gpu-memory-bar" aria-hidden="true"><span data-weight-bar></span><span data-kv-bar></span><span data-reserve-bar></span></div>
+  <p data-memory-result aria-live="polite"></p>
+</div>
+
+<p>예를 들어 기본값인 8B·16비트 가중치·32층·KV 헤드 8개·8,192토큰·동시 요청 1개에서는 가중치가 약 <strong>14.9 GiB</strong>, KV 캐시가 <strong>1.0 GiB</strong>, 여유분 3 GiB를 포함한 합계가 약 <strong>18.9 GiB</strong>입니다. 동시 요청을 8개로 바꾸면 KV 캐시만 8 GiB로 늘어납니다. 가중치는 그대로여도 용량이 부족해질 수 있습니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 계산기 결과의 한계</p>
+<p>이 계산기는 가중치 보조 데이터, 메모리 단편화, CUDA graph, 연산 중 피크 메모리, 모델 병렬화, 일부 층만 활성화하는 MoE 구조를 정확히 모델링하지 않습니다. GPU 용량과 비교한 결과는 <strong>배포 가능 판정이 아닌 1차 예산</strong>입니다. 선택한 모델·서빙 엔진·실제 요청 길이로 부하 시험을 하세요.</p>
+</div>
+<p>원문은 정밀도 형식이 GPU마다 다르게 지원된다고도 강조합니다. 예를 들어 어떤 GPU에서 FP8 형식을 <strong>저장</strong>할 수 있다는 것과 해당 형식의 연산을 <strong>하드웨어로 가속</strong>할 수 있다는 것은 다릅니다. 모델 파일의 형식, 엔진의 커널, GPU 세대를 함께 확인해야 합니다.</p>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/getting-started/calculating-gpu-memory-for-llms/">Modular 원문: GPU 메모리 계산기</a> — 원문의 간단한 계산기와 주의점.</li>
+<li><a href="https://arxiv.org/abs/2309.06180">vLLM PagedAttention 논문</a> — 가변 길이 요청에서 KV 캐시 할당이 중요한 이유.</li>
+</ul>
+<h2 id="_4">메모리가 부족하면 무엇을 조정할까?<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>먼저 실제로 부족한 부분을 확인하세요. 가중치가 큰 경우에는 모델 크기나 정밀도를 바꾸거나 모델을 여러 GPU에 나눠야 합니다. KV 캐시가 큰 경우에는 최대 문맥 길이, 동시 요청 수, KV 정밀도, 캐시 관리 방식을 검토합니다. 여유분이 부족하면 같은 모델이 로딩되더라도 피크 부하에서 메모리 부족 오류가 날 수 있습니다.</p>
+<table>
+<thead>
+<tr>
+<th>바꾸는 값</th>
+<th>주로 줄어드는 메모리</th>
+<th>함께 확인할 점</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>더 작은 모델</td>
+<td>가중치, 대개 KV 캐시</td>
+<td>작업 품질과 필요한 문맥 길이</td>
+</tr>
+<tr>
+<td>가중치 양자화</td>
+<td>가중치</td>
+<td>품질, 커널 지원, 추가 보조 데이터</td>
+</tr>
+<tr>
+<td>최대 문맥 길이 축소</td>
+<td>요청별 KV 캐시 상한</td>
+<td>긴 문서와 대화의 처리 가능 여부</td>
+</tr>
+<tr>
+<td>동시 요청 제한</td>
+<td>KV 캐시 총량</td>
+<td>대기 시간과 처리량</td>
+</tr>
+<tr>
+<td>KV 캐시 양자화·블록 관리</td>
+<td>KV 캐시</td>
+<td>지원 여부, 품질·속도 영향</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_5">핵심 정리<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>가중치 크기는 매개변수 수와 저장 정밀도로 먼저 추정합니다.</li>
+<li>GB와 GiB는 다른 단위입니다. GPU 용량과 같은 단위로 비교합니다.</li>
+<li>KV 캐시는 길이와 동시 요청 수에 따라 커집니다.</li>
+<li>실행 여유분까지 합쳐야 서빙 메모리의 1차 예산이 됩니다.</li>
+<li>계산기로 후보를 좁힌 뒤 실제 트래픽과 엔진으로 검증합니다.</li>
+</ul>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/getting-started/calculating-gpu-memory-for-llms/">Modular 원문: GPU 메모리 계산</a> — 메모리 예산의 출발점.</li>
+<li><a href="https://handbook.modular.com/inference-optimization/pagedattention/">Modular 원문: PagedAttention</a> — KV 캐시 블록 관리.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+        
+          
+          <a href="../llm-inference-metrics/" class="md-footer__link md-footer__link--prev" aria-label="이전: 추론 성능 지표">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                추론 성능 지표
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../static-dynamic-continuous-batching/" class="md-footer__link md-footer__link--next" aria-label="다음: 배칭">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                배칭
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <a href="https://tonkex.github.io/">GitHub Pages 홈으로 돌아가기</a> · 원저작 Modular
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/metric-lab-v1.js"></script>
+      
+        <script src="../../javascripts/request-flow-v1.js"></script>
+      
+        <script src="../../javascripts/gpu-memory-lab-v1.js"></script>
+      
+        <script src="../../javascripts/batching-lab-v1.js"></script>
+      
+        <script src="../../javascripts/paged-lab-v1.js"></script>
+      
+    
+  </body>
+</html>

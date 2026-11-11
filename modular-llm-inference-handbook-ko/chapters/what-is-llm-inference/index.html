@@ -1,0 +1,986 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Modular LLM Inference Handbook의 한국어 번역과 쉬운 보충 설명">
+      
+      
+        <meta name="author" content="Modular 원저작 · 한국어 번역 및 해설">
+      
+      
+        <link rel="canonical" href="https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/what-is-llm-inference/">
+      
+      
+        <link rel="prev" href="../..">
+      
+      
+        <link rel="next" href="../how-llm-inference-works/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>LLM 추론이란 무엇인가 - LLM 추론 핸드북 한국어판</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/metric-lab-v2.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/request-flow-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/gpu-memory-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/batching-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/paged-lab-v1.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#llm-api" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-header__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LLM 추론 핸드북 한국어판
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              LLM 추론이란 무엇인가
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-nav__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LLM 추론 핸드북 한국어판
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    시작하기
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    핵심 장
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    핵심 장
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 추론이란 무엇인가
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 추론이란 무엇인가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        추론 서버는 무엇을 하는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        추론과 서빙은 어떻게 다른가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        추론 최적화는 무엇을 바꾸는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API만 사용해도 왜 알아야 할까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API만 사용해도 왜 알아야 할까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../how-llm-inference-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM은 어떻게 답을 만드는가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-inference-metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 성능 지표
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calculating-gpu-memory-for-llms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU 메모리 계산
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../static-dynamic-continuous-batching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배칭
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pagedattention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PagedAttention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    용어집
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../attribution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    원문과 저작자 표시
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        추론 서버는 무엇을 하는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        추론과 서빙은 어떻게 다른가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        추론 최적화는 무엇을 바꾸는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API만 사용해도 왜 알아야 할까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API만 사용해도 왜 알아야 할까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="llm-api">LLM 추론이란 무엇인가: API 뒤에서는 무슨 일이 일어날까?<a class="headerlink" href="#llm-api" title="Permanent link">&para;</a></h1>
+<p>애플리케이션에서 모델 API에 질문을 보내면 잠시 뒤 답이 돌아옵니다. 이 사이에 모델이 입력을 읽고 다음 토큰을 계산하는 과정이 <strong>추론(inference)</strong>입니다. 사용자가 보낸 요청을 받아 모델에 전달하고, 여러 요청이 몰려도 응답을 돌려주는 일까지 합치면 <strong>서빙(serving)</strong>이라고 부릅니다.</p>
+<p>이 장은 Modular의 <a href="https://handbook.modular.com/llm-inference-basics/what-is-llm-inference/">What is LLM inference?</a>를 번역·재구성했습니다. 기준 원문은 <a href="https://github.com/modular/llm-inference-handbook/blob/07e93d6948c508b34bc7154a1400e025b0033ca3/docs/llm-inference-basics/what-is-llm-inference.md">저장소 커밋 <code>07e93d6</code></a>입니다. 별도로 더한 내용은 <code>한국어판 보충 설명</code>으로 표시합니다.</p>
+<p>추론은 고객 지원 챗봇의 답변, 긴 글의 요약과 문장 교정, 자연어 설명을 바탕으로 한 코드 생성, 여러 단계를 수행하는 AI 에이전트 등에서 쓰입니다. 응용 분야는 달라도 <strong>이미 학습된 모델에 입력을 넣고 출력을 계산한다</strong>는 점은 같습니다.</p>
+<p>아래 단계에서 하나를 선택하면 요청의 어느 부분이 추론이고 어느 부분이 서빙인지 볼 수 있습니다. 이 대화형 도해는 한국어판에서 새로 제작했습니다.</p>
+<div class="request-flow" data-request-flow>
+  <h3>한 요청의 이동 경로</h3>
+  <div class="request-flow-steps" role="group" aria-label="요청 처리 단계">
+    <button type="button" data-flow-step="0" aria-pressed="true">1. 요청 접수</button>
+    <button type="button" data-flow-step="1" aria-pressed="false">2. 입력 준비</button>
+    <button type="button" data-flow-step="2" aria-pressed="false">3. Prefill</button>
+    <button type="button" data-flow-step="3" aria-pressed="false">4. Decode</button>
+    <button type="button" data-flow-step="4" aria-pressed="false">5. 응답 전달</button>
+  </div>
+  <p data-flow-description aria-live="polite">서버가 사용자 요청을 받아 대기열에 넣습니다. 이 단계는 서빙에 속합니다.</p>
+  <p class="request-flow-kind" data-flow-kind>서빙 단계</p>
+</div>
+
+<h2 id="_1">추론 서버는 무엇을 하는가?<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><strong>추론 서버</strong>는 모델을 메모리에 올리고, 애플리케이션 요청을 받아, 계산 결과를 응답으로 돌려주는 프로그램입니다. 모델만 실행하는 Python 스크립트와 달리 여러 사용자가 동시에 들어오는 상황도 다룹니다.</p>
+<p>서버에는 보통 다음 기능이 필요합니다.</p>
+<ul>
+<li><strong>요청 대기열</strong>: 한꺼번에 들어온 요청의 실행 순서를 관리합니다.</li>
+<li><strong>배칭</strong>: 여러 요청을 함께 계산해 GPU를 효율적으로 사용합니다.</li>
+<li><strong>스트리밍</strong>: 답 전체를 기다리지 않고 생성된 토큰부터 보냅니다.</li>
+<li><strong>확장과 관측</strong>: 요청이 늘 때 서버를 늘리고, 지연·오류·자원 사용을 측정합니다.</li>
+</ul>
+<p>원문은 <em>추론 서버</em>와 <em>추론 프레임워크</em>라는 말을 실무에서 혼용하기도 한다고 설명합니다. 서버는 실행 중인 요청 처리 프로그램을, 프레임워크는 그 서버를 만들고 최적화하는 도구와 기능까지 가리킬 때가 많습니다. vLLM, SGLang, MAX, TensorRT-LLM처럼 두 역할을 함께 제공하는 도구도 있습니다.</p>
+<p>규모가 커지면 서버를 여러 복제본으로 늘리거나 줄이는 <strong>확장</strong>, 어느 복제본으로 요청을 보낼지 정하는 <strong>부하 분산</strong>, 모델 버전 교체와 상태 확인도 서빙의 일부가 됩니다. 한 요청의 GPU 계산만 빨라져도 대기열이나 네트워크가 막히면 사용자의 응답은 늦을 수 있습니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 모델과 서버는 별개</p>
+<p>모델 파일을 다운로드했다고 해서 서비스가 준비된 것은 아닙니다. 모델의 가중치와 토크나이저를 읽고, GPU 메모리를 확보하고, 요청 형식을 해석하고, 동시 요청을 조정하는 실행 환경이 필요합니다. 소규모 실험에서는 이 일을 한 프로세스가 맡을 수 있지만, 사용자가 늘면 요청 관리와 계산을 나누어 생각하는 편이 문제를 찾기 쉽습니다.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/what-is-llm-inference/">Modular 원문: LLM 추론이란?</a> — 추론 서버의 역할과 용어.</li>
+<li><a href="https://docs.vllm.ai/en/latest/serving/online_serving/openai_compatible_server/">vLLM 공식 서빙 안내</a> — 실제 추론 서버가 제공하는 API의 예.</li>
+</ul>
+<h2 id="_2">추론과 서빙은 어떻게 다른가?<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p><strong>추론</strong>은 모델이 입력에서 출력을 계산하는 과정입니다. 학습된 가중치를 사용해 다음 토큰의 점수를 만들고, 토큰을 하나 고른 뒤 그 토큰을 다시 입력에 더해 계산을 반복합니다. 이 계산은 노트북이나 단일 Python 프로그램 안에서도 할 수 있습니다.</p>
+<p><strong>서빙</strong>은 그 계산을 사용자와 애플리케이션이 안정적으로 이용하게 하는 과정입니다. HTTP API, 요청 대기열, 배칭, 모델 로딩, 상태 확인, 로깅, 부하 분산 등이 여기에 들어갑니다.</p>
+<table>
+<thead>
+<tr>
+<th>질문</th>
+<th>추론에서 보는 것</th>
+<th>서빙에서 보는 것</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>무엇을 수행하는가?</td>
+<td>입력 토큰으로 다음 출력 토큰을 계산한다.</td>
+<td>요청을 받고, 계산을 배치하고, 결과를 전달한다.</td>
+</tr>
+<tr>
+<td>성능 문제는?</td>
+<td>모델 계산, 메모리 읽기, KV cache 사용</td>
+<td>대기열, 동시 요청, 라우팅, 네트워크</td>
+</tr>
+<tr>
+<td>단독 실행이 가능한가?</td>
+<td>가능하다.</td>
+<td>사용자에게 제공할 실행 경로가 필요하다.</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 경계가 겹치는 이유</p>
+<p>실제 제품에서는 한 프로세스가 API를 받고 GPU 계산도 수행할 수 있습니다. 그래서 도구 이름만 보고 둘을 구분하기 어렵습니다. 느린 요청을 분석할 때는 <strong>대기열에서 보낸 시간</strong>과 <strong>모델이 실제 계산한 시간</strong>을 나누면 경계가 분명해집니다.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/what-is-llm-inference/">Modular 원문: LLM 추론이란?</a> — 추론과 서빙의 구분.</li>
+<li><a href="https://docs.vllm.ai/en/latest/design/metrics/">vLLM 공식 지표 안내</a> — 실행 중·대기 중 요청과 처리 시간의 관측 예.</li>
+</ul>
+<h2 id="_3">추론 최적화는 무엇을 바꾸는가?<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>추론 최적화는 응답을 더 빠르게 보내거나, 같은 하드웨어로 더 많은 요청을 처리하거나, 필요한 메모리와 비용을 줄이는 기법입니다. 단, 속도만 높이고 답의 품질이나 안정성을 잃으면 좋은 최적화라고 할 수 없습니다.</p>
+<p>원문이 소개하는 대표적인 방법은 다음과 같습니다.</p>
+<ul>
+<li><strong>연속 배칭</strong>: 요청이 끝나는 대로 새 요청을 계산 묶음에 넣어 GPU 빈자리를 줄입니다.</li>
+<li><strong>KV cache 관리와 prefix caching</strong>: 이미 계산한 입력의 일부를 재사용하거나 메모리를 더 효율적으로 관리합니다.</li>
+<li><strong>양자화</strong>: 모델 가중치의 표현 정밀도를 낮춰 메모리 사용과 계산 비용을 줄입니다. 품질과 하드웨어 지원을 함께 살펴야 합니다.</li>
+<li><strong>추측 디코딩(speculative decoding)</strong>: 작은 모델이 먼저 제안한 토큰을 큰 모델이 검증해 생성 시간을 줄이려 합니다.</li>
+<li><strong>병렬화</strong>: 모델 또는 요청을 여러 GPU에 나누어 처리합니다. GPU 사이 통신 비용이 생깁니다.</li>
+</ul>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 기법보다 먼저 병목</p>
+<p>첫 토큰이 늦다면 입력 처리와 대기열을, 첫 토큰 뒤의 글이 느리다면 출력 생성과 메모리 사용을 먼저 봅니다. 어느 구간이 느린지 모른 채 기법을 적용하면 비용만 늘 수도 있습니다. 다음 <a href="../llm-inference-metrics/">성능 지표 장</a>에서 이 구분을 숫자로 확인합니다.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/inference-optimization/">Modular 원문: 추론 최적화</a> — 기법별 원문 목차.</li>
+<li><a href="https://docs.vllm.ai/en/latest/features/">vLLM 공식 최적화 기능 안내</a> — 서빙 엔진 기능의 구현 예.</li>
+</ul>
+<h2 id="api">API만 사용해도 왜 알아야 할까?<a class="headerlink" href="#api" title="Permanent link">&para;</a></h2>
+<p>관리형 API를 쓰면 GPU와 서버가 보이지 않습니다. 그래도 응답 시간이 길어지거나 비용이 늘면 입력 길이, 출력 길이, 동시 요청, 스트리밍 여부를 조정해야 합니다. 어떤 지표가 어느 구간의 문제인지 알면 공급자를 비교하거나 자체 서빙을 검토할 때도 질문이 명확해집니다.</p>
+<p>원문은 개발자에게는 빠르고 안정적인 서비스 설계, 기술 책임자에게는 공급자와 자체 운영의 선택, 일반 독자에게는 AI 서비스의 실제 동작을 이해하는 데 이 지식이 유용하다고 설명합니다. 팀의 요구가 커지면 비용, 지연, 맞춤 설정, 데이터 관리 요건 때문에 관리형 API와 자체 서빙을 함께 검토할 수 있습니다. 어느 방식이 낫다는 결론은 요청량과 운영 역량을 함께 본 뒤 내려야 합니다.</p>
+<p>반대로 모델을 직접 운영한다면 GPU 메모리, 대기열, 배칭, 장애 대응까지 책임져야 합니다. 이 책은 계산의 원리에서 시작해 그런 운영 선택으로 이어집니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 하나의 요청부터 보기</p>
+<p>처음에는 GPU 종류나 프레임워크 이름을 외울 필요가 없습니다. 질문 하나를 보내고, <strong>첫 토큰이 언제 왔는지</strong>, <strong>마지막 토큰이 언제 왔는지</strong>, <strong>몇 토큰이 생성됐는지</strong>부터 기록하세요. 이 세 값만 있어도 뒤에서 배울 TTFT, E2EL, TPOT를 계산할 수 있습니다.</p>
+</div>
+<h3 id="_4">핵심 정리<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h3>
+<ul>
+<li>추론은 학습된 모델이 입력에서 출력을 계산하는 과정입니다.</li>
+<li>서빙은 그 계산을 여러 사용자가 안정적으로 이용하도록 요청을 관리하는 과정입니다.</li>
+<li>추론 서버는 모델 로딩, 요청 접수, 실행, 응답 전달을 연결합니다.</li>
+<li>최적화 기법은 서로 다른 병목을 다루므로 먼저 느린 구간을 찾아야 합니다.</li>
+<li>관리형 API 사용자도 요청 길이와 지연 지표를 알면 비용과 경험을 개선할 수 있습니다.</li>
+</ul>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/what-is-llm-inference/">Modular 원문: LLM 추론이란?</a> — API 사용자에게 필요한 이유.</li>
+<li><a href="https://handbook.modular.com/llm-inference-basics/llm-inference-metrics/">Modular 원문: 핵심 성능 지표</a> — 다음 장에서 사용할 시간 지표.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+        
+          
+          <a href="../.." class="md-footer__link md-footer__link--prev" aria-label="이전: 시작하기">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                시작하기
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../how-llm-inference-works/" class="md-footer__link md-footer__link--next" aria-label="다음: LLM은 어떻게 답을 만드는가">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                LLM은 어떻게 답을 만드는가
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <a href="https://tonkex.github.io/">GitHub Pages 홈으로 돌아가기</a> · 원저작 Modular
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/metric-lab-v1.js"></script>
+      
+        <script src="../../javascripts/request-flow-v1.js"></script>
+      
+        <script src="../../javascripts/gpu-memory-lab-v1.js"></script>
+      
+        <script src="../../javascripts/batching-lab-v1.js"></script>
+      
+        <script src="../../javascripts/paged-lab-v1.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1220 @@
+
+<!doctype html>
+<html lang="ko" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Modular LLM Inference Handbook의 한국어 번역과 쉬운 보충 설명">
+      
+      
+        <meta name="author" content="Modular 원저작 · 한국어 번역 및 해설">
+      
+      
+        <link rel="canonical" href="https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/how-llm-inference-works/">
+      
+      
+        <link rel="prev" href="../what-is-llm-inference/">
+      
+      
+        <link rel="next" href="../llm-inference-metrics/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.1">
+    
+    
+      
+        <title>LLM은 어떻게 답을 만드는가 - LLM 추론 핸드북 한국어판</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/metric-lab-v2.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/request-flow-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/gpu-memory-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/batching-lab-v1.css">
+    
+      <link rel="stylesheet" href="../../stylesheets/paged-lab-v1.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#llm" class="md-skip">
+          콘텐츠로 이동
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="상단/헤더">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-header__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            LLM 추론 핸드북 한국어판
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              LLM은 어떻게 답을 만드는가
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="teal"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="검색" placeholder="검색" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="검색">
+        
+        <button type="reset" class="md-search__icon md-icon" title="지우기" aria-label="지우기" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            검색 초기화
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="네비게이션" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="LLM 추론 핸드북 한국어판" class="md-nav__button md-logo" aria-label="LLM 추론 핸드북 한국어판" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    LLM 추론 핸드북 한국어판
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    시작하기
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    핵심 장
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    핵심 장
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../what-is-llm-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM 추론이란 무엇인가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM은 어떻게 답을 만드는가
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LLM은 어떻게 답을 만드는가
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        토큰은 무엇이고 왜 나누는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        모델 안에는 어떤 계산이 있는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attention은 무엇을 참고하는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        미래 토큰을 왜 가리는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefill-decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill과 decode는 무엇이 다른가?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prefill과 decode는 무엇이 다른가?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill: 입력 전체 읽기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decode: 출력 이어 쓰기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        두 단계를 같은 GPU에서 실행하면
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kv-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        문맥 창과 KV cache는 어떻게 다른가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        모든 LLM이 토큰을 하나씩 만들까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        다음 토큰은 어떻게 고르고 왜 느릴까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="다음 토큰은 어떻게 고르고 왜 느릴까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../llm-inference-metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 성능 지표
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../calculating-gpu-memory-for-llms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GPU 메모리 계산
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../static-dynamic-continuous-batching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배칭
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pagedattention/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PagedAttention
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    용어집
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../attribution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    원문과 저작자 표시
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="목차">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      목차
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        토큰은 무엇이고 왜 나누는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        모델 안에는 어떤 계산이 있는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Attention은 무엇을 참고하는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        미래 토큰을 왜 가리는가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prefill-decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill과 decode는 무엇이 다른가?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prefill과 decode는 무엇이 다른가?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#prefill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prefill: 입력 전체 읽기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decode: 출력 이어 쓰기
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        두 단계를 같은 GPU에서 실행하면
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kv-cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        문맥 창과 KV cache는 어떻게 다른가?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#llm_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        모든 LLM이 토큰을 하나씩 만들까?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        다음 토큰은 어떻게 고르고 왜 느릴까?
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="다음 토큰은 어떻게 고르고 왜 느릴까?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        핵심 정리
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="llm">LLM은 어떻게 답을 만드는가?<a class="headerlink" href="#llm" title="Permanent link">&para;</a></h1>
+<p>모델에 질문을 보내고 첫 글자가 보이기까지 왜 시간이 걸릴까요? 답이 시작된 뒤에도 왜 한 번에 끝나지 않고 조금씩 나타날까요? 이 장은 입력이 <strong>토큰</strong>으로 바뀌고, 모델이 입력을 읽는 <strong>prefill</strong>을 거쳐, 출력 토큰을 하나씩 만드는 <strong>decode</strong>까지를 따라갑니다.</p>
+<p>이 장은 Modular의 <a href="https://handbook.modular.com/llm-inference-basics/how-does-llm-inference-work/">How does an LLM work?</a>를 번역·재구성했습니다. 기준 원문은 <a href="https://github.com/modular/llm-inference-handbook/blob/07e93d6948c508b34bc7154a1400e025b0033ca3/docs/llm-inference-basics/how-does-llm-inference-work.md">저장소 커밋 <code>07e93d6</code></a>입니다. 이 장에서 말하는 일반적인 LLM은 별도 표시가 없으면 <strong>다음 토큰을 예측하는 decoder-only Transformer</strong>를 뜻합니다.</p>
+<h2 id="_1">토큰은 무엇이고 왜 나누는가?<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>모델은 문장을 문자 그대로 계산하지 않습니다. 먼저 <strong>토크나이저(tokenizer)</strong>가 문장을 작은 단위인 <strong>토큰(token)</strong>으로 나누고, 각 토큰을 정수 ID로 바꿉니다. 토큰은 단어 하나일 수도, 단어의 일부나 문장부호일 수도 있습니다. 토크나이저와 어휘 목록은 모델마다 다릅니다.</p>
+<p>예를 들어 <code>안녕하세요, 오늘 날씨는?</code>을 넣으면 토크나이저는 이를 여러 토큰 ID로 바꿉니다. 정확한 분할과 ID는 모델의 토크나이저에 따라 달라지므로, 어떤 모델의 토큰 수를 다른 모델에 그대로 적용하면 안 됩니다.</p>
+<p>모델은 현재까지의 토큰을 보고 <strong>다음 토큰 하나</strong>의 점수를 계산합니다. 선택된 토큰을 입력 끝에 붙이고 같은 과정을 반복합니다. 멈춤 토큰이나 최대 출력 길이 같은 종료 조건에 도달하면 새 토큰들을 다시 읽을 수 있는 텍스트로 변환합니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 토큰 수와 비용</p>
+<p>API가 입력·출력 토큰 수로 과금한다면 문자의 개수보다 토크나이저가 만든 토큰 수가 중요합니다. 같은 뜻의 문장이라도 언어와 표기 방식에 따라 토큰 수가 달라질 수 있습니다. 비용이나 최대 문맥 길이를 계산할 때는 사용할 모델의 토크나이저로 세어야 합니다.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/how-does-llm-inference-work/">Modular 원문: LLM은 어떻게 동작하는가?</a> — 토큰화와 생성 루프.</li>
+<li><a href="https://huggingface.co/docs/transformers/main_classes/tokenizer">Hugging Face Transformers 토크나이저 문서</a> — 모델별 토큰화 구현의 예.</li>
+</ul>
+<h2 id="_2">모델 안에는 어떤 계산이 있는가?<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>토큰 ID는 먼저 숫자 벡터인 <strong>임베딩</strong>으로 바뀝니다. 모델은 토큰의 순서를 알 수 있도록 위치 정보도 사용합니다. 벡터는 여러 Transformer 층을 지나면서 주변 토큰과의 관계를 반영하고, 마지막 층의 결과는 가능한 다음 토큰 각각의 점수인 <strong>logit</strong>으로 바뀝니다.</p>
+<p>위치 정보를 더하는 방법도 모델마다 다릅니다. 예를 들어 <strong>RoPE(Rotary Positional Embedding)</strong>는 attention 계산에서 위치를 표현합니다. 다음 토큰 후보는 모델의 <strong>어휘 목록(vocabulary)</strong>에 있는 토큰으로 한정되므로, 어휘가 크면 마지막 점수 계산층도 커집니다.</p>
+<p>한 Transformer 층을 단순화하면 두 일을 합니다.</p>
+<ol>
+<li><strong>Self-attention</strong>은 현재 토큰이 앞의 어떤 토큰 정보를 참고할지 계산합니다.</li>
+<li><strong>Feed-forward network</strong>는 각 토큰의 표현을 변환합니다.</li>
+</ol>
+<p>이 층을 여러 번 지나면 입력 문장과 이미 생성한 토큰을 바탕으로 다음 토큰의 점수를 얻습니다. 점수를 확률로 바꾸고 하나를 고르는 과정은 뒤의 <em>샘플링</em> 절에서 다룹니다.</p>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/how-does-llm-inference-work/#whats-inside-an-llm">Modular 원문: 모델 내부 구조</a> — 임베딩, Transformer 층, 출력층.</li>
+<li><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> — Transformer 구조를 제시한 논문.</li>
+</ul>
+<h2 id="attention">Attention은 무엇을 참고하는가?<a class="headerlink" href="#attention" title="Permanent link">&para;</a></h2>
+<p>문장에 같은 단어가 여러 의미로 쓰이면 주변 문맥을 봐야 합니다. <strong>Attention</strong>은 토큰마다 다른 토큰의 정보를 얼마나 가져올지 가중치를 계산합니다.</p>
+<p>각 층은 토큰의 현재 표현에서 세 벡터를 만듭니다.</p>
+<ul>
+<li><strong>Query(Q)</strong>: 지금 어떤 정보를 찾는가?</li>
+<li><strong>Key(K)</strong>: 이 토큰이 어떤 정보와 연결되는가?</li>
+<li><strong>Value(V)</strong>: 연결됐을 때 실제로 가져올 내용은 무엇인가?</li>
+</ul>
+<p>현재 토큰의 Q와 참고할 토큰들의 K를 비교해 점수를 만들고, softmax로 합이 1인 가중치로 바꿉니다. 그 가중치로 V를 합쳐 현재 토큰의 표현을 갱신합니다. 간단한 한 개 attention head의 식은 다음과 같습니다.</p>
+<div class="arithmatex">\[
+\operatorname{Attention}(Q,K,V)
+=\operatorname{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+\]</div>
+<p>여기서 <span class="arithmatex">\(d_k\)</span>는 K 벡터의 차원입니다. 식을 외우는 것보다 <strong>Q와 K는 어느 토큰을 참고할지 정하고, V는 실제로 가져올 정보</strong>라는 구분이 중요합니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: Attention과 사실 확인</p>
+<p>Attention이 특정 토큰을 많이 참고했다는 사실만으로 모델이 그 문장을 이해하거나 답이 사실이라고 결론 내릴 수는 없습니다. 이 계산은 다음 토큰을 예측하는 내부 과정입니다. 출력의 정확성은 별도로 평가해야 합니다.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/how-does-llm-inference-work/#the-attention-mechanism">Modular 원문: Attention 메커니즘</a> — Q, K, V의 역할.</li>
+<li><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> — scaled dot-product attention의 원전.</li>
+</ul>
+<h2 id="_3">미래 토큰을 왜 가리는가?<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>다음 토큰을 예측할 때 현재 위치가 아직 생성되지 않은 미래 토큰을 보면 답을 미리 보는 셈입니다. <strong>Causal mask</strong>는 각 위치가 자기 자신과 이전 위치의 토큰만 참고하도록 attention 점수를 제한합니다. 미래 위치의 점수를 사실상 사용할 수 없게 만들어 가중치가 0이 되게 합니다.</p>
+<p>이 가림은 여러 입력 토큰을 병렬 처리하는 학습과 prefill에서 중요합니다. 한 번에 여러 위치를 계산하더라도 앞의 위치가 뒤의 내용을 보지 못해야, 나중에 한 토큰씩 생성할 때의 조건과 맞습니다. 길이가 다른 문장을 배치로 묶기 위해 추가한 의미 없는 <strong>padding 토큰</strong>도 mask로 제외할 수 있습니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: decode에서는?</p>
+<p>일반적인 한 토큰씩의 decode에서는 아직 미래 토큰 자체가 존재하지 않습니다. 따라서 prefill에서처럼 여러 미래 위치를 가리는 문제가 적지만, 구현에 따라 attention mask를 계속 사용할 수 있습니다.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/how-does-llm-inference-work/#the-attention-mask">Modular 원문: Attention mask</a> — causal mask와 padding mask.</li>
+<li><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a> — autoregressive decoder의 masking.</li>
+</ul>
+<h2 id="prefill-decode">Prefill과 decode는 무엇이 다른가?<a class="headerlink" href="#prefill-decode" title="Permanent link">&para;</a></h2>
+<p>입력을 읽는 단계와 답을 이어 쓰는 단계는 작업의 모양이 다릅니다.</p>
+<h3 id="prefill">Prefill: 입력 전체 읽기<a class="headerlink" href="#prefill" title="Permanent link">&para;</a></h3>
+<p>토크나이저가 만든 입력 토큰을 모델에 넣습니다. 모델은 입력 전체를 알고 있으므로 각 위치를 병렬 계산할 수 있습니다. 각 Transformer 층에서 Q, K, V를 계산하고, 뒤의 생성 단계가 다시 쓸 <strong>KV cache</strong>를 만듭니다. 긴 입력은 이 단계의 시간이 늘어나기 쉽습니다.</p>
+<p>첫 토큰이 사용자에게 도착하기까지의 <strong>TTFT</strong>에는 prefill 외에도 대기열과 네트워크 시간이 포함됩니다. 따라서 TTFT가 길다는 사실만으로 prefill 계산이 유일한 원인이라고 단정하면 안 됩니다.</p>
+<h3 id="decode">Decode: 출력 이어 쓰기<a class="headerlink" href="#decode" title="Permanent link">&para;</a></h3>
+<p>입력 처리가 끝나면 모델은 다음 토큰을 하나 고릅니다. 새 토큰을 붙이고, 또 다음 토큰을 고릅니다. 토큰을 고르는 순서는 앞 토큰에 의존하므로 한 요청의 전체 출력을 보통 한 번에 병렬 생성할 수 없습니다.</p>
+<p>이 반복은 최대 출력 토큰 수에 도달하거나, 종료 토큰이 나오거나, 지정한 중지 문자열 같은 조건에 걸리면 멈춥니다. 생성한 토큰 ID는 다시 사람이 읽는 텍스트로 변환합니다. 스트리밍 API라면 완료 전에도 만들어진 부분을 순서대로 전송할 수 있습니다.</p>
+<p>이때 과거 토큰의 K와 V를 다시 계산하지 않도록 KV cache에서 읽습니다. 그 대가로 토큰이 늘수록 cache가 커지고 GPU 메모리를 차지합니다. Decode의 체감 속도는 토큰 사이의 간격인 <strong>ITL</strong>이나 평균 <strong>TPOT</strong>로 살핍니다.</p>
+<table>
+<thead>
+<tr>
+<th>단계</th>
+<th>입력 상태</th>
+<th>주로 보는 성능</th>
+<th>자주 문제 되는 자원</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prefill</td>
+<td>요청의 입력 토큰 전체를 알고 있다.</td>
+<td>TTFT의 일부</td>
+<td>긴 입력에 필요한 계산량</td>
+</tr>
+<tr>
+<td>Decode</td>
+<td>앞 토큰의 결과를 보고 다음 하나를 만든다.</td>
+<td>ITL·TPOT</td>
+<td>반복적인 가중치·KV cache 읽기</td>
+</tr>
+</tbody>
+</table>
+<h3 id="gpu">두 단계를 같은 GPU에서 실행하면<a class="headerlink" href="#gpu" title="Permanent link">&para;</a></h3>
+<p>여러 요청이 몰린 서버에서는 한 요청의 prefill과 다른 요청의 decode가 GPU 시간을 경쟁합니다. 긴 입력을 처리하는 동안 이미 답을 받고 있던 요청의 다음 토큰이 늦어질 수 있습니다. 이를 줄이기 위해 스케줄러를 조정하거나 두 단계를 다른 작업자로 분리하는 설계도 있습니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 계산 병목과 메모리 병목</p>
+<p>Prefill을 늘 계산 병목, decode를 늘 메모리 병목으로 단정하지 마세요. 이는 흔한 경향을 설명하는 단순화이며 모델 크기, 배치, 문맥 길이, 하드웨어에 따라 달라집니다. 실제 병목은 입력 길이와 동시 요청 수를 기록한 뒤 측정해야 합니다.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/how-does-llm-inference-work/#the-two-phases-of-llm-inference">Modular 원문: 추론의 두 단계</a> — prefill, decode, KV cache.</li>
+<li><a href="https://arxiv.org/abs/2401.09670">DistServe 논문</a> — 두 단계를 분리하는 운영 설계.</li>
+</ul>
+<h2 id="kv-cache">문맥 창과 KV cache는 어떻게 다른가?<a class="headerlink" href="#kv-cache" title="Permanent link">&para;</a></h2>
+<p><strong>문맥 창(context window)</strong>은 한 요청에서 모델이 참고할 수 있는 토큰의 범위입니다. 대화를 이어갈 때 이전 메시지를 입력에 다시 포함하면 모델이 앞의 내용을 볼 수 있습니다. 최대 길이를 넘으면 오래된 메시지를 빼거나 요약하는 등의 처리가 필요합니다.</p>
+<p><strong>KV cache</strong>는 한 번의 추론 실행 중 이미 계산한 K와 V를 저장한 메모리입니다. 문맥 창은 <em>모델에 보이는 토큰 범위</em>이고, KV cache는 <em>그 범위를 처리하며 만든 계산 결과의 저장 공간</em>입니다. 둘을 같은 뜻으로 쓰면 메모리 문제를 이해하기 어렵습니다.</p>
+<p>원문은 Llama 3 8B의 8K 토큰 시퀀스가 FP16 KV 캐시를 약 1 GB 쓸 수 있다는 예를 듭니다. 이는 모델 구조와 KV 헤드 수에 따른 <strong>사례값</strong>이며 모든 8B 모델에 적용되는 상수가 아닙니다. 가중치가 GPU에 올라가더라도 활성 요청마다 캐시가 추가되므로, 실제 동시 요청 수는 <a href="../calculating-gpu-memory-for-llms/">GPU 메모리 예산</a>에 의해 제한됩니다. 캐시를 블록으로 관리하는 <a href="../pagedattention/">PagedAttention</a>, 공통 입력을 재사용하는 prefix caching, 일부를 다른 메모리로 옮기는 offloading은 각각 다른 방식으로 이 부담을 다룹니다.</p>
+<div class="admonition info">
+<p class="admonition-title">한국어판 보충 설명: 요청 사이의 재사용</p>
+<p>일반적인 새 요청에서는 이전 대화를 다시 보내더라도 입력을 새로 처리합니다. 같은 앞부분의 KV cache를 요청 사이에 재사용하려면 서버가 <strong>prefix caching</strong> 같은 기능을 지원하고 재사용 가능한 조건이 맞아야 합니다. 대화 기록을 API에 다시 보내는 행위 자체가 KV cache의 영구 저장을 뜻하지는 않습니다.</p>
+</div>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/how-does-llm-inference-work/#what-is-a-context-window-and-how-does-it-work-in-llm-inference">Modular 원문: 문맥 창</a> — 문맥과 cache의 관계.</li>
+<li><a href="https://handbook.modular.com/inference-optimization/prefix-caching/">Modular 원문: Prefix caching</a> — 요청 사이의 앞부분 재사용.</li>
+</ul>
+<h2 id="llm_1">모든 LLM이 토큰을 하나씩 만들까?<a class="headerlink" href="#llm_1" title="Permanent link">&para;</a></h2>
+<p>이 장의 설명은 널리 쓰이는 <strong>자기회귀형 decoder-only 모델</strong>을 기준으로 합니다. BERT 같은 encoder-only 모델은 분류나 표현 추출에 쓰이며 같은 방식으로 긴 답을 토큰별 생성하지 않습니다. T5 같은 encoder-decoder 모델은 입력을 읽는 encoder와 출력을 생성하는 decoder를 구분합니다.</p>
+<p>원문은 텍스트를 반복적으로 다듬는 <strong>diffusion LLM</strong>도 소개합니다. 이런 모델은 자기회귀형 모델과 생성 절차가 다릅니다. 다만 특정 제품의 속도나 품질 주장을 모든 diffusion LLM에 일반화할 수는 없습니다. 이 책의 뒤쪽 서빙·캐시 설명은 기본적으로 자기회귀형 모델을 대상으로 합니다.</p>
+<p>원문에는 Mercury와 Gemini Diffusion이라는 초기 사례가 나옵니다. 두 사례는 텍스트를 한 토큰씩 이어 붙이는 방식 외에도 연구와 제품 실험이 있음을 보여 줍니다. 원문의 특정 배속·우수성 표현은 비교 조건에 따라 달라지므로 여기서는 보편적 성능 수치로 옮기지 않았습니다.</p>
+<table>
+<thead>
+<tr>
+<th>모델 계열</th>
+<th>대표적인 사용 방식</th>
+<th>이 장의 prefill·decode 설명 적용</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Encoder-only</td>
+<td>분류·검색 표현</td>
+<td>그대로 적용되지 않는다.</td>
+</tr>
+<tr>
+<td>Encoder-decoder</td>
+<td>입력 변환·생성</td>
+<td>decoder의 순차 생성에는 일부 적용된다.</td>
+</tr>
+<tr>
+<td>Decoder-only</td>
+<td>채팅·코드 생성</td>
+<td>이 장의 기본 모델이다.</td>
+</tr>
+<tr>
+<td>Diffusion 기반 텍스트 모델</td>
+<td>반복적 결과 개선</td>
+<td>생성 방식에 따라 별도 설명이 필요하다.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/how-does-llm-inference-work/#faqs">Modular 원문: 모델 계열과 FAQ</a> — 적용 범위와 예외.</li>
+<li><a href="https://arxiv.org/abs/2502.09992">Large Language Diffusion Models</a> — diffusion 방식 텍스트 생성의 연구 사례.</li>
+</ul>
+<h2 id="_4">다음 토큰은 어떻게 고르고 왜 느릴까?<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>모델은 다음 단어를 바로 내놓지 않고 어휘의 각 토큰에 대한 점수를 만듭니다. <strong>Temperature</strong>는 이 점수에서 만든 확률 분포의 뾰족함을 조절합니다. <strong>Greedy</strong> 방식은 가장 높은 확률의 토큰을 고르고, <strong>top-k</strong>와 <strong>top-p</strong>는 후보 집합을 제한한 뒤 선택합니다. 같은 모델이라도 설정에 따라 다른 답이 나올 수 있습니다.</p>
+<p>추론이 느려지는 주된 이유는 다음과 같습니다.</p>
+<ol>
+<li>출력 토큰을 앞 토큰에 의존해 순서대로 만들기 때문에 한 요청의 생성 단계에 병렬화 한계가 있습니다.</li>
+<li>Decode 때 모델 가중치와 커지는 KV cache를 반복해 읽습니다.</li>
+<li>입력이 길거나 동시 요청이 많으면 prefill 계산과 대기열 시간이 늘 수 있습니다.</li>
+</ol>
+<p>따라서 느리다는 말만으로 최적화 방법을 고를 수 없습니다. <a href="../llm-inference-metrics/">성능 지표 장</a>의 TTFT·TPOT·E2EL을 먼저 구분하고, 요청 길이와 서버 부하를 함께 적어 두세요.</p>
+<h3 id="_5">핵심 정리<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h3>
+<ul>
+<li>토크나이저는 문장을 모델이 읽는 토큰 ID로 바꿉니다.</li>
+<li>Attention의 Q와 K는 참고할 토큰을 정하고, V는 가져올 정보를 제공합니다.</li>
+<li>Causal mask는 현재 위치가 미래 토큰을 미리 보지 못하게 합니다.</li>
+<li>Prefill은 입력을 읽고 KV cache를 만들며, decode는 그 cache를 쓰면서 출력 토큰을 이어 만듭니다.</li>
+<li>문맥 창은 모델에 보이는 범위이고 KV cache는 계산 결과의 저장 공간입니다.</li>
+</ul>
+<p><strong>관련 자료</strong></p>
+<ul>
+<li><a href="https://handbook.modular.com/llm-inference-basics/how-does-llm-inference-work/">Modular 원문: LLM은 어떻게 동작하는가?</a> — 이 장 전체의 번역 기준.</li>
+<li><a href="https://handbook.modular.com/model-interaction/inference-parameters/">Modular 원문: 생성 파라미터</a> — temperature와 샘플링의 자세한 설명.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  맨위로
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="하단/푸터" >
+        
+          
+          <a href="../what-is-llm-inference/" class="md-footer__link md-footer__link--prev" aria-label="이전: LLM 추론이란 무엇인가">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                이전
+              </span>
+              <div class="md-ellipsis">
+                LLM 추론이란 무엇인가
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../llm-inference-metrics/" class="md-footer__link md-footer__link--next" aria-label="다음: 추론 성능 지표">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                다음
+              </span>
+              <div class="md-ellipsis">
+                추론 성능 지표
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      <a href="https://tonkex.github.io/">GitHub Pages 홈으로 돌아가기</a> · 원저작 Modular
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.footer", "navigation.top", "toc.follow", "search.highlight"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\ud074\ub9bd\ubcf4\ub4dc\uc5d0 \ubcf5\uc0ac\ub428", "clipboard.copy": "\ud074\ub9bd\ubcf4\ub4dc\ub85c \ubcf5\uc0ac", "search.result.more.one": "\uc774 \ubb38\uc11c\uc5d0\uc11c 1\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.more.other": "\uc774 \ubb38\uc11c\uc5d0\uc11c #\uac1c\uc758 \uac80\uc0c9 \uacb0\uacfc \ub354 \ubcf4\uae30", "search.result.none": "\uac80\uc0c9\uc5b4\uc640 \uc77c\uce58\ud558\ub294 \ubb38\uc11c\uac00 \uc5c6\uc2b5\ub2c8\ub2e4", "search.result.one": "1\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.other": "#\uac1c\uc758 \uc77c\uce58\ud558\ub294 \ubb38\uc11c", "search.result.placeholder": "\uac80\uc0c9\uc5b4\ub97c \uc785\ub825\ud558\uc138\uc694", "search.result.term.missing": "\ud3ec\ud568\ub418\uc9c0 \uc54a\uc740 \uac80\uc0c9\uc5b4", "select.version": "\ubc84\uc804 \uc120\ud0dd"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.a5f9d56c.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="../../javascripts/metric-lab-v1.js"></script>
+      
+        <script src="../../javascripts/request-flow-v1.js"></script>
+      
+        <script src="../../javascripts/gpu-memory-lab-v1.js"></script>
+      
+        <script src="../../javascripts/batching-lab-v1.js"></script>
+      
+        <script src="../../javascripts/paged-lab-v1.js"></script>
+      
+    
+  </body>
+</html>

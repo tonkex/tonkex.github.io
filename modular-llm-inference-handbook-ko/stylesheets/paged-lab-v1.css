@@ -1,0 +1,9 @@
+.paged-lab { border: 1px solid var(--md-default-fg-color--lightest); border-radius: .6rem; padding: 1rem; margin: 1.2rem 0; }
+.paged-lab h3 { margin-top: 0; }
+.paged-inputs { display: grid; grid-template-columns: repeat(auto-fit, minmax(8rem, 1fr)); gap: .7rem; }
+.paged-inputs label { display: flex; flex-direction: column; gap: .3rem; font-size: .8rem; font-weight: 600; }
+.paged-inputs input { width: 100%; padding: .4rem; border: 1px solid var(--md-default-fg-color--lightest); border-radius: .25rem; background: var(--md-default-bg-color); color: var(--md-default-fg-color); font: inherit; }
+.paged-blocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .4rem; margin: .7rem 0; }
+.paged-blocks div { padding: .5rem; background: var(--md-code-bg-color); border-left: .25rem solid #00a68b; }
+.paged-lab [data-paged-error] { color: #a52a2a; }
+.paged-lab [data-paged-result] { font-weight: 600; }
