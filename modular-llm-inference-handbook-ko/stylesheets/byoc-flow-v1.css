@@ -1,0 +1,10 @@
+.byoc-flow { border: 1px solid var(--md-default-fg-color--lighter); border-radius: .65rem; padding: 1rem; margin: 1.2rem 0; background: var(--md-code-bg-color); }
+.byoc-flow h3 { margin-top: 0; }
+.byoc-flow-buttons { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: .8rem; }
+.byoc-flow-buttons button { padding: .4rem .7rem; border: 1px solid var(--md-default-fg-color--lighter); border-radius: .4rem; color: var(--md-default-fg-color); background: var(--md-default-bg-color); cursor: pointer; font: inherit; }
+.byoc-flow-buttons button[aria-pressed="true"] { background: var(--md-primary-fg-color); color: var(--md-primary-bg-color); }
+.byoc-flow-buttons button:focus-visible { outline: 2px solid var(--md-accent-fg-color); outline-offset: 2px; }
+.byoc-flow-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr)); gap: .7rem; }
+.byoc-flow-grid > div { border: 1px solid var(--md-default-fg-color--lighter); border-radius: .4rem; padding: .7rem; background: var(--md-default-bg-color); }
+.byoc-flow-grid p { margin: .35rem 0 0; }
+.byoc-flow [data-byoc-note] { margin-bottom: 0; font-size: .82rem; }

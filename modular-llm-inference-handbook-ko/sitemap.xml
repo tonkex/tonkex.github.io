@@ -2,62 +2,78 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/attribution/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/foundations/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/glossary/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
+    </url>
+    <url>
+         <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/planning-deployment/</loc>
+         <lastmod>2026-11-12</lastmod>
+    </url>
+    <url>
+         <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/bring-your-own-cloud/</loc>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/calculating-gpu-memory-for-llms/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/choosing-the-right-gpu/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
+    </url>
+    <url>
+         <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/choosing-the-right-inference-framework/</loc>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/choosing-the-right-model/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/cpu-vs-gpu-vs-tpu/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/how-llm-inference-works/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/llm-inference-metrics/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
+    </url>
+    <url>
+         <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/on-prem-llms/</loc>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/pagedattention/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/serverless-vs-self-hosted-llm-inference/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/static-dynamic-continuous-batching/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/training-inference-differences/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
     <url>
          <loc>https://tonkex.github.io/modular-llm-inference-handbook-ko/chapters/what-is-llm-inference/</loc>
-         <lastmod>2026-11-11</lastmod>
+         <lastmod>2026-11-12</lastmod>
     </url>
 </urlset>

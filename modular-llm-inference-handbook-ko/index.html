@@ -67,6 +67,8 @@
     
       <link rel="stylesheet" href="stylesheets/hosting-cost-lab-v1.css">
     
+      <link rel="stylesheet" href="stylesheets/byoc-flow-v1.css">
+    
     <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -552,6 +554,34 @@
   
   
     <li class="md-nav__item">
+      <a href="planning-deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배포 계획 소개
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="chapters/serverless-vs-self-hosted-llm-inference/" class="md-nav__link">
         
   
@@ -644,6 +674,90 @@
     
   
     GPU 메모리 계산
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chapters/choosing-the-right-inference-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 프레임워크 선택
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chapters/bring-your-own-cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BYOC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="chapters/on-prem-llms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    온프레미스 배포
   
 
     
@@ -870,7 +984,7 @@
 
 <h1 id="llm">LLM 추론 핸드북 한국어판<a class="headerlink" href="#llm" title="Permanent link">&para;</a></h1>
 <p>LLM API의 응답이 느리거나 GPU 비용이 높을 때, 어느 숫자부터 확인해야 할까요? 이 책은 <a href="https://handbook.modular.com/">Modular의 LLM Inference Handbook</a>을 한국어로 읽을 수 있도록 옮기고, 필요한 배경 설명과 실습을 보탭니다.</p>
-<p>먼저 <a href="foundations/">추론의 기초</a>에서 학습과 추론, 토큰 생성 과정, CPU·GPU·TPU, 성능 지표를 순서대로 읽어 보세요. 실제 서비스를 계획한다면 <a href="chapters/serverless-vs-self-hosted-llm-inference/">서버리스와 자체 호스팅</a>, <a href="chapters/choosing-the-right-model/">모델 선택</a>, <a href="chapters/choosing-the-right-gpu/">GPU 선택</a>, <a href="chapters/calculating-gpu-memory-for-llms/">GPU 메모리 계산</a>을 이어서 읽으세요. 여러 요청을 처리하는 방법은 <a href="chapters/static-dynamic-continuous-batching/">배칭</a>과 <a href="chapters/pagedattention/">PagedAttention</a>에서 살펴봅니다. 원문의 나머지 문서는 영역별로 추가합니다.</p>
+<p>먼저 <a href="foundations/">추론의 기초</a>에서 학습과 추론, 토큰 생성 과정, CPU·GPU·TPU, 성능 지표를 순서대로 읽어 보세요. 실제 서비스를 계획한다면 <a href="planning-deployment/">배포 계획</a>에서 서버리스·자체 호스팅, 모델, GPU, 추론 프레임워크와 운영 위치를 순서대로 비교하세요. 여러 요청을 처리하는 방법은 <a href="chapters/static-dynamic-continuous-batching/">배칭</a>과 <a href="chapters/pagedattention/">PagedAttention</a>에서 살펴봅니다. 원문의 나머지 문서는 영역별로 추가합니다.</p>
 <p>처음 읽는다면 <a href="glossary/">용어집</a>을 옆에 열어 두세요. 원저작자, 원문 기준 시점, 번역·보충 설명의 구분은 <a href="attribution/">원문과 저작자 표시</a>에 적었습니다.</p>
 <p><a href="https://tonkex.github.io/">GitHub Pages 홈으로 돌아가기</a></p>
 
@@ -976,6 +1090,8 @@
         <script src="javascripts/lifecycle-lab-v1.js"></script>
       
         <script src="javascripts/hosting-cost-lab-v1.js"></script>
+      
+        <script src="javascripts/byoc-flow-v1.js"></script>
       
     
   </body>

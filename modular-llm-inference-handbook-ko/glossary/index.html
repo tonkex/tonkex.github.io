@@ -69,6 +69,8 @@
     
       <link rel="stylesheet" href="../stylesheets/hosting-cost-lab-v1.css">
     
+      <link rel="stylesheet" href="../stylesheets/byoc-flow-v1.css">
+    
     <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
@@ -544,6 +546,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../planning-deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    배포 계획 소개
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../chapters/serverless-vs-self-hosted-llm-inference/" class="md-nav__link">
         
   
@@ -636,6 +666,90 @@
     
   
     GPU 메모리 계산
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapters/choosing-the-right-inference-framework/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    추론 프레임워크 선택
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapters/bring-your-own-cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    BYOC
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapters/on-prem-llms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    온프레미스 배포
   
 
     
@@ -1019,6 +1133,26 @@
 <td>메모리 대역폭</td>
 <td>GPU 메모리와 연산 장치 사이에서 단위 시간에 옮길 수 있는 데이터 양</td>
 </tr>
+<tr>
+<td>추론 프레임워크</td>
+<td>모델 적재, 생성, 배칭, KV 캐시와 API 등 서빙 작업을 돕는 소프트웨어</td>
+</tr>
+<tr>
+<td>런타임</td>
+<td>모델을 실제 장비에서 실행하는 소프트웨어. 제품에 따라 추론 프레임워크와 비슷한 뜻으로 쓰인다.</td>
+</tr>
+<tr>
+<td>제어 영역(control plane)</td>
+<td>배포·확장·업데이트 정책을 관리하는 구성요소</td>
+</tr>
+<tr>
+<td>데이터 영역(data plane)</td>
+<td>사용자의 요청을 받아 모델을 실행하고 응답을 보내는 경로</td>
+</tr>
+<tr>
+<td>온프레미스</td>
+<td>조직이 직접 관리하는 장비에서 서비스를 실행하는 방식</td>
+</tr>
 </tbody>
 </table>
 
@@ -1140,6 +1274,8 @@
         <script src="../javascripts/lifecycle-lab-v1.js"></script>
       
         <script src="../javascripts/hosting-cost-lab-v1.js"></script>
+      
+        <script src="../javascripts/byoc-flow-v1.js"></script>
       
     
   </body>
